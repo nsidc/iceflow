@@ -11,7 +11,7 @@ def search_and_download(
     short_name: ShortName,
     bounding_box,
     temporal: tuple[str, str],
-):
+) -> list[str]:
     earthaccess.login()
 
     results = earthaccess.search_data(
@@ -20,7 +20,9 @@ def search_and_download(
         temporal=temporal,
     )
 
-    earthaccess.download(results, f"./data/{short_name}")
+    downloaded_files = earthaccess.download(results, f"./data/{short_name}")
+
+    return downloaded_files
 
 
 if __name__ == "__main__":
