@@ -1,8 +1,13 @@
 name: valkyrie-lib
 channels:
   - conda-forge
+  - nsidc
 dependencies:
   - python ~=3.12.0
   - earthaccess ~=0.10.0
+  - pandas
+  - h5py
+  - numpy
+  - gps-timemachine
   # dev tools
   - pre-commit
