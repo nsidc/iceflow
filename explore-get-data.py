@@ -5,6 +5,7 @@ import earthaccess
 import pandas as pd
 
 from valkyrie.ingest.atm1b import atm1b_data
+from valkyrie.itrf.converter import transform_itrf
 
 
 ShortName = Literal["ILATM1B"]
@@ -51,4 +52,11 @@ if __name__ == "__main__":
     for result in results:
         data_df = atm1b_data(result)
         all_dfs.append(data_df)
+    # This df contains data  w/ two ITRFs
     complete_df = pd.concat(all_dfs)
+    complete_df = complete_df.set_index("utc_datetime")
+
+    transformed = transform_itrf(
+        data=complete_df,
+        target_itrf="ITRF2008",
+    )

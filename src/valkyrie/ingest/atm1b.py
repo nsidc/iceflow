@@ -94,7 +94,7 @@ def _data_dtype(endianness, field_count):
     }[endianness][field_count]
 
 
-def _file_metadata(fn):
+def _file_dtype(fn):
     """Return the dtype for the given file."""
     data_endianness = Endian.BIG
 
@@ -202,14 +202,14 @@ def _utc_datetime(gps_time, file_date):
     ls = int(leap_seconds(file_date))
     utc = pd.to_datetime(tdf).values - np.timedelta64(ls, "s")
 
-    return pd.Series(np.datetime_as_string(utc).astype("|S"))
+    return pd.Series(utc)
 
 
 def _atm1b_qfit_dataframe(fn):
     """Read an ATM1B QFIT file into a DataFrame, stripping bad data if
     necessary.
     """
-    dtype = _file_metadata(fn)
+    dtype = _file_dtype(fn)
 
     raw_data = np.fromfile(fn, dtype=dtype)
     raw_data = _strip_header(raw_data)
@@ -246,6 +246,73 @@ def _atm1b_qfit_data(fn, file_date):
     _augment_with_optional_values(df, original_shape)
 
     return df
+
+
+def _qfit_file_header(filepath: Path):
+    """Return the header string from a QFIT file."""
+    dtype = np.dtype([("record_type", ">i4"), ("header", ">a44")])
+
+    record_size = np.fromfile(filepath, dtype=">i4", count=1)[0]
+    if record_size >= 100:
+        record_size = np.fromfile(filepath, dtype="<i4", count=1)[0]
+        if record_size >= 100:
+            raise ValueError("invalid record size found")
+        dtype = np.dtype([("record_type", "<i4"), ("header", "<a44")])
+
+    raw_data = np.fromfile(filepath, dtype=dtype)
+
+    # In 'normal' files with headers, we skip the first two records
+    # and only keep those whose record_type is negative.
+    if len(raw_data) > 2:
+        idx = 2
+        while raw_data[idx]["record_type"] < 0:
+            idx += 1
+        header = raw_data[2:idx]
+        return "".join([r["header"].decode("UTF-8") for r in header])
+    else:
+        return None
+
+
+def extract_itrf(filepath: Path) -> str:
+    ext = filepath.suffix
+
+    if ext == ".qi":
+        header = _qfit_file_header(filepath)
+        results = re.finditer(r"itrf\d{2,4}", header)
+        itrfs = list(set(result.group() for result in results))
+
+        if len(itrfs) == 1:
+            itrf = itrfs[0]
+        else:
+            raise RuntimeError(f"Failed to extract ITRF from file: {filepath}")
+
+    elif ext == "h5py":
+        with h5py.File(filepath, "r") as ds:
+            itrf = str(ds["ancillary_data"]["reference_frame"][:][0], encoding="utf8")
+    else:
+        raise RuntimeError(f"Failed to read ITRF from unrecognized file: {filepath}")
+
+    itrf = itrf.upper()
+
+    if itrf not in [
+        "ITRF93",
+        "ITRF94",
+        "ITRF96",
+        "ITRF97",
+        "ITRF2000",
+        "ITRF2005",
+        "ITRF2008",
+    ]:
+        # Try to normalize:
+        try:
+            itrf = {
+                "ITRF05": "ITRF2005",
+                "ITRF08": "ITRF2008",
+            }[itrf]
+        except KeyError:
+            raise RuntimeError(f"Unrecognized ATM1B ITRF {itrf}")
+
+    return itrf
 
 
 def _ilatm1bv2_dataframe(fn):
@@ -391,8 +458,13 @@ def atm1b_data(filepath: Path) -> pd.DataFrame:
     year = int(match.group(1))
 
     if year >= 2013:
-        return _ilatm1bv2_data(filepath, _ilatm1b_date(filename))
+        data = _ilatm1bv2_data(filepath, _ilatm1b_date(filename))
     elif year >= 2009:
-        return _atm1b_qfit_data(filepath, _ilatm1b_date(filename))
+        data = _atm1b_qfit_data(filepath, _ilatm1b_date(filename))
     else:
-        return _atm1b_qfit_data(filepath, _blatm1bv1_date(filename))
+        data = _atm1b_qfit_data(filepath, _blatm1bv1_date(filename))
+
+    itrf = extract_itrf(filepath)
+    data["ITRF"] = itrf
+
+    return data

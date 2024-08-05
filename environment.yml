@@ -9,5 +9,7 @@ dependencies:
   - h5py
   - numpy
   - gps-timemachine
+  - pyproj
+  - shapely
   # dev tools
   - pre-commit
