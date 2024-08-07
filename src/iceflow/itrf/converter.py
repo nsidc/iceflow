@@ -1,12 +1,10 @@
-import collections
+from __future__ import annotations
+
 import datetime as dt
-import logging
-import os
 import time
 
 import pandas as pd
 from pyproj import Transformer
-from shapely.geometry.point import Point
 
 
 def _datetime_to_decimal_year(date):

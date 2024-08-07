@@ -127,6 +127,10 @@ ignore = [
   "PLR09",    # Too many <...>
   "PLR2004",  # Magic value used in comparison
   "ISC001",   # Conflicts with formatter
+  "RET504",   # Unnecessary assignments before return statements are helpful during debugging.
+  "PD901",    # Avoid using generic variable name `df` for dataframes.
+  "EM101",    # Exceptions should not use string literals
+  "SIM108",   # Use ternary operator. Sometimes this is less readable.
 ]
 isort.required-imports = ["from __future__ import annotations"]
 # Uncomment if using a _compat.typing backport

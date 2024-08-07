@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import namedtuple
 from functools import partial
 
@@ -14,8 +16,9 @@ from shapely.ops import transform
 def _shift_large_longitudes(threshold, x, y):
     if x > threshold:
         return (x - 360, y)
-    else:
-        return (x, y)
+
+    # Return the point unchanged.
+    return (x, y)
 
 
 ANTA = Polygon(
@@ -2512,8 +2515,9 @@ SOAM_FALSE_EASTING = 0.0
 def shift_lon(x, y):
     if x < 0.0:
         return (360.0 + x, y)
-    else:
-        return (x, y)
+
+    # return the point unchanged.
+    return (x, y)
 
 
 Plate = namedtuple("Plate", "polygon, false_easting name")
@@ -2540,3 +2544,6 @@ def plate_name(point):
         p = Point(*shift_lon(x[0] + fe, y[0]))
         if polygon.intersects(p):
             return name
+
+    err_msg = f"Failed to find plate for {point}"
+    raise RuntimeError(err_msg)
