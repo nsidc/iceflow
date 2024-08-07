@@ -36,6 +36,7 @@ dependencies = []
 test = [
   "pytest >=6",
   "pytest-cov >=3",
+  "mypy",
 ]
 dev = [
   "pytest >=6",
@@ -81,12 +82,22 @@ strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 disallow_untyped_defs = false
+disallow_untyped_calls = false
 disallow_incomplete_defs = false
+check_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = "iceflow.*"
-disallow_untyped_defs = true
+module = [
+  "iceflow.*",
+  "shapely.*",
+  "pandas.*",
+  "pyproj.*",
+  "h5py.*",
+  "numpy.*",
+  "gps_timemachine.*",
+]
 disallow_incomplete_defs = true
+ignore_missing_imports = true
 
 
 [tool.ruff]

@@ -134,9 +134,12 @@ def _blatm1bv1_date(fn):
     return fn_date
 
 
-def _ilatm1b_date(fn: str):
+def _ilatm1b_date(fn: str) -> dt.datetime:
     """Return the date from the given ILATM1B filename."""
     m = re.search(r"_(\d{8})_", fn)
+    if not m:
+        err = f"Failed to extract date from filepath: {fn}"
+        raise RuntimeError(err)
     fn_date = m.group(1)
     return dt.datetime.strptime(fn_date, "%Y%m%d")
 
@@ -248,7 +251,7 @@ def _atm1b_qfit_data(fn, file_date):
     return df
 
 
-def _qfit_file_header(filepath: Path):
+def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
     dtype = np.dtype([("record_type", ">i4"), ("header", ">a44")])
 
@@ -270,7 +273,8 @@ def _qfit_file_header(filepath: Path):
         header = raw_data[2:idx]
         return "".join([r["header"].decode("UTF-8") for r in header])
 
-    return None
+    err = "Failed to read qfit file header for {filepath}"
+    raise RuntimeError(err)
 
 
 def extract_itrf(filepath: Path) -> str:
