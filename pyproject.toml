@@ -155,23 +155,3 @@ messages_control.disable = [
   "missing-function-docstring",
   "wrong-import-position",
 ]
-
-[tool.pixi.dependencies]
-earthaccess = "~=0.10.0"
-pandas = "*"
-h5py = "*"
-numpy = "*"
-gps-timemachine = {channel = "nsidc", version = "*"}
-pyproj = "*"
-shapely = "*"
-
-[tool.pixi.environments]
-dev = {features = ["dev"]}
-test = {features = ["test"]}
-
-[tool.pixi.project]
-channels = ["conda-forge", "nsidc"]
-platforms = ["linux-64"]
-
-[tool.pixi.tasks]
-test = { cmd = "PYTHONPATH=src pytest" }

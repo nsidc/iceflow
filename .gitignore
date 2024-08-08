@@ -1,7 +1,3 @@
-# pixi environments
-.pixi
-*.egg-info
-
 # Temporary local data store
 data/
 
