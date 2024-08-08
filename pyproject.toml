@@ -28,15 +28,6 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = [
-  "earthaccess ~=0.10.0",
-  "pandas",
-  "h5py",
-  "numpy",
-  "gps-timemachine",
-  "pyproj",
-  "shapely",
-]
 
 [project.optional-dependencies]
 test = [
@@ -166,5 +157,19 @@ messages_control.disable = [
   "wrong-import-position",
 ]
 
+[tool.pixi.dependencies]
+earthaccess = "~=0.10.0"
+pandas = "*"
+h5py = "*"
+numpy = "*"
+gps-timemachine = {channel = "nsidc", version = "*"}
+pyproj = "*"
+shapely = "*"
+
+[tool.pixi.environments]
+dev = {features = ["dev"]}
+test = {features = ["test"]}
+
 [tool.pixi.project]
 channels = ["conda-forge", "nsidc"]
+platforms = ["linux-64"]

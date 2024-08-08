@@ -1,4 +1,10 @@
+# pixi environments
+.pixi
+*.egg-info
+
+# Temporary local data store
 data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
