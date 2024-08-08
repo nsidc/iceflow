@@ -132,6 +132,7 @@ ignore = [
   "PD901",    # Avoid using generic variable name `df` for dataframes.
   "EM101",    # Exceptions should not use string literals
   "SIM108",   # Use ternary operator. Sometimes this is less readable.
+  "T201",     # Remove 'print' statements. Sometimes these are handy.
 ]
 isort.required-imports = ["from __future__ import annotations"]
 # Uncomment if using a _compat.typing backport

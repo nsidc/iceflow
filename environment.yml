@@ -1,4 +1,4 @@
-name: valkyrie-lib
+name: iceflow
 channels:
   - conda-forge
   - nsidc
@@ -13,3 +13,6 @@ dependencies:
   - shapely
   # dev tools
   - pre-commit
+  - invoke
+  - mypy
+  - pytest
