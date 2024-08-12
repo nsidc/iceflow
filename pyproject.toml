@@ -24,18 +24,6 @@ classifiers = [
 ]
 dynamic = ["version"]
 
-[project.optional-dependencies]
-test = [
-  "pytest >=6",
-  "pytest-cov >=3",
-  "mypy",
-]
-dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
-  "pre-commit"
-]
-
 [project.urls]
 Homepage = "https://github.com/NSIDC/iceflow"
 "Bug Tracker" = "https://github.com/NSIDC/iceflow/issues"
