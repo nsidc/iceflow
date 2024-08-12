@@ -13,10 +13,10 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: 80cba93492c2623cc6c309a1340bbe7cc2e20e6e5916fcb9a9c3ef5a345108fe
-    osx-arm64: 11e0572bcadd43e8766c83b35183d416dd6aaf3ad1461dcc647c27a9ebe0c2f6
-    osx-64: e530265455a6fc762da8eefe09a5a4fb9b30822701472896303f3e54038ca0e2
-    win-64: d04f18290b9c0a5632392b7da96ab5adef2b0f31069887dc607301cf200497d2
+    linux-64: daf7d6cc784f203d5c4b87b981b8d95f989db4a23e77d7cdcad4cc459735835c
+    osx-arm64: 9fe217976c785a9e429957cdfad31f70aa1b867f5a7a5e95ddbafefd39bc7588
+    osx-64: 0e01ef040ad26079637a66dab4ad9667ba696059fad86752416ba87ae16b82af
+    win-64: 8b0d43d8e6f6e083327758951cab3bdc50c1840a4b41149e8c16a1e426d4466b
   channels:
     - url: conda-forge
       used_env_vars: []
@@ -24,8 +24,8 @@ metadata:
       used_env_vars: []
   platforms:
     - linux-64
-    - osx-arm64
     - osx-64
+    - osx-arm64
     - win-64
   sources:
     - environment.yml
@@ -1979,6 +1979,22 @@ package:
       sha256: 5845ffe82a6fa4d437a2eae1e32a1ad308d7ad349f61e337c0a890fe04c513cc
     category: main
     optional: false
+  - name: setuptools-scm
+    version: 8.1.0
+    manager: conda
+    platform: linux-64
+    dependencies:
+      packaging: ">=20.0"
+      python: ">=3.8"
+      setuptools: ">=45"
+      tomli: ">=1.0.0"
+      typing-extensions: ""
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools-scm-8.1.0-pyhd8ed1ab_0.conda
+    hash:
+      md5: ba9f7f0ec4f2a18de3e7bce67c4a431e
+      sha256: 3f7b45c90eaa1c9e7ef974d3995a98a37f7672b40e002455baf0fce256e7f202
+    category: main
+    optional: false
   - name: ukkonen
     version: 1.0.1
     manager: conda
@@ -2135,6 +2151,18 @@ package:
     hash:
       md5: 39067833cbb620066d492f8bd6f11dbf
       sha256: 0479e3f8c8e90049a6d92d4c7e67916c6d6cdafd11a1a31c54c785cce44aeb20
+    category: main
+    optional: false
+  - name: setuptools_scm
+    version: 8.1.0
+    manager: conda
+    platform: linux-64
+    dependencies:
+      setuptools-scm: ">=8.1.0,<8.1.1.0a0"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools_scm-8.1.0-hd8ed1ab_0.conda
+    hash:
+      md5: 7ed7b077f6c6ebcb5fc66f23985df487
+      sha256: 00e736790575001fe50d69bb463c04ecdc470b9e104ee7728a54b6a1e59404f5
     category: main
     optional: false
   - name: shapely
@@ -3972,6 +4000,22 @@ package:
       sha256: 5845ffe82a6fa4d437a2eae1e32a1ad308d7ad349f61e337c0a890fe04c513cc
     category: main
     optional: false
+  - name: setuptools-scm
+    version: 8.1.0
+    manager: conda
+    platform: osx-64
+    dependencies:
+      typing-extensions: ""
+      python: ">=3.8"
+      packaging: ">=20.0"
+      tomli: ">=1.0.0"
+      setuptools: ">=45"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools-scm-8.1.0-pyhd8ed1ab_0.conda
+    hash:
+      md5: ba9f7f0ec4f2a18de3e7bce67c4a431e
+      sha256: 3f7b45c90eaa1c9e7ef974d3995a98a37f7672b40e002455baf0fce256e7f202
+    category: main
+    optional: false
   - name: ukkonen
     version: 1.0.1
     manager: conda
@@ -4111,6 +4155,18 @@ package:
     hash:
       md5: 94f0105e95b1b04fc598867765cbdbf6
       sha256: ae4440acd586faa250f8e8a88dc432f33f548e0b2fc872ac682419429a5bcc08
+    category: main
+    optional: false
+  - name: setuptools_scm
+    version: 8.1.0
+    manager: conda
+    platform: osx-64
+    dependencies:
+      setuptools-scm: ">=8.1.0,<8.1.1.0a0"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools_scm-8.1.0-hd8ed1ab_0.conda
+    hash:
+      md5: 7ed7b077f6c6ebcb5fc66f23985df487
+      sha256: 00e736790575001fe50d69bb463c04ecdc470b9e104ee7728a54b6a1e59404f5
     category: main
     optional: false
   - name: cachecontrol-with-filecache
@@ -5963,6 +6019,22 @@ package:
       sha256: 5845ffe82a6fa4d437a2eae1e32a1ad308d7ad349f61e337c0a890fe04c513cc
     category: main
     optional: false
+  - name: setuptools-scm
+    version: 8.1.0
+    manager: conda
+    platform: osx-arm64
+    dependencies:
+      typing-extensions: ""
+      python: ">=3.8"
+      packaging: ">=20.0"
+      tomli: ">=1.0.0"
+      setuptools: ">=45"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools-scm-8.1.0-pyhd8ed1ab_0.conda
+    hash:
+      md5: ba9f7f0ec4f2a18de3e7bce67c4a431e
+      sha256: 3f7b45c90eaa1c9e7ef974d3995a98a37f7672b40e002455baf0fce256e7f202
+    category: main
+    optional: false
   - name: ukkonen
     version: 1.0.1
     manager: conda
@@ -6102,6 +6174,18 @@ package:
     hash:
       md5: 94f0105e95b1b04fc598867765cbdbf6
       sha256: ae4440acd586faa250f8e8a88dc432f33f548e0b2fc872ac682419429a5bcc08
+    category: main
+    optional: false
+  - name: setuptools_scm
+    version: 8.1.0
+    manager: conda
+    platform: osx-arm64
+    dependencies:
+      setuptools-scm: ">=8.1.0,<8.1.1.0a0"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools_scm-8.1.0-hd8ed1ab_0.conda
+    hash:
+      md5: 7ed7b077f6c6ebcb5fc66f23985df487
+      sha256: 00e736790575001fe50d69bb463c04ecdc470b9e104ee7728a54b6a1e59404f5
     category: main
     optional: false
   - name: cachecontrol-with-filecache
@@ -7961,6 +8045,22 @@ package:
       sha256: 6d99757a71db359d787a0d7cd996e358a9ac9d86fdd8d0ea18ea1be6acc16b49
     category: main
     optional: false
+  - name: setuptools-scm
+    version: 8.1.0
+    manager: conda
+    platform: win-64
+    dependencies:
+      typing-extensions: ""
+      python: ">=3.8"
+      packaging: ">=20.0"
+      tomli: ">=1.0.0"
+      setuptools: ">=45"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools-scm-8.1.0-pyhd8ed1ab_0.conda
+    hash:
+      md5: ba9f7f0ec4f2a18de3e7bce67c4a431e
+      sha256: 3f7b45c90eaa1c9e7ef974d3995a98a37f7672b40e002455baf0fce256e7f202
+    category: main
+    optional: false
   - name: ukkonen
     version: 1.0.1
     manager: conda
@@ -8080,6 +8180,18 @@ package:
     hash:
       md5: 5ede4753180c7a550a443c430dc8ab52
       sha256: 5845ffe82a6fa4d437a2eae1e32a1ad308d7ad349f61e337c0a890fe04c513cc
+    category: main
+    optional: false
+  - name: setuptools_scm
+    version: 8.1.0
+    manager: conda
+    platform: win-64
+    dependencies:
+      setuptools-scm: ">=8.1.0,<8.1.1.0a0"
+    url: https://conda.anaconda.org/conda-forge/noarch/setuptools_scm-8.1.0-hd8ed1ab_0.conda
+    hash:
+      md5: 7ed7b077f6c6ebcb5fc66f23985df487
+      sha256: 00e736790575001fe50d69bb463c04ecdc470b9e104ee7728a54b6a1e59404f5
     category: main
     optional: false
   - name: aiobotocore

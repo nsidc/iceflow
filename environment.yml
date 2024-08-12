@@ -17,3 +17,5 @@ dependencies:
   - mypy
   - pytest
   - conda-lock
+  - setuptools
+  - setuptools_scm[toml]
