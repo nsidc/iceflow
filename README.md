@@ -25,10 +25,6 @@ TODO
 
 TODO
 
-## Troubleshooting
-
-{troubleshooting}
-
 ## Credit
 
 This content was developed by the National Snow and Ice Data Center with funding
