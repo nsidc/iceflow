@@ -155,7 +155,7 @@ def _augment_with_optional_values(df, original_shape):
     """Add columns (w/ zeros) to the dataframe depending on what fields
     the original data did not include."""
     rows, cols = original_shape
-    zeros = np.zeros((rows,), dtype=np.int32)  # type: ignore [var-annotated]
+    zeros = np.zeros((rows,), dtype=np.int32)
 
     if cols == 10:
         df["gps_pdop"] = zeros
