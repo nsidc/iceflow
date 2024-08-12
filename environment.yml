@@ -17,6 +17,7 @@ dependencies:
   - mypy
   - pytest
   - conda-lock
+  - bump-my-version
   # Build utilities
   - conda-build ~=24.5.1
   - boa ~=0.17.0
