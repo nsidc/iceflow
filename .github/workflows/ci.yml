@@ -30,10 +30,6 @@ jobs:
           # Increase this key to trigger cache invalidation
           cache-environment-key: 1
 
-      # pip install
-      - name: "Pip install package."
-        run: "pip install -e ."
-
       # Linter
       - name: "Run pre-commit tests"
         run: "pre-commit run --all-files"
