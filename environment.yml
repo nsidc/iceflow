@@ -8,7 +8,7 @@ dependencies:
   - pandas ~=2.2
   - h5py ~=3.11
   - numpy ~=2.0.1
-  - gps-timemachine
+  - gps-timemachine ~=1.1.4
   - pyproj ~=3.6.1
   - shapely ~=2.0.5
   # dev tools
