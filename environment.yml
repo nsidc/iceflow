@@ -16,3 +16,4 @@ dependencies:
   - invoke
   - mypy
   - pytest
+  - conda-lock
