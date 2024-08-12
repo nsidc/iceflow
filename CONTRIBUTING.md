@@ -37,3 +37,18 @@ Available tasks:
   test.pytest                  Run all tests with pytest.
   test.typecheck (test.mypy)   Run mypy typechecking.
 ```
+
+# Releasing
+
+To release a new version of the software, first update the CHANGELOG.md to
+reflect the version you plan to release. Then, bump the version with
+[bump-by-version](https://github.com/callowayproject/bump-my-version):
+
+```
+$ bump-my-version bump {major|minor|patch}
+```
+
+This will update files containing the software version number. Commit these
+changes and, once ready, merge them into `main` (through the use of a Pull
+Request on a feature branch). Tag the commit you want to release on `main` to
+initiate a GitHub Action (GHA) that will release the package to anaconda.org.
