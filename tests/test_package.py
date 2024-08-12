@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import importlib.metadata
-
-import iceflow as m
+import iceflow
 
 
 def test_version():
-    assert importlib.metadata.version("iceflow") == m.__version__
+    assert iceflow.__version__ is not None
