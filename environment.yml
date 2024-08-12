@@ -13,10 +13,10 @@ dependencies:
   - shapely ~=2.0.5
   # dev tools
   - pre-commit
-  - invoke
-  - mypy
-  - pytest
-  - conda-lock
+  - invoke ~=2.2.0
+  - mypy ~=1.11.1
+  - pytest ~=8.3.2
+  - conda-lock ~=2.5.7
   - bump-my-version
   # Build utilities
   - conda-build ~=24.5.1
