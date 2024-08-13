@@ -57,23 +57,40 @@ def test_e2e(tmp_path):
     # specifying the version, earthaccess returns results for both versions.
     # This might be OK, but ILVIS2 has a similar situation, but we don't
     # (currently) have code to support it.
-    results = search_and_download(
+    results2009 = search_and_download(
         short_name="ILATM1B",
         version="1",
         output_dir=tmp_path,
         bounding_box=(-103.125559, -75.180563, -102.677327, -74.798063),
-        temporal=("1993-01-01", "2020-01-01"),
+        temporal=("2009-11-01", "2009-12-01"),
     )
 
+    results2012 = search_and_download(
+        short_name="ILATM1B",
+        version="1",
+        output_dir=tmp_path,
+        bounding_box=(-103.125559, -75.180563, -102.677327, -74.798063),
+        temporal=("2012-11-01", "2012-12-01"),
+    )
+
+    # 3 results total; ~62M total size
+    results = [*results2009, *results2012]
     all_dfs = []
     for result in results:
         data_df = atm1b_data(result)
         all_dfs.append(data_df)
-    # This df contains data  w/ two ITRFs
+
+    # This df contains data w/ two ITRFs: ITRF2005 and ITRF2008.
     complete_df = pd.concat(all_dfs)
 
     transformed = transform_itrf(
-        data=complete_df,
+        # TODO: this type ignore highlights a problem w/ pandera's mypy
+        # integration. Mypy doesn't recognize that a child of the
+        # `commonDataColumns` is valid (this is a `atm1bData` instance, which
+        # inherits from `commonDataColumns`). It might be better to turn
+        # off/ignore pandera typecheckng w/ mypy and just rely on the runtime
+        # validation that pandera provides.
+        data=complete_df,  # type: ignore[arg-type]
         target_itrf="ITRF2008",
     )
 
