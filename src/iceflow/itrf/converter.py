@@ -41,8 +41,6 @@ class itrfTransformationDataSchema(pa.DataFrameModel):
 
 @pa.check_types()
 def transform_itrf(
-    # TODO: function assumes pandas dataframe representing data w/ expected
-    # fields.
     data: DataFrame[itrfTransformationDataSchema],
     target_itrf: str,
     # These two must both be specified to apply the plate model
@@ -57,9 +55,6 @@ def transform_itrf(
 
     TODO:
         * Update typing for function
-        * Consider passing in lat/lon/elev/time directly instead of as a pandas df?
-        * If this takes a pd.df w/ expected fields, one of those fields could be
-          ITRF & plate, which would be used by this func.
     """
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
