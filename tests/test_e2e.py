@@ -43,7 +43,7 @@ def search_and_download(
     # short_name based subdir for data.
     output_subdir = output_dir / short_name
     output_subdir.mkdir(exist_ok=True)
-    downloaded_files = earthaccess.download(results, output_subdir)
+    downloaded_files = earthaccess.download(results, str(output_subdir))
     downloaded_filepaths = [Path(filepath_str) for filepath_str in downloaded_files]
 
     return downloaded_filepaths
