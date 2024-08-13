@@ -14,7 +14,7 @@ from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
 from pandera.typing import DataFrame, Series
 
-from iceflow.ingest.models import commonDataColumns
+from iceflow.ingest.models import ITRF_LIST, commonDataColumns
 
 """
 The dtypes used to read any of the input ATM1B input files.
@@ -310,15 +310,7 @@ def extract_itrf(filepath: Path) -> str:
 
     itrf = itrf.upper()
 
-    if itrf not in [
-        "ITRF93",
-        "ITRF94",
-        "ITRF96",
-        "ITRF97",
-        "ITRF2000",
-        "ITRF2005",
-        "ITRF2008",
-    ]:
+    if itrf not in ITRF_LIST:
         # Try to normalize:
         try:
             itrf = {
