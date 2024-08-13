@@ -4,10 +4,12 @@
 
 # Iceflow Python Library
 
-> [!WARNING] This repository is under active development. Major changes to the
-> structure of this repository and its code are expected. We are striving to
-> develop code that is well-tested and peer-reviewed, but nothing contained here
-> should be expected to work correctly (or at all!) in this early phase.
+<!-- prettier-ignore -->
+> [!WARNING]
+> This repository is under active development. Major changes to the structure of
+> this repository and its code are expected. We are striving to develop code
+> that is well-tested and peer-reviewed, but nothing contained here should be
+> expected to work correctly (or at all!) in this early phase.
 
 Spike repo to explore replicating the functionality of
 [valkyrie](https://bitbucket.org/nsidc/valkyrie) as a Python library for use in
