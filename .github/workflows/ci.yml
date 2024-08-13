@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+# Default to bash in login mode; key to activating conda environment
+# https://github.com/mamba-org/provision-with-micromamba#IMPORTANT
+defaults:
+  run:
+    shell: "bash -l {0}"
+
+jobs:
+  test:
+    name: "Run tests"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Check out repository"
+        uses: "actions/checkout@v4"
+
+      - name: "Install Conda environment"
+        uses: "mamba-org/setup-micromamba@v1"
+        with:
+          environment-file: "conda-lock.yml"
+          # When using a lock-file, we have to set an environment name.
+          environment-name: "iceflow"
+          cache-environment: true
+          # Increase this key to trigger cache invalidation
+          cache-environment-key: 1
+
+      # Linter
+      - name: "Run pre-commit tests"
+        run: "pre-commit run --all-files"
+
+      # Unit tests
+      - name: "Run typecheck and tests"
+        run: "invoke test.all"

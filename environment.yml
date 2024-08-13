@@ -1,15 +1,24 @@
-name: valkyrie-lib
+name: iceflow
 channels:
   - conda-forge
   - nsidc
 dependencies:
   - python ~=3.12.0
   - earthaccess ~=0.10.0
-  - pandas
-  - h5py
-  - numpy
-  - gps-timemachine
-  - pyproj
-  - shapely
+  - pandas ~=2.2
+  - h5py ~=3.11
+  - numpy ~=2.0.1
+  - gps-timemachine ~=1.1.4
+  - pyproj ~=3.6.1
+  - shapely ~=2.0.5
   # dev tools
   - pre-commit
+  - invoke ~=2.2.0
+  - mypy ~=1.11.1
+  - pytest ~=8.3.2
+  - conda-lock ~=2.5.7
+  - bump-my-version
+  # Build utilities
+  - conda-build ~=24.5.1
+  - boa ~=0.17.0
+  - anaconda-client ~=1.12.3

@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 import datetime as dt
-from enum import Enum
-import glob
 import logging
-import os
 import re
+from enum import Enum
 from pathlib import Path
 
 import h5py
@@ -134,9 +134,12 @@ def _blatm1bv1_date(fn):
     return fn_date
 
 
-def _ilatm1b_date(fn: str):
+def _ilatm1b_date(fn: str) -> dt.datetime:
     """Return the date from the given ILATM1B filename."""
     m = re.search(r"_(\d{8})_", fn)
+    if not m:
+        err = f"Failed to extract date from filepath: {fn}"
+        raise RuntimeError(err)
     fn_date = m.group(1)
     return dt.datetime.strptime(fn_date, "%Y%m%d")
 
@@ -200,7 +203,7 @@ def _utc_datetime(gps_time, file_date):
     tdf["day"] = file_date.day
 
     ls = int(leap_seconds(file_date))
-    utc = pd.to_datetime(tdf).values - np.timedelta64(ls, "s")
+    utc = pd.to_datetime(tdf).to_numpy() - np.timedelta64(ls, "s")
 
     return pd.Series(utc)
 
@@ -214,14 +217,14 @@ def _atm1b_qfit_dataframe(fn):
     raw_data = np.fromfile(fn, dtype=dtype)
     raw_data = _strip_header(raw_data)
 
-    if dtype == ATM1B_DTYPE_14_LE or dtype == ATM1B_DTYPE_14_BE:
+    if dtype in (ATM1B_DTYPE_14_LE, ATM1B_DTYPE_14_BE):
         # Ignore records with invalid data (this occurs in the 14-word
         # format records containing passive brightness data)
-        logging.info("Before filter. Data shape: {}".format(raw_data.shape))
+        logging.info("Before filter. Data shape: %s", raw_data.shape)
         raw_data = raw_data[
             (raw_data["latitude"] != 0) & (raw_data["elevation"] != -9999)
         ]
-        logging.info("After filter. Data shape: {}".format(raw_data.shape))
+        logging.info("After filter. Data shape: %s", raw_data.shape)
 
         if raw_data.shape[0] == 0:
             logging.warning("After removal of bad data, file contains no valid data.")
@@ -248,7 +251,7 @@ def _atm1b_qfit_data(fn, file_date):
     return df
 
 
-def _qfit_file_header(filepath: Path):
+def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
     dtype = np.dtype([("record_type", ">i4"), ("header", ">a44")])
 
@@ -269,8 +272,9 @@ def _qfit_file_header(filepath: Path):
             idx += 1
         header = raw_data[2:idx]
         return "".join([r["header"].decode("UTF-8") for r in header])
-    else:
-        return None
+
+    err = "Failed to read qfit file header for {filepath}"
+    raise RuntimeError(err)
 
 
 def extract_itrf(filepath: Path) -> str:
@@ -279,18 +283,20 @@ def extract_itrf(filepath: Path) -> str:
     if ext == ".qi":
         header = _qfit_file_header(filepath)
         results = re.finditer(r"itrf\d{2,4}", header)
-        itrfs = list(set(result.group() for result in results))
+        itrfs = list({result.group() for result in results})
 
         if len(itrfs) == 1:
             itrf = itrfs[0]
         else:
-            raise RuntimeError(f"Failed to extract ITRF from file: {filepath}")
+            err = f"Failed to extract ITRF from file: {filepath}"
+            raise RuntimeError(err)
 
     elif ext == "h5py":
         with h5py.File(filepath, "r") as ds:
             itrf = str(ds["ancillary_data"]["reference_frame"][:][0], encoding="utf8")
     else:
-        raise RuntimeError(f"Failed to read ITRF from unrecognized file: {filepath}")
+        err = f"Failed to read ITRF from unrecognized file: {filepath}"
+        raise RuntimeError(err)
 
     itrf = itrf.upper()
 
@@ -309,8 +315,9 @@ def extract_itrf(filepath: Path) -> str:
                 "ITRF05": "ITRF2005",
                 "ITRF08": "ITRF2008",
             }[itrf]
-        except KeyError:
-            raise RuntimeError(f"Unrecognized ATM1B ITRF {itrf}")
+        except KeyError as e:
+            err = f"Unrecognized ATM1B ITRF {itrf}"
+            raise RuntimeError(err) from e
 
     return itrf
 
@@ -358,78 +365,6 @@ def _ilatm1bv2_data(fn, file_date):
     return df
 
 
-def df_columns(df):
-    """Return a list of column names corresponding to the data encoded and
-    returned by the `row_values` function. This should be the database
-    column names corresponding to the values returned by that
-    function.
-
-    Parameters
-    ----------
-    df
-        Unused. For ATM1B, the list of columns is the same regardless of
-        the source file.
-
-    Returns
-    -------
-        The list of column names for the data frame.
-    """
-    return [
-        "utc_datetime",
-        "point",
-        "gps_time",
-        "rel_time",
-        "azimuth",
-        "pitch",
-        "roll",
-        "xmt_sigstr",
-        "rcv_sigstr",
-        "gps_pdop",
-        "pulse_width",
-        "passive_signal",
-        "passive_footprint_latitude",
-        "passive_footprint_longitude",
-        "passive_footprint_synthesized_elevation",
-    ]
-
-
-def row_values(row):
-    """Return a bytestring containing comma-delimited values for a given
-    row in the dataset. This string can be used in a SQL statement to
-    insert the data into a matching database table.
-
-    Parameters
-    ----------
-    row
-        The row tuple from a pandas.DataFrame that was obtained by calling
-        atm1b_data and augmented with `utc_datetime`.
-
-    Returns
-    -------
-    row
-        The row as a comma-delimited bytestring (`bytes`).
-    """
-    return b"%s,SRID=4326;POINT(%f %f %f),%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
-        row.utc_datetime,
-        row.longitude,
-        row.latitude,
-        row.elevation,
-        row.gps_time,
-        row.rel_time,
-        row.azimuth,
-        row.pitch,
-        row.roll,
-        row.xmt_sigstr,
-        row.rcv_sigstr,
-        row.gps_pdop,
-        row.pulse_width,
-        row.passive_signal,
-        row.passive_footprint_latitude,
-        row.passive_footprint_longitude,
-        row.passive_footprint_synthesized_elevation,
-    )
-
-
 def atm1b_data(filepath: Path) -> pd.DataFrame:
     """
     Return the atm1b data given a filename.
@@ -453,7 +388,8 @@ def atm1b_data(filepath: Path) -> pd.DataFrame:
     # Find the date, which corresponds to the product version.
     match = re.search(r".*_(\d{4})\d{4}_.*", filename)
     if not match:
-        raise RuntimeError(f"Failed to recognize {filename} as ATM1B data.")
+        err = f"Failed to recognize {filename} as ATM1B data."
+        raise RuntimeError(err)
 
     year = int(match.group(1))
 

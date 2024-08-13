@@ -1,0 +1,37 @@
+package:
+  name: iceflow
+  version: "0.1.0"
+
+source:
+  path: ../
+
+build:
+  number: "{ { environ.get('BUILD_NUMBER', 0) } }"
+  script: python -m pip install . --no-deps -vv
+  preserve_egg_dir: True
+  noarch: python
+
+requirements:
+  build:
+    - python ~=3.10
+    - numpy ~=2.0.1
+
+  run:
+    - python ~=3.10
+    - numpy ~=2.0.1
+    - earthaccess ~=0.10.0
+    - pandas ~=2.2
+    - h5py ~=3.11
+    - gps-timemachine ~=1.1.4
+    - pyproj ~=3.6.1
+    - shapely ~=2.0.5
+
+about:
+  home: https://github.com/nsidc/iceflow
+  license: MIT
+  summary: "Harmonized access to (pre)OIB/IceSAT/IceSAT2 data"
+
+test:
+  imports:
+    - iceflow
+    - iceflow.ingest.atm1b
