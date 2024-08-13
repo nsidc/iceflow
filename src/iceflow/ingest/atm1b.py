@@ -10,6 +10,7 @@ import h5py
 import numpy as np
 import pandas as pd
 from gps_timemachine.gps import leap_seconds
+from numpy.typing import DTypeLike
 
 """
 The dtypes used to read any of the input ATM1B input files.
@@ -77,7 +78,7 @@ class Endian(Enum):
     BIG = 2
 
 
-def _data_dtype(endianness, field_count):
+def _data_dtype(endianness: Endian, field_count: int) -> DTypeLike:
     """Return the appropriate QFIT dtype based on the given endianness and
     number of fields in the file."""
     return {
@@ -94,13 +95,13 @@ def _data_dtype(endianness, field_count):
     }[endianness][field_count]
 
 
-def _file_dtype(fn):
+def _file_dtype(filepath: Path) -> DTypeLike:
     """Return the dtype for the given file."""
     data_endianness = Endian.BIG
 
-    record_size = np.fromfile(fn, dtype=">i4", count=1)[0]
+    record_size = np.fromfile(filepath, dtype=">i4", count=1)[0]
     if record_size >= 100:
-        record_size = np.fromfile(fn, dtype="<i4", count=1)[0]
+        record_size = np.fromfile(filepath, dtype="<i4", count=1)[0]
         if record_size >= 100:
             raise ValueError("invalid record size found")
         data_endianness = Endian.LITTLE
@@ -188,7 +189,9 @@ def _strip_header(data):
     return data[idx:]
 
 
-def _utc_datetime(gps_time, file_date):
+def _utc_datetime(
+    gps_time: pd.Series[int], file_date: dt.date
+) -> pd.Series[pd.Timestamp]:
     """Return `utc_datetime` Series, with values calculated from the given
     date and the GPS time values, with a leap second adjustment to the GPS
     times.
@@ -208,13 +211,13 @@ def _utc_datetime(gps_time, file_date):
     return pd.Series(utc)
 
 
-def _atm1b_qfit_dataframe(fn):
+def _atm1b_qfit_dataframe(filepath: Path) -> pd.DataFrame:
     """Read an ATM1B QFIT file into a DataFrame, stripping bad data if
     necessary.
     """
-    dtype = _file_dtype(fn)
+    dtype = _file_dtype(filepath)
 
-    raw_data = np.fromfile(fn, dtype=dtype)
+    raw_data = np.fromfile(filepath, dtype=dtype)
     raw_data = _strip_header(raw_data)
 
     if dtype in (ATM1B_DTYPE_14_LE, ATM1B_DTYPE_14_BE):
@@ -233,11 +236,11 @@ def _atm1b_qfit_dataframe(fn):
     return pd.DataFrame(raw_data)
 
 
-def _atm1b_qfit_data(fn, file_date):
+def _atm1b_qfit_data(filepath: Path, file_date: dt.date) -> pd.DataFrame:
     """Returns an ATM1B DataFrame read from a QFIT file, performing all
     necessary conversions on the data.
     """
-    df = _atm1b_qfit_dataframe(fn)
+    df = _atm1b_qfit_dataframe(filepath)
     original_shape = df.shape
 
     df["latitude"] = df["latitude"] * 1e-6
@@ -322,7 +325,7 @@ def extract_itrf(filepath: Path) -> str:
     return itrf
 
 
-def _ilatm1bv2_dataframe(fn):
+def _ilatm1bv2_dataframe(filepath: Path) -> pd.DataFrame:
     """Returns an ATM1B DataFrame read from an HDF5 file, performing all
     necessary scaling and type conversion.
     """
@@ -341,7 +344,7 @@ def _ilatm1bv2_dataframe(fn):
         ("gps_time", "instrument_parameters/time_hhmmss", 1000, np.uint32),
     ]
     df = pd.DataFrame()
-    with h5py.File(fn, "r") as atmv2:
+    with h5py.File(filepath, "r") as atmv2:
         for key, name, scale_factor, dtype in variables:
             if scale_factor and dtype:
                 df[key] = (atmv2[name][:] * scale_factor).astype(dtype)
@@ -351,7 +354,7 @@ def _ilatm1bv2_dataframe(fn):
     return df
 
 
-def _ilatm1bv2_data(fn, file_date):
+def _ilatm1bv2_data(fn: Path, file_date: dt.date) -> pd.DataFrame:
     """Returns an ATM1B DataFrame, performing all necessary conversions /
     augmentation on the data.
     """

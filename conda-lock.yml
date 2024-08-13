@@ -13,10 +13,10 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: a265debf8bbcc2873df1d29de52807d753e3e8b4b5016a508e04ccc85f42cf85
-    osx-arm64: ca01dd5fa2e5dd314e0b46953f07679be0ae9f5eef823ca5f174a1dcc8197ae6
-    osx-64: 060df41baa992cb6afc3268581cedf8ba6a2ad4de3982acbe473aec8f3a62daf
-    win-64: 472051535dd8bb9af76d6db0e5df4cd38ff87e3538d17e8afd60a7478f746210
+    linux-64: 1f3808c7bc97e28d1329cb5b8f2f0b1fe4735f28199bb477f200eb1ebd6c149f
+    osx-arm64: ab84f54794e7ed33d7edaf7b7629261cb6849d718ec5de36df93898901fb8588
+    osx-64: 637d4af143356dcc0077643ffa5a18a85ac041c0b9f4e168163472e642de2a21
+    win-64: d9c235bfbb2b63e1eaf102425062e6e06906ad3e4515085162cef559a251d98f
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -1817,6 +1817,18 @@ package:
     sha256: ba49bed74ca170c5a3bf995c33a6179fd74b33abb2444f511862e7f9f57f9149
   category: main
   optional: false
+- name: types-pytz
+  version: 2024.1.0.20240417
+  manager: conda
+  platform: linux-64
+  dependencies:
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/types-pytz-2024.1.0.20240417-pyhd8ed1ab_0.conda
+  hash:
+    md5: 7b71ace1b99195041329427c435b8125
+    sha256: cc3913a5504b867c748981ba302e82dbc2bda71837f4894d29db8f6cb490e25d
+  category: main
+  optional: false
 - name: typing_extensions
   version: 4.12.2
   manager: conda
@@ -2866,6 +2878,20 @@ package:
   hash:
     md5: ae00b61f3000d2284d1f2584d4dfafa8
     sha256: 80fd53b68aa89b929d03874b99621ec8cc6a12629bd8bfbdca87a95f8852af96
+  category: main
+  optional: false
+- name: pandas-stubs
+  version: 2.2.2.240807
+  manager: conda
+  platform: linux-64
+  dependencies:
+    numpy: '>=1.26.0'
+    python: '>=3.9'
+    types-pytz: '>=2022.1.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandas-stubs-2.2.2.240807-pyhd8ed1ab_0.conda
+  hash:
+    md5: f045ee4454edcf41eb489594ed8cef62
+    sha256: 858fc48f3f9b398d8ca1a4006d637ec3767cb24b5c8c6f669dcaeb64442fa4c4
   category: main
   optional: false
 - name: pydantic
@@ -4986,6 +5012,18 @@ package:
     sha256: ba49bed74ca170c5a3bf995c33a6179fd74b33abb2444f511862e7f9f57f9149
   category: main
   optional: false
+- name: types-pytz
+  version: 2024.1.0.20240417
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/types-pytz-2024.1.0.20240417-pyhd8ed1ab_0.conda
+  hash:
+    md5: 7b71ace1b99195041329427c435b8125
+    sha256: cc3913a5504b867c748981ba302e82dbc2bda71837f4894d29db8f6cb490e25d
+  category: main
+  optional: false
 - name: typing_extensions
   version: 4.12.2
   manager: conda
@@ -6121,6 +6159,20 @@ package:
   hash:
     md5: 240737937f1f046b0e03ecc11ac4ec98
     sha256: 99ef3986a0c6a5fe31a94b298f3ef60eb7ec7aa683a9aee6682f97d003aeb423
+  category: main
+  optional: false
+- name: pandas-stubs
+  version: 2.2.2.240807
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.9'
+    numpy: '>=1.26.0'
+    types-pytz: '>=2022.1.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandas-stubs-2.2.2.240807-pyhd8ed1ab_0.conda
+  hash:
+    md5: f045ee4454edcf41eb489594ed8cef62
+    sha256: 858fc48f3f9b398d8ca1a4006d637ec3767cb24b5c8c6f669dcaeb64442fa4c4
   category: main
   optional: false
 - name: pre-commit
@@ -8091,6 +8143,18 @@ package:
     sha256: ba49bed74ca170c5a3bf995c33a6179fd74b33abb2444f511862e7f9f57f9149
   category: main
   optional: false
+- name: types-pytz
+  version: 2024.1.0.20240417
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/types-pytz-2024.1.0.20240417-pyhd8ed1ab_0.conda
+  hash:
+    md5: 7b71ace1b99195041329427c435b8125
+    sha256: cc3913a5504b867c748981ba302e82dbc2bda71837f4894d29db8f6cb490e25d
+  category: main
+  optional: false
 - name: typing_extensions
   version: 4.12.2
   manager: conda
@@ -9226,6 +9290,20 @@ package:
   hash:
     md5: b38af0cd7ae3616c90a2511272385941
     sha256: 664bf370d1e254f29fab3b9834ae5f692a59f7e35c64c61d9a9b9989831fd721
+  category: main
+  optional: false
+- name: pandas-stubs
+  version: 2.2.2.240807
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.9'
+    numpy: '>=1.26.0'
+    types-pytz: '>=2022.1.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandas-stubs-2.2.2.240807-pyhd8ed1ab_0.conda
+  hash:
+    md5: f045ee4454edcf41eb489594ed8cef62
+    sha256: 858fc48f3f9b398d8ca1a4006d637ec3767cb24b5c8c6f669dcaeb64442fa4c4
   category: main
   optional: false
 - name: pre-commit
@@ -11099,6 +11177,18 @@ package:
     sha256: ba49bed74ca170c5a3bf995c33a6179fd74b33abb2444f511862e7f9f57f9149
   category: main
   optional: false
+- name: types-pytz
+  version: 2024.1.0.20240417
+  manager: conda
+  platform: win-64
+  dependencies:
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/types-pytz-2024.1.0.20240417-pyhd8ed1ab_0.conda
+  hash:
+    md5: 7b71ace1b99195041329427c435b8125
+    sha256: cc3913a5504b867c748981ba302e82dbc2bda71837f4894d29db8f6cb490e25d
+  category: main
+  optional: false
 - name: typing_extensions
   version: 4.12.2
   manager: conda
@@ -12512,6 +12602,20 @@ package:
   hash:
     md5: 92a5cf9f4778c6c9e02582d99885b34d
     sha256: f27b950c52cac5784b184a258c599cea81fcbfbd688897da799de4b6bf91af6e
+  category: main
+  optional: false
+- name: pandas-stubs
+  version: 2.2.2.240807
+  manager: conda
+  platform: win-64
+  dependencies:
+    python: '>=3.9'
+    numpy: '>=1.26.0'
+    types-pytz: '>=2022.1.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandas-stubs-2.2.2.240807-pyhd8ed1ab_0.conda
+  hash:
+    md5: f045ee4454edcf41eb489594ed8cef62
+    sha256: 858fc48f3f9b398d8ca1a4006d637ec3767cb24b5c8c6f669dcaeb64442fa4c4
   category: main
   optional: false
 - name: shapely
