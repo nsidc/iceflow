@@ -5,8 +5,10 @@ import time
 
 import pandas as pd
 import pandera as pa
-from pandera.typing import DataFrame, Index, Series
+from pandera.typing import DataFrame
 from pyproj import Transformer
+
+from iceflow.ingest.models import commonDataColumns
 
 
 def _datetime_to_decimal_year(date):
@@ -31,17 +33,9 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
-class itrfTransformationDataSchema(pa.DataFrameModel):
-    ITRF: Series[str]
-    latitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
-    longitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
-    elevation: Series[pa.dtypes.Float] = pa.Field(coerce=True)
-    utc_datetime: Index[pa.dtypes.DateTime] = pa.Field(check_name=True)
-
-
 @pa.check_types()
 def transform_itrf(
-    data: DataFrame[itrfTransformationDataSchema],
+    data: DataFrame[commonDataColumns],
     target_itrf: str,
     # These two must both be specified to apply the plate model
     # step. Nothing happens if only one is given. TODO: raise an error if

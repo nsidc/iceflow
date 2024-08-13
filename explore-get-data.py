@@ -55,7 +55,6 @@ if __name__ == "__main__":
         all_dfs.append(data_df)
     # This df contains data  w/ two ITRFs
     complete_df = pd.concat(all_dfs)
-    complete_df = complete_df.set_index("utc_datetime")
 
     transformed = transform_itrf(
         data=complete_df,

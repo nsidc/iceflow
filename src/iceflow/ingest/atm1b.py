@@ -9,8 +9,12 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pandas as pd
+import pandera as pa
 from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
+from pandera.typing import DataFrame, Series
+
+from iceflow.ingest.models import commonDataColumns
 
 """
 The dtypes used to read any of the input ATM1B input files.
@@ -154,7 +158,10 @@ def _shift_lon(lon):
 
 def _augment_with_optional_values(df, original_shape):
     """Add columns (w/ zeros) to the dataframe depending on what fields
-    the original data did not include."""
+    the original data did not include.
+
+    TODO: should use nan instead of 0 for missing??
+    """
     rows, cols = original_shape
     zeros = np.zeros((rows,), dtype=np.int32)
 
@@ -368,7 +375,24 @@ def _ilatm1bv2_data(fn: Path, file_date: dt.date) -> pd.DataFrame:
     return df
 
 
-def atm1b_data(filepath: Path) -> pd.DataFrame:
+class atm1bData(commonDataColumns):
+    # Data fields unique to ATM1B data.
+    rel_time: Series[pa.dtypes.Int32]
+    xmt_sigstr: Series[pa.dtypes.Int32]
+    rcv_sigstr: Series[pa.dtypes.Int32]
+    azimuth: Series[pa.dtypes.Int32]
+    pitch: Series[pa.dtypes.Int32]
+    roll: Series[pa.dtypes.Int32]
+    gps_pdop: Series[pa.dtypes.Int32]
+    gps_time: Series[pa.dtypes.Int32]
+    passive_signal: Series[pa.dtypes.Int32]
+    passive_footprint_latitude: Series[pa.dtypes.Int32]
+    passive_footprint_longitude: Series[pa.dtypes.Int32]
+    passive_footprint_synthesized_elevation: Series[pa.dtypes.Int32]
+
+
+@pa.check_types()
+def atm1b_data(filepath: Path) -> DataFrame[atm1bData]:
     """
     Return the atm1b data given a filename.
 
@@ -405,5 +429,9 @@ def atm1b_data(filepath: Path) -> pd.DataFrame:
 
     itrf = extract_itrf(filepath)
     data["ITRF"] = itrf
+
+    data = data.set_index("utc_datetime")
+
+    data = DataFrame[atm1bData](data)
 
     return data
