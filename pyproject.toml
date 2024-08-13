@@ -62,6 +62,7 @@ disallow_untyped_defs = false
 disallow_untyped_calls = false
 disallow_incomplete_defs = false
 check_untyped_defs = true
+plugins = "pandera.mypy"
 
 [[tool.mypy.overrides]]
 module = [

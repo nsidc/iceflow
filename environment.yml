@@ -12,6 +12,7 @@ dependencies:
   - gps-timemachine ~=1.1.4
   - pyproj ~=3.6.1
   - shapely ~=2.0.5
+  - pandera[mypy]
   # dev tools
   - pre-commit
   - invoke ~=2.2.0
