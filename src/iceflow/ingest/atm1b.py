@@ -264,14 +264,14 @@ def _atm1b_qfit_data(filepath: Path, file_date: dt.date) -> pd.DataFrame:
 
 def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
-    dtype = np.dtype([("record_type", ">i4"), ("header", ">a44")])
+    dtype = np.dtype([("record_type", ">i4"), ("header", ">S44")])
 
     record_size = np.fromfile(filepath, dtype=">i4", count=1)[0]
     if record_size >= 100:
         record_size = np.fromfile(filepath, dtype="<i4", count=1)[0]
         if record_size >= 100:
             raise ValueError("invalid record size found")
-        dtype = np.dtype([("record_type", "<i4"), ("header", "<a44")])
+        dtype = np.dtype([("record_type", "<i4"), ("header", "<S44")])
 
     raw_data = np.fromfile(filepath, dtype=dtype)
 
