@@ -9,6 +9,7 @@ from pandera.typing import DataFrame
 from pyproj import Transformer
 
 from iceflow.ingest.models import commonDataColumns
+from iceflow.itrf import ITRF
 
 
 def _datetime_to_decimal_year(date):
@@ -36,7 +37,7 @@ def _datetime_to_decimal_year(date):
 @pa.check_types()
 def transform_itrf(
     data: DataFrame[commonDataColumns],
-    target_itrf: str,
+    target_itrf: ITRF,
     # These two must both be specified to apply the plate model
     # step. Nothing happens if only one is given. TODO: raise an error if
     # only one is given. Can we determine the plate from the data instead of
