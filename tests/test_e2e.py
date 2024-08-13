@@ -1,3 +1,13 @@
+"""End-to-End test for the typical iceflow pipeline.
+
+* Searches for small sample of data
+* Downloads small sample of data
+* Performs ITRF transformation
+
+This serves as prototype for planned Jupyter Notebook-based tutorial featuring
+this library.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,12 +22,14 @@ from iceflow.itrf.converter import transform_itrf
 ShortName = Literal["ILATM1B"]
 
 
+# TODO: move this
 def search_and_download(
     *,
     version: str,
     short_name: ShortName,
     bounding_box,
     temporal: tuple[str, str],
+    output_dir: Path,
 ) -> list[Path]:
     earthaccess.login()
 
@@ -28,13 +40,16 @@ def search_and_download(
         temporal=temporal,
     )
 
-    downloaded_files = earthaccess.download(results, f"./data/{short_name}")
+    # short_name based subdir for data.
+    output_subdir = output_dir / short_name
+    output_subdir.mkdir(exist_ok=True)
+    downloaded_files = earthaccess.download(results, output_subdir)
     downloaded_filepaths = [Path(filepath_str) for filepath_str in downloaded_files]
 
     return downloaded_filepaths
 
 
-if __name__ == "__main__":
+def test_e2e(tmp_path):
     # TODO: handle different versions of datasets.
     # ILATM1B has two versions. v1 is in
     # qfit format and covers 2009-03-31 through 2012-11-08. v2 is in hdf5 format
@@ -45,6 +60,7 @@ if __name__ == "__main__":
     results = search_and_download(
         short_name="ILATM1B",
         version="1",
+        output_dir=tmp_path,
         bounding_box=(-103.125559, -75.180563, -102.677327, -74.798063),
         temporal=("1993-01-01", "2020-01-01"),
     )
@@ -60,3 +76,5 @@ if __name__ == "__main__":
         data=complete_df,
         target_itrf="ITRF2008",
     )
+
+    assert transformed is not None
