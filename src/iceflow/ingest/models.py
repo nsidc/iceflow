@@ -1,19 +1,14 @@
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import TypeVar
 
+import pandas as pd
 import pandera as pa
-from pandera.typing import DataFrame, Index, Series
+from pandera.typing import Index, Series
 
 from iceflow.itrf import SUPPORTED_ITRFS
 
 TDataFrame_co = TypeVar("TDataFrame_co", covariant=True)
-
-
-# Workaround for inheritance issue. See:
-# https://github.com/unionai-oss/pandera/issues/1170
-class DataFrame_co(DataFrame, Generic[TDataFrame_co]):  # type: ignore[type-arg]
-    pass
 
 
 class commonDataColumns(pa.DataFrameModel):
@@ -22,3 +17,10 @@ class commonDataColumns(pa.DataFrameModel):
     latitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
     longitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
     elevation: Series[pa.dtypes.Float] = pa.Field(coerce=True)
+
+
+class IceFlowData(pd.DataFrame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Validate the data w/ pandera
+        commonDataColumns.validate(self)

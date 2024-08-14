@@ -12,9 +12,9 @@ import pandas as pd
 import pandera as pa
 from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
-from pandera.typing import DataFrame, Series
+from pandera.typing import Series
 
-from iceflow.ingest.models import DataFrame_co, commonDataColumns
+from iceflow.ingest.models import IceFlowData, commonDataColumns
 from iceflow.itrf import SUPPORTED_ITRFS
 
 """
@@ -384,8 +384,14 @@ class atm1bData(commonDataColumns):
     passive_footprint_synthesized_elevation: Series[pa.dtypes.Int32]
 
 
-@pa.check_types()
-def atm1b_data(filepath: Path) -> DataFrame[atm1bData]:
+class ATM1BData(IceFlowData):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Validate the data w/ pandera
+        atm1bData.validate(self)
+
+
+def atm1b_data(filepath: Path) -> ATM1BData:
     """
     Return the atm1b data given a filename.
 
@@ -425,6 +431,6 @@ def atm1b_data(filepath: Path) -> DataFrame[atm1bData]:
 
     data = data.set_index("utc_datetime")
 
-    data = DataFrame_co[atm1bData](data)
+    data = ATM1BData(data)
 
     return data
