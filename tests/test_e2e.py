@@ -16,7 +16,8 @@ from typing import Literal
 import earthaccess
 import pandas as pd
 
-from iceflow.ingest.atm1b import atm1b_data
+from iceflow.ingest.atm1b import atm1b_data, atm1bData
+from iceflow.ingest.models import DataFrame_co
 from iceflow.itrf.converter import transform_itrf
 
 ShortName = Literal["ILATM1B"]
@@ -82,15 +83,10 @@ def test_e2e(tmp_path):
 
     # This df contains data w/ two ITRFs: ITRF2005 and ITRF2008.
     complete_df = pd.concat(all_dfs)
+    complete_df = DataFrame_co[atm1bData](complete_df)
 
     transformed = transform_itrf(
-        # TODO: this type ignore highlights a problem w/ pandera's mypy
-        # integration. Mypy doesn't recognize that a child of the
-        # `commonDataColumns` is valid (this is a `atm1bData` instance, which
-        # inherits from `commonDataColumns`). It might be better to turn
-        # off/ignore pandera typecheckng w/ mypy and just rely on the runtime
-        # validation that pandera provides.
-        data=complete_df,  # type: ignore[arg-type]
+        data=complete_df,
         target_itrf="ITRF2008",
     )
 

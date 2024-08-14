@@ -14,7 +14,7 @@ from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
 from pandera.typing import DataFrame, Series
 
-from iceflow.ingest.models import commonDataColumns
+from iceflow.ingest.models import DataFrame_co, commonDataColumns
 from iceflow.itrf import SUPPORTED_ITRFS
 
 """
@@ -425,6 +425,6 @@ def atm1b_data(filepath: Path) -> DataFrame[atm1bData]:
 
     data = data.set_index("utc_datetime")
 
-    data = DataFrame[atm1bData](data)
+    data = DataFrame_co[atm1bData](data)
 
     return data
