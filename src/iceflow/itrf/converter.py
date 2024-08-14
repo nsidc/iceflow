@@ -43,11 +43,7 @@ def transform_itrf(
     target_epoch: str | None = None,
 ) -> pd.DataFrame:
     """Pipeline string for proj to transform from the source to the target
-    ITRF frame and, optionally, epoch.
-
-    TODO:
-        * Update typing for function
-    """
+    ITRF frame and, optionally, epoch."""
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
         # If the source ITRF is the same as the target for this chunk, skip transformation.
