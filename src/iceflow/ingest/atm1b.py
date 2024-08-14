@@ -14,7 +14,7 @@ from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
 from pandera.typing import Series
 
-from iceflow.ingest.models import IceFlowData, commonDataColumns
+from iceflow.ingest.models import IceFlowData, IceFlowDataSchema
 from iceflow.itrf import SUPPORTED_ITRFS
 
 """
@@ -368,7 +368,7 @@ def _ilatm1bv2_data(fn: Path, file_date: dt.date) -> pd.DataFrame:
     return df
 
 
-class atm1bData(commonDataColumns):
+class ATM1BDataSchema(IceFlowDataSchema):
     # Data fields unique to ATM1B data.
     rel_time: Series[pa.dtypes.Int32]
     xmt_sigstr: Series[pa.dtypes.Int32]
@@ -388,7 +388,10 @@ class ATM1BData(IceFlowData):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Validate the data w/ pandera
-        atm1bData.validate(self)
+        # TODO: Does this result in pandera validating the common columns twice?
+        # The `super` call above would trigger the `IceFlowData`'s __init__,
+        # which include a call to `validate` on the common data columns.
+        ATM1BDataSchema.validate(self)
 
 
 def atm1b_data(filepath: Path) -> ATM1BData:
