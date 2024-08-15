@@ -25,7 +25,7 @@ def pytest(_ctx):
     Includes a code-coverage check.
     """
     print_and_run(
-        f"PYTHONPATH={PROJECT_DIR}/src:$PYTHONPATH pytest -s",
+        f"PYTHONPATH={PROJECT_DIR}/src:$PYTHONPATH pytest --capture=no",
         pty=True,
     )
 
