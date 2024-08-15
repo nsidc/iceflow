@@ -82,7 +82,7 @@ def transform_itrf(
         # TODO: Should we create a new decimalyears when doing an epoch
         # propagation since PROJ doesn't do this?
 
-        lats, lons, elevs, _ = transformer.transform(
+        lons, lats, elevs, _ = transformer.transform(
             chunk.longitude,
             chunk.latitude,
             chunk.elevation,
