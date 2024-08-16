@@ -3,20 +3,23 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+from iceflow.ingest.models import DataFrame_co, commonDataColumns
 from iceflow.itrf.converter import _datetime_to_decimal_year, transform_itrf
 
 
 def test_transform_itrf():
-    synth_df = pd.DataFrame(
-        {
-            # Note: duplicate data here because otherwise a deprecation warning
-            # error about single-value series is raised from pandas' internals,
-            # and pytest complains.
-            "latitude": [70, 70],
-            "longitude": [-50, -50],
-            "elevation": [1, 1],
-            "ITRF": ["ITRF93", "ITRF93"],
-        },
+    synth_df = DataFrame_co[commonDataColumns](
+        pd.DataFrame(
+            {
+                # Note: duplicate data here because otherwise a deprecation warning
+                # error about single-value series is raised from pandas' internals,
+                # and pytest complains.
+                "latitude": [70, 70],
+                "longitude": [-50, -50],
+                "elevation": [1, 1],
+                "ITRF": ["ITRF93", "ITRF93"],
+            },
+        )
     )
 
     constant_datetime = pd.to_datetime("1993-07-02 12:00:00")
