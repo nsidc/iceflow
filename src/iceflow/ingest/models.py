@@ -12,7 +12,7 @@ TDataFrame_co = TypeVar("TDataFrame_co", covariant=True)
 
 # Workaround for inheritance issue. See:
 # https://github.com/unionai-oss/pandera/issues/1170
-class DataFrame_co(DataFrame, Generic[TDataFrame_co]):  # type: ignore[type-arg]
+class IceFlowDataFrame(DataFrame, Generic[TDataFrame_co]):  # type: ignore[type-arg]
     pass
 
 
