@@ -34,4 +34,4 @@ about:
 test:
   imports:
     - iceflow
-    - iceflow.ingest.atm1b
+    - iceflow.data.atm1b

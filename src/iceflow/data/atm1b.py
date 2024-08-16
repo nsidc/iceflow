@@ -13,7 +13,7 @@ import pandera as pa
 from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
 
-from iceflow.ingest.models import ATM1BDataFrame
+from iceflow.data.models import ATM1BDataFrame
 from iceflow.itrf import SUPPORTED_ITRFS
 
 """
