@@ -1,20 +1,26 @@
 from __future__ import annotations
 
+import calendar
 import datetime as dt
-import time
 
 import pandas as pd
+import pandera as pa
 from pyproj import Transformer
+
+from iceflow.ingest.models import IceflowDataFrame
+from iceflow.itrf import ITRF
 
 
 def _datetime_to_decimal_year(date):
     """Stolen from
-    https://stackoverflow.com/questions/6451655/python-how-to-convert-datetime-dates-to-decimal-years
+    https://stackoverflow.com/questions/6451655/python-how-to-convert-datetime-dates-to-decimal-years,
+    with one modification: `calendar.timegm` is used to set the epoch instead of
+    `time.mktime`, which assumes local time.
     """
 
     def sinceEpoch(date):
         # returns seconds since epoch
-        return time.mktime(date.timetuple())
+        return calendar.timegm(date.timetuple())
 
     s = sinceEpoch
 
@@ -29,11 +35,10 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
+@pa.check_types()
 def transform_itrf(
-    # TODO: function assumes pandas dataframe representing data w/ expected
-    # fields.
-    data: pd.DataFrame,
-    target_itrf: str,
+    data: IceflowDataFrame,
+    target_itrf: ITRF,
     # These two must both be specified to apply the plate model
     # step. Nothing happens if only one is given. TODO: raise an error if
     # only one is given. Can we determine the plate from the data instead of
@@ -46,9 +51,6 @@ def transform_itrf(
 
     TODO:
         * Update typing for function
-        * Consider passing in lat/lon/elev/time directly instead of as a pandas df?
-        * If this takes a pd.df w/ expected fields, one of those fields could be
-          ITRF & plate, which would be used by this func.
     """
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
@@ -82,7 +84,7 @@ def transform_itrf(
         # TODO: Should we create a new decimalyears when doing an epoch
         # propagation since PROJ doesn't do this?
 
-        lats, lons, elevs, _ = transformer.transform(
+        lons, lats, elevs, _ = transformer.transform(
             chunk.longitude,
             chunk.latitude,
             chunk.elevation,

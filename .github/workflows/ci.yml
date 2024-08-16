@@ -36,4 +36,4 @@ jobs:
 
       # Unit tests
       - name: "Run typecheck and tests"
-        run: "invoke test.all"
+        run: "invoke test.ci"

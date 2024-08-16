@@ -13,10 +13,10 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: 1f3808c7bc97e28d1329cb5b8f2f0b1fe4735f28199bb477f200eb1ebd6c149f
-    osx-arm64: ab84f54794e7ed33d7edaf7b7629261cb6849d718ec5de36df93898901fb8588
-    osx-64: 637d4af143356dcc0077643ffa5a18a85ac041c0b9f4e168163472e642de2a21
-    win-64: d9c235bfbb2b63e1eaf102425062e6e06906ad3e4515085162cef559a251d98f
+    linux-64: 17b4f1cc12ef6fa60e6cd88f77f880b6fd0cd28d8121248e6129abe56177bd7d
+    osx-arm64: 57d13b048f4c8fcd20a5a3ef1190f6fa8692e7f16f60475a2c2d989c3cc65be0
+    osx-64: e84f35b10b171a900429469782bc3331d37a2eca05df84238668542a394756bb
+    win-64: 49bedf7624cdaf6488241ac1bacfb8e91eac888822dc2acf5df93967944dcb2f
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -1404,15 +1404,15 @@ package:
   category: main
   optional: false
 - name: multimethod
-  version: '1.12'
+  version: 1.9.1
   manager: conda
   platform: linux-64
   dependencies:
-    python: '>=3.9'
-  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.12-pyhd8ed1ab_0.conda
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.9.1-pyhd8ed1ab_0.conda
   hash:
-    md5: 4767a1b0ffd992ca8f0cd985f5fc8aa4
-    sha256: c596b847a058a869530d2f7591db6132a00503c76516da2380b49488de52b639
+    md5: 48223af3f697ccd9b114adb6a66e0f11
+    sha256: 7fcfda7b4a1d74205fcfdefd93804226a6eaffc74a319414c7d8d88f9249db3b
   category: main
   optional: false
 - name: mypy_extensions
@@ -2387,6 +2387,20 @@ package:
     sha256: d3b9a8ed6da7c9f9553c5fd8a4fca9c3e0ab712fa5f497859f82337d67533b73
   category: main
   optional: false
+- name: typing_inspect
+  version: 0.9.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    mypy_extensions: '>=0.3.0'
+    python: '>=3.5'
+    typing_extensions: '>=3.7.4'
+  url: https://conda.anaconda.org/conda-forge/noarch/typing_inspect-0.9.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 9e924b76b91908a17e28a19a0ab88687
+    sha256: 16e0b825c138e14ebc84623248d91d93a8cff29bb93595cc4aa46ca32f24f1de
+  category: main
+  optional: false
 - name: urllib3
   version: 1.26.19
   manager: conda
@@ -2705,6 +2719,20 @@ package:
   hash:
     md5: ba445bf767ae6f0d959ff2b40c20912b
     sha256: 2b26d58aa59e46f933c3126367348651b0dab6e0bf88014e857415bb184a4667
+  category: main
+  optional: false
+- name: typeguard
+  version: 4.3.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    importlib-metadata: '>=3.6'
+    python: '>=3.8'
+    typing-extensions: '>=4.10.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typeguard-4.3.0-pyhd8ed1ab_1.conda
+  hash:
+    md5: 10f49ee1beb82947170c5a5e1a8c0ef3
+    sha256: 1bbf56b43b7a4f696e6d4027404865519bc676760129580ba558555dedfdcfa9
   category: main
   optional: false
 - name: ukkonen
@@ -3061,6 +3089,26 @@ package:
     sha256: 36fe73da4d37bc7ac2d1540526ecd294fbd09acda04e096181ab8f1ccd2b464c
   category: main
   optional: false
+- name: pandera-base
+  version: 0.20.3
+  manager: conda
+  platform: linux-64
+  dependencies:
+    multimethod: <=1.10.0
+    numpy: '>=1.19.0'
+    packaging: '>=20.0'
+    pandas: '>=1.2.0'
+    pydantic: ''
+    python: '>=3.8'
+    typeguard: '>=3.0.2'
+    typing_inspect: '>=0.6.0'
+    wrapt: ''
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-base-0.20.3-pyhd8ed1ab_0.conda
+  hash:
+    md5: 736acd845c4fe83600fc44358e62100b
+    sha256: 319948578d3c73411ce3dd63b3b497a38b2e8c0e5559ac6cf75db0ac5a24ee4e
+  category: main
+  optional: false
 - name: pre-commit
   version: 3.8.0
   manager: conda
@@ -3209,6 +3257,18 @@ package:
   hash:
     md5: a613b51c489c244349d61783a436357d
     sha256: c7d07af7a8a69c626be06191f06628e6ea32e9bedbf0f92ee4d1d010d362fa10
+  category: main
+  optional: false
+- name: pandera
+  version: 0.20.3
+  manager: conda
+  platform: linux-64
+  dependencies:
+    pandera-base: '>=0.20.3,<0.20.4.0a0'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-0.20.3-hd8ed1ab_0.conda
+  hash:
+    md5: c5dccdafb966b0a4a156cba0168379c7
+    sha256: d8f6c4b2e82ea9f3a0ee24080e38cae8c46fccf9c1751b005a10d31b7dcc7873
   category: main
   optional: false
 - name: conda
@@ -3537,15 +3597,15 @@ package:
   category: main
   optional: false
 - name: c-ares
-  version: 1.32.3
+  version: 1.33.0
   manager: conda
   platform: osx-64
   dependencies:
     __osx: '>=10.13'
-  url: https://conda.anaconda.org/conda-forge/osx-64/c-ares-1.32.3-h51dda26_0.conda
+  url: https://conda.anaconda.org/conda-forge/osx-64/c-ares-1.33.0-h51dda26_0.conda
   hash:
-    md5: 5487b45a597e142da7839941ab2494a9
-    sha256: 2454287fa7d32b2cd089ad2bb46c8f8634b6f409d6fa8892c37ccc66134ec076
+    md5: 3355b2350a1de63943bcd053a4fccd6d
+    sha256: d1f2429bf3d5d1c7e1a0ce5bf6216b563024169293731a130f7d8a64230b9302
   category: main
   optional: false
 - name: icu
@@ -4572,15 +4632,15 @@ package:
   category: main
   optional: false
 - name: multimethod
-  version: '1.12'
+  version: 1.9.1
   manager: conda
   platform: osx-64
   dependencies:
-    python: '>=3.9'
-  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.12-pyhd8ed1ab_0.conda
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.9.1-pyhd8ed1ab_0.conda
   hash:
-    md5: 4767a1b0ffd992ca8f0cd985f5fc8aa4
-    sha256: c596b847a058a869530d2f7591db6132a00503c76516da2380b49488de52b639
+    md5: 48223af3f697ccd9b114adb6a66e0f11
+    sha256: 7fcfda7b4a1d74205fcfdefd93804226a6eaffc74a319414c7d8d88f9249db3b
   category: main
   optional: false
 - name: mypy_extensions
@@ -5558,6 +5618,20 @@ package:
     sha256: d3b9a8ed6da7c9f9553c5fd8a4fca9c3e0ab712fa5f497859f82337d67533b73
   category: main
   optional: false
+- name: typing_inspect
+  version: 0.9.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.5'
+    typing_extensions: '>=3.7.4'
+    mypy_extensions: '>=0.3.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typing_inspect-0.9.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 9e924b76b91908a17e28a19a0ab88687
+    sha256: 16e0b825c138e14ebc84623248d91d93a8cff29bb93595cc4aa46ca32f24f1de
+  category: main
+  optional: false
 - name: urllib3
   version: 1.26.19
   manager: conda
@@ -5838,6 +5912,20 @@ package:
   hash:
     md5: ba445bf767ae6f0d959ff2b40c20912b
     sha256: 2b26d58aa59e46f933c3126367348651b0dab6e0bf88014e857415bb184a4667
+  category: main
+  optional: false
+- name: typeguard
+  version: 4.3.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.8'
+    importlib-metadata: '>=3.6'
+    typing-extensions: '>=4.10.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typeguard-4.3.0-pyhd8ed1ab_1.conda
+  hash:
+    md5: 10f49ee1beb82947170c5a5e1a8c0ef3
+    sha256: 1bbf56b43b7a4f696e6d4027404865519bc676760129580ba558555dedfdcfa9
   category: main
   optional: false
 - name: ukkonen
@@ -6341,6 +6429,38 @@ package:
     sha256: c7d07af7a8a69c626be06191f06628e6ea32e9bedbf0f92ee4d1d010d362fa10
   category: main
   optional: false
+- name: pandera-base
+  version: 0.20.3
+  manager: conda
+  platform: osx-64
+  dependencies:
+    pydantic: ''
+    wrapt: ''
+    python: '>=3.8'
+    packaging: '>=20.0'
+    numpy: '>=1.19.0'
+    pandas: '>=1.2.0'
+    typing_inspect: '>=0.6.0'
+    typeguard: '>=3.0.2'
+    multimethod: <=1.10.0
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-base-0.20.3-pyhd8ed1ab_0.conda
+  hash:
+    md5: 736acd845c4fe83600fc44358e62100b
+    sha256: 319948578d3c73411ce3dd63b3b497a38b2e8c0e5559ac6cf75db0ac5a24ee4e
+  category: main
+  optional: false
+- name: pandera
+  version: 0.20.3
+  manager: conda
+  platform: osx-64
+  dependencies:
+    pandera-base: '>=0.20.3,<0.20.4.0a0'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-0.20.3-hd8ed1ab_0.conda
+  hash:
+    md5: c5dccdafb966b0a4a156cba0168379c7
+    sha256: d8f6c4b2e82ea9f3a0ee24080e38cae8c46fccf9c1751b005a10d31b7dcc7873
+  category: main
+  optional: false
 - name: conda
   version: 24.7.1
   manager: conda
@@ -6667,15 +6787,15 @@ package:
   category: main
   optional: false
 - name: c-ares
-  version: 1.32.3
+  version: 1.33.0
   manager: conda
   platform: osx-arm64
   dependencies:
     __osx: '>=11.0'
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/c-ares-1.32.3-h99b78c6_0.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/c-ares-1.33.0-h99b78c6_0.conda
   hash:
-    md5: c27bebc62991ab075b773f86ba64aa9b
-    sha256: dc8e2c2508295595675fb829345a156b0bb42b164271c2fcafb7fb193449bcf8
+    md5: 47874589be833bd706221ce6897374df
+    sha256: cc80521ffcc27ddf1362a85acee440bea4aa669f367463cd7d28cb46b497ec55
   category: main
   optional: false
 - name: icu
@@ -7703,15 +7823,15 @@ package:
   category: main
   optional: false
 - name: multimethod
-  version: '1.12'
+  version: 1.9.1
   manager: conda
   platform: osx-arm64
   dependencies:
-    python: '>=3.9'
-  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.12-pyhd8ed1ab_0.conda
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.9.1-pyhd8ed1ab_0.conda
   hash:
-    md5: 4767a1b0ffd992ca8f0cd985f5fc8aa4
-    sha256: c596b847a058a869530d2f7591db6132a00503c76516da2380b49488de52b639
+    md5: 48223af3f697ccd9b114adb6a66e0f11
+    sha256: 7fcfda7b4a1d74205fcfdefd93804226a6eaffc74a319414c7d8d88f9249db3b
   category: main
   optional: false
 - name: mypy_extensions
@@ -8689,6 +8809,20 @@ package:
     sha256: d3b9a8ed6da7c9f9553c5fd8a4fca9c3e0ab712fa5f497859f82337d67533b73
   category: main
   optional: false
+- name: typing_inspect
+  version: 0.9.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.5'
+    typing_extensions: '>=3.7.4'
+    mypy_extensions: '>=0.3.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typing_inspect-0.9.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 9e924b76b91908a17e28a19a0ab88687
+    sha256: 16e0b825c138e14ebc84623248d91d93a8cff29bb93595cc4aa46ca32f24f1de
+  category: main
+  optional: false
 - name: urllib3
   version: 1.26.19
   manager: conda
@@ -8969,6 +9103,20 @@ package:
   hash:
     md5: ba445bf767ae6f0d959ff2b40c20912b
     sha256: 2b26d58aa59e46f933c3126367348651b0dab6e0bf88014e857415bb184a4667
+  category: main
+  optional: false
+- name: typeguard
+  version: 4.3.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.8'
+    importlib-metadata: '>=3.6'
+    typing-extensions: '>=4.10.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typeguard-4.3.0-pyhd8ed1ab_1.conda
+  hash:
+    md5: 10f49ee1beb82947170c5a5e1a8c0ef3
+    sha256: 1bbf56b43b7a4f696e6d4027404865519bc676760129580ba558555dedfdcfa9
   category: main
   optional: false
 - name: ukkonen
@@ -9470,6 +9618,38 @@ package:
   hash:
     md5: a613b51c489c244349d61783a436357d
     sha256: c7d07af7a8a69c626be06191f06628e6ea32e9bedbf0f92ee4d1d010d362fa10
+  category: main
+  optional: false
+- name: pandera-base
+  version: 0.20.3
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    pydantic: ''
+    wrapt: ''
+    python: '>=3.8'
+    packaging: '>=20.0'
+    numpy: '>=1.19.0'
+    pandas: '>=1.2.0'
+    typing_inspect: '>=0.6.0'
+    typeguard: '>=3.0.2'
+    multimethod: <=1.10.0
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-base-0.20.3-pyhd8ed1ab_0.conda
+  hash:
+    md5: 736acd845c4fe83600fc44358e62100b
+    sha256: 319948578d3c73411ce3dd63b3b497a38b2e8c0e5559ac6cf75db0ac5a24ee4e
+  category: main
+  optional: false
+- name: pandera
+  version: 0.20.3
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    pandera-base: '>=0.20.3,<0.20.4.0a0'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-0.20.3-hd8ed1ab_0.conda
+  hash:
+    md5: c5dccdafb966b0a4a156cba0168379c7
+    sha256: d8f6c4b2e82ea9f3a0ee24080e38cae8c46fccf9c1751b005a10d31b7dcc7873
   category: main
   optional: false
 - name: conda
@@ -10739,15 +10919,15 @@ package:
   category: main
   optional: false
 - name: multimethod
-  version: '1.12'
+  version: 1.9.1
   manager: conda
   platform: win-64
   dependencies:
-    python: '>=3.9'
-  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.12-pyhd8ed1ab_0.conda
+    python: '>=3.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/multimethod-1.9.1-pyhd8ed1ab_0.conda
   hash:
-    md5: 4767a1b0ffd992ca8f0cd985f5fc8aa4
-    sha256: c596b847a058a869530d2f7591db6132a00503c76516da2380b49488de52b639
+    md5: 48223af3f697ccd9b114adb6a66e0f11
+    sha256: 7fcfda7b4a1d74205fcfdefd93804226a6eaffc74a319414c7d8d88f9249db3b
   category: main
   optional: false
 - name: mypy_extensions
@@ -11772,6 +11952,20 @@ package:
     sha256: d3b9a8ed6da7c9f9553c5fd8a4fca9c3e0ab712fa5f497859f82337d67533b73
   category: main
   optional: false
+- name: typing_inspect
+  version: 0.9.0
+  manager: conda
+  platform: win-64
+  dependencies:
+    python: '>=3.5'
+    typing_extensions: '>=3.7.4'
+    mypy_extensions: '>=0.3.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typing_inspect-0.9.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 9e924b76b91908a17e28a19a0ab88687
+    sha256: 16e0b825c138e14ebc84623248d91d93a8cff29bb93595cc4aa46ca32f24f1de
+  category: main
+  optional: false
 - name: virtualenv
   version: 20.26.3
   manager: conda
@@ -12041,6 +12235,20 @@ package:
   hash:
     md5: ba445bf767ae6f0d959ff2b40c20912b
     sha256: 2b26d58aa59e46f933c3126367348651b0dab6e0bf88014e857415bb184a4667
+  category: main
+  optional: false
+- name: typeguard
+  version: 4.3.0
+  manager: conda
+  platform: win-64
+  dependencies:
+    python: '>=3.8'
+    importlib-metadata: '>=3.6'
+    typing-extensions: '>=4.10.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/typeguard-4.3.0-pyhd8ed1ab_1.conda
+  hash:
+    md5: 10f49ee1beb82947170c5a5e1a8c0ef3
+    sha256: 1bbf56b43b7a4f696e6d4027404865519bc676760129580ba558555dedfdcfa9
   category: main
   optional: false
 - name: ukkonen
@@ -12634,6 +12842,38 @@ package:
   hash:
     md5: b4a76f36780fa55cd2104f2970ff6bed
     sha256: 723a8f400918b63626cd49ab3364a661fe07c70c3e022431fc610e196a14b49f
+  category: main
+  optional: false
+- name: pandera-base
+  version: 0.20.3
+  manager: conda
+  platform: win-64
+  dependencies:
+    pydantic: ''
+    wrapt: ''
+    python: '>=3.8'
+    packaging: '>=20.0'
+    numpy: '>=1.19.0'
+    pandas: '>=1.2.0'
+    typing_inspect: '>=0.6.0'
+    typeguard: '>=3.0.2'
+    multimethod: <=1.10.0
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-base-0.20.3-pyhd8ed1ab_0.conda
+  hash:
+    md5: 736acd845c4fe83600fc44358e62100b
+    sha256: 319948578d3c73411ce3dd63b3b497a38b2e8c0e5559ac6cf75db0ac5a24ee4e
+  category: main
+  optional: false
+- name: pandera
+  version: 0.20.3
+  manager: conda
+  platform: win-64
+  dependencies:
+    pandera-base: '>=0.20.3,<0.20.4.0a0'
+  url: https://conda.anaconda.org/conda-forge/noarch/pandera-0.20.3-hd8ed1ab_0.conda
+  hash:
+    md5: c5dccdafb966b0a4a156cba0168379c7
+    sha256: d8f6c4b2e82ea9f3a0ee24080e38cae8c46fccf9c1751b005a10d31b7dcc7873
   category: main
   optional: false
 - name: conda
