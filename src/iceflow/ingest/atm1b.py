@@ -254,6 +254,8 @@ def _atm1b_qfit_data(filepath: Path, file_date: dt.date) -> pd.DataFrame:
     df["latitude"] = df["latitude"] * 1e-6
     df["longitude"] = df["longitude"] * 1e-6
     df["longitude"] = df["longitude"].apply(_shift_lon)
+    # elevation values are natively stored as Meters 10**-3. We convert them
+    # back to meters here.
     df["elevation"] = df["elevation"] * 1e-3
     df["elevation"] = df["elevation"].astype(np.float32)
     df["utc_datetime"] = _utc_datetime(df["gps_time"], file_date)
