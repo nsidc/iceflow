@@ -41,7 +41,8 @@ def fetch_iceflow_df(
 
     all_dfs = []
     for result in results:
-        # TODO: how parameterize on short_name?
+        # TODO: how parameterize on short_name? Perhaps with e.g.,
+        # https://docs.python.org/3.11/library/functools.html#functools.singledispatch
         data_df = atm1b_data(result)
         all_dfs.append(data_df)
 
