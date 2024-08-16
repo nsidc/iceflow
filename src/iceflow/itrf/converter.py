@@ -45,7 +45,7 @@ def transform_itrf(
     # requiring the user to pass?
     plate: str | None = None,
     target_epoch: str | None = None,
-) -> pd.DataFrame:
+) -> IceflowDataFrame:
     """Pipeline string for proj to transform from the source to the target
     ITRF frame and, optionally, epoch.
 
@@ -95,9 +95,11 @@ def transform_itrf(
         transformed_chunk["latitude"] = lats
         transformed_chunk["longitude"] = lons
         transformed_chunk["elevation"] = elevs
+        transformed_chunk["ITRF"] = target_itrf
         transformed_chunks.append(transformed_chunk)
 
     transformed_df = pd.concat(transformed_chunks)
     transformed_df = transformed_df.reset_index().set_index("utc_datetime")
+    transformed_df = IceflowDataFrame(transformed_df)
 
     return transformed_df

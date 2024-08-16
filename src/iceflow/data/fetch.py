@@ -2,17 +2,16 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Literal
 
 import earthaccess
 
-ShortName = Literal["ILATM1B"]
+DEFAULT_OUTPUT_PATH = Path("TODO")
 
 
 def search_and_download(
     *,
     version: str,
-    short_name: ShortName,
+    short_name: str,
     bounding_box: Sequence[float],
     temporal: tuple[str, str],
     output_dir: Path,
