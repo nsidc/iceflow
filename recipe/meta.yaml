@@ -19,12 +19,14 @@ requirements:
   run:
     - python ~=3.10
     - numpy ~=2.0.1
+
     - earthaccess ~=0.10.0
     - pandas ~=2.2
     - h5py ~=3.11
     - gps-timemachine ~=1.1.4
     - pyproj ~=3.6.1
     - shapely ~=2.0.5
+    - pandera[mypy] ~= 0.20.3
 
 about:
   home: https://github.com/nsidc/iceflow
