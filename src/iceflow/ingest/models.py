@@ -7,6 +7,8 @@ from pandera.typing import DataFrame, Index, Series
 
 from iceflow.itrf import SUPPORTED_ITRFS
 
+# Covariant type vars end with `_co` by convention. See:
+# https://peps.python.org/pep-0484/#covariance-and-contravariance
 TDataFrame_co = TypeVar("TDataFrame_co", covariant=True)
 
 
