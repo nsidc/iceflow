@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import os
-import time
-
 import pandas as pd
 import pytest
 
@@ -39,8 +36,7 @@ def test_transform_itrf():
 
 
 @pytest.mark.parametrize("timezone", ["America/Denver", "UTC"])
-def test__datetime_to_decimal_year(timezone):
-    os.environ["TZ"] = timezone
-    time.tzset()
+def test__datetime_to_decimal_year(timezone, monkeypatch):
+    monkeypatch.setenv("TZ", timezone)
     result = _datetime_to_decimal_year(pd.to_datetime("1993-07-02 12:00:00"))
     assert result == 1993.5
