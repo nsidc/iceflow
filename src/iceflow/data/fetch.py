@@ -5,8 +5,6 @@ from pathlib import Path
 
 import earthaccess
 
-DEFAULT_OUTPUT_PATH = Path("TODO")
-
 
 def search_and_download(
     *,

@@ -7,7 +7,7 @@ from typing import Literal
 import pandas as pd
 
 from iceflow.data.atm1b import atm1b_data
-from iceflow.data.fetch import DEFAULT_OUTPUT_PATH, search_and_download
+from iceflow.data.fetch import search_and_download
 from iceflow.data.models import IceflowDataFrame
 from iceflow.itrf import ITRF
 from iceflow.itrf.converter import transform_itrf
@@ -23,7 +23,7 @@ def fetch_iceflow_df(
     dataset_short_name: DatasetShortName,
     bounding_box: Sequence[float],
     temporal: tuple[str, str],
-    output_dir: Path = DEFAULT_OUTPUT_PATH,
+    output_dir: Path,
     output_itrf: ITRF | None,
 ) -> IceflowDataFrame:
     """Search for data matching parameters and return an IceflowDataframe.
