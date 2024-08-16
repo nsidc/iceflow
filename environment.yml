@@ -13,6 +13,7 @@ dependencies:
   - pyproj ~=3.6.1
   - shapely ~=2.0.5
   - pandera[mypy] ~= 0.20.3
+  - pydantic ~=2.8.2
   # dev tools
   - pre-commit
   - invoke ~=2.2.0

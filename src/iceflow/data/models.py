@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from collections.abc import Sequence
+from typing import Generic, Literal, TypeVar
 
 import pandera as pa
+import pydantic
 from pandera.typing import DataFrame, Index, Series
 
 from iceflow.itrf import SUPPORTED_ITRFS
@@ -44,3 +46,20 @@ class ATM1BSchema(CommonDataColumnsSchema):
 
 IceflowDataFrame = DataFrame_co[CommonDataColumnsSchema]
 ATM1BDataFrame = DataFrame_co[ATM1BSchema]
+
+DatasetShortName = Literal["ILATM1B"]
+
+
+class Dataset(pydantic.BaseModel):
+    short_name: DatasetShortName
+    version: str
+
+
+class ATM1BDataset(Dataset):
+    short_name: DatasetShortName = "ILATM1B"
+
+
+class DatasetSearchParameters(pydantic.BaseModel):
+    dataset: Dataset
+    bounding_box: Sequence[float]
+    temporal: tuple[str, str]
