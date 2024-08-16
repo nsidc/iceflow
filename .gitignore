@@ -1,5 +1,5 @@
 # Temporary local data store
-data/
+downloaded-data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

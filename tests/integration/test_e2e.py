@@ -16,8 +16,8 @@ from typing import Literal
 import earthaccess
 import pandas as pd
 
-from iceflow.ingest.atm1b import atm1b_data
-from iceflow.ingest.models import IceflowDataFrame
+from iceflow.data.atm1b import atm1b_data
+from iceflow.data.models import IceflowDataFrame
 from iceflow.itrf.converter import transform_itrf
 
 ShortName = Literal["ILATM1B"]

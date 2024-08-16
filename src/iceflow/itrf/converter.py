@@ -7,7 +7,7 @@ import pandas as pd
 import pandera as pa
 from pyproj import Transformer
 
-from iceflow.ingest.models import IceflowDataFrame
+from iceflow.data.models import IceflowDataFrame
 from iceflow.itrf import ITRF
 
 
