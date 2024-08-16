@@ -9,8 +9,12 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pandas as pd
+import pandera as pa
 from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
+
+from iceflow.ingest.models import ATM1BDataFrame
+from iceflow.itrf import SUPPORTED_ITRFS
 
 """
 The dtypes used to read any of the input ATM1B input files.
@@ -154,7 +158,10 @@ def _shift_lon(lon):
 
 def _augment_with_optional_values(df, original_shape):
     """Add columns (w/ zeros) to the dataframe depending on what fields
-    the original data did not include."""
+    the original data did not include.
+
+    TODO: should use nan instead of 0 for missing??
+    """
     rows, cols = original_shape
     zeros = np.zeros((rows,), dtype=np.int32)
 
@@ -258,14 +265,14 @@ def _atm1b_qfit_data(filepath: Path, file_date: dt.date) -> pd.DataFrame:
 
 def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
-    dtype = np.dtype([("record_type", ">i4"), ("header", ">a44")])
+    dtype = np.dtype([("record_type", ">i4"), ("header", ">S44")])
 
     record_size = np.fromfile(filepath, dtype=">i4", count=1)[0]
     if record_size >= 100:
         record_size = np.fromfile(filepath, dtype="<i4", count=1)[0]
         if record_size >= 100:
             raise ValueError("invalid record size found")
-        dtype = np.dtype([("record_type", "<i4"), ("header", "<a44")])
+        dtype = np.dtype([("record_type", "<i4"), ("header", "<S44")])
 
     raw_data = np.fromfile(filepath, dtype=dtype)
 
@@ -305,15 +312,7 @@ def extract_itrf(filepath: Path) -> str:
 
     itrf = itrf.upper()
 
-    if itrf not in [
-        "ITRF93",
-        "ITRF94",
-        "ITRF96",
-        "ITRF97",
-        "ITRF2000",
-        "ITRF2005",
-        "ITRF2008",
-    ]:
+    if itrf not in SUPPORTED_ITRFS:
         # Try to normalize:
         try:
             itrf = {
@@ -370,7 +369,8 @@ def _ilatm1bv2_data(fn: Path, file_date: dt.date) -> pd.DataFrame:
     return df
 
 
-def atm1b_data(filepath: Path) -> pd.DataFrame:
+@pa.check_types()
+def atm1b_data(filepath: Path) -> ATM1BDataFrame:
     """
     Return the atm1b data given a filename.
 
@@ -407,5 +407,9 @@ def atm1b_data(filepath: Path) -> pd.DataFrame:
 
     itrf = extract_itrf(filepath)
     data["ITRF"] = itrf
+
+    data = data.set_index("utc_datetime")
+
+    data = ATM1BDataFrame(data)
 
     return data

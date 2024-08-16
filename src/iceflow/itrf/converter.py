@@ -4,7 +4,11 @@ import calendar
 import datetime as dt
 
 import pandas as pd
+import pandera as pa
 from pyproj import Transformer
+
+from iceflow.ingest.models import IceflowDataFrame
+from iceflow.itrf import ITRF
 
 
 def _datetime_to_decimal_year(date):
@@ -31,11 +35,10 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
+@pa.check_types()
 def transform_itrf(
-    # TODO: function assumes pandas dataframe representing data w/ expected
-    # fields.
-    data: pd.DataFrame,
-    target_itrf: str,
+    data: IceflowDataFrame,
+    target_itrf: ITRF,
     # These two must both be specified to apply the plate model
     # step. Nothing happens if only one is given. TODO: raise an error if
     # only one is given. Can we determine the plate from the data instead of
@@ -48,9 +51,6 @@ def transform_itrf(
 
     TODO:
         * Update typing for function
-        * Consider passing in lat/lon/elev/time directly instead of as a pandas df?
-        * If this takes a pd.df w/ expected fields, one of those fields could be
-          ITRF & plate, which would be used by this func.
     """
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
