@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from iceflow.data.api import fetch_iceflow_df
+from iceflow.api import fetch_iceflow_df
 from iceflow.data.models import IceflowDataFrame
 from iceflow.itrf import ITRF
 
