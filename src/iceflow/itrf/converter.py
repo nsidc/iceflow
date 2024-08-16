@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import calendar
 import datetime as dt
-import time
 
 import pandas as pd
 from pyproj import Transformer
@@ -9,12 +9,14 @@ from pyproj import Transformer
 
 def _datetime_to_decimal_year(date):
     """Stolen from
-    https://stackoverflow.com/questions/6451655/python-how-to-convert-datetime-dates-to-decimal-years
+    https://stackoverflow.com/questions/6451655/python-how-to-convert-datetime-dates-to-decimal-years,
+    with one modification: `calendar.timegm` is used to set the epoch instead of
+    `time.mktime`, which assumes local time.
     """
 
     def sinceEpoch(date):
         # returns seconds since epoch
-        return time.mktime(date.timetuple())
+        return calendar.timegm(date.timetuple())
 
     s = sinceEpoch
 
@@ -82,7 +84,7 @@ def transform_itrf(
         # TODO: Should we create a new decimalyears when doing an epoch
         # propagation since PROJ doesn't do this?
 
-        lats, lons, elevs, _ = transformer.transform(
+        lons, lats, elevs, _ = transformer.transform(
             chunk.longitude,
             chunk.latitude,
             chunk.elevation,
