@@ -19,15 +19,26 @@ def typecheck(_ctx):
 
 
 @task()
-def pytest(_ctx):
-    """Run all tests with pytest.
-
-    Includes a code-coverage check.
-    """
+def unit(_ctx):
+    """Run all unit tests with pytest."""
     print_and_run(
-        f"PYTHONPATH={PROJECT_DIR}/src:$PYTHONPATH pytest --capture=no",
+        f"PYTHONPATH={PROJECT_DIR}/src:$PYTHONPATH pytest tests/unit/ --capture=no",
         pty=True,
     )
+
+
+@task()
+def pytest(_ctx):
+    """Run all tests with pytest."""
+    print_and_run(
+        f"PYTHONPATH={PROJECT_DIR}/src:$PYTHONPATH pytest tests/ --capture=no",
+        pty=True,
+    )
+
+
+@task(pre=[typecheck, unit])
+def ci(_ctx):
+    """Run all CI tests"""
 
 
 @task(

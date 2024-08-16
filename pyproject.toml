@@ -39,9 +39,6 @@ filterwarnings = [
   "error",
 ]
 log_cli_level = "INFO"
-testpaths = [
-  "tests",
-]
 
 
 [tool.coverage]
