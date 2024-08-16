@@ -16,8 +16,8 @@ from typing import Literal
 import earthaccess
 import pandas as pd
 
-from iceflow.ingest.atm1b import atm1b_data, atm1bData
-from iceflow.ingest.models import IceFlowDataFrame
+from iceflow.ingest.atm1b import atm1b_data
+from iceflow.ingest.models import IceflowDataFrame
 from iceflow.itrf.converter import transform_itrf
 
 ShortName = Literal["ILATM1B"]
@@ -83,7 +83,7 @@ def test_e2e(tmp_path):
 
     # This df contains data w/ two ITRFs: ITRF2005 and ITRF2008.
     complete_df = pd.concat(all_dfs)
-    complete_df = IceFlowDataFrame[atm1bData](complete_df)
+    complete_df = IceflowDataFrame(complete_df)
 
     transformed = transform_itrf(
         data=complete_df,

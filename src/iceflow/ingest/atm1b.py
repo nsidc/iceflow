@@ -12,9 +12,8 @@ import pandas as pd
 import pandera as pa
 from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
-from pandera.typing import DataFrame, Series
 
-from iceflow.ingest.models import IceFlowDataFrame, commonDataColumns
+from iceflow.ingest.models import ATM1BDataFrame
 from iceflow.itrf import SUPPORTED_ITRFS
 
 """
@@ -370,24 +369,8 @@ def _ilatm1bv2_data(fn: Path, file_date: dt.date) -> pd.DataFrame:
     return df
 
 
-class atm1bData(commonDataColumns):
-    # Data fields unique to ATM1B data.
-    rel_time: Series[pa.dtypes.Int32]
-    xmt_sigstr: Series[pa.dtypes.Int32]
-    rcv_sigstr: Series[pa.dtypes.Int32]
-    azimuth: Series[pa.dtypes.Int32]
-    pitch: Series[pa.dtypes.Int32]
-    roll: Series[pa.dtypes.Int32]
-    gps_pdop: Series[pa.dtypes.Int32]
-    gps_time: Series[pa.dtypes.Int32]
-    passive_signal: Series[pa.dtypes.Int32]
-    passive_footprint_latitude: Series[pa.dtypes.Int32]
-    passive_footprint_longitude: Series[pa.dtypes.Int32]
-    passive_footprint_synthesized_elevation: Series[pa.dtypes.Int32]
-
-
 @pa.check_types()
-def atm1b_data(filepath: Path) -> DataFrame[atm1bData]:
+def atm1b_data(filepath: Path) -> ATM1BDataFrame:
     """
     Return the atm1b data given a filename.
 
@@ -427,6 +410,6 @@ def atm1b_data(filepath: Path) -> DataFrame[atm1bData]:
 
     data = data.set_index("utc_datetime")
 
-    data = IceFlowDataFrame[atm1bData](data)
+    data = ATM1BDataFrame(data)
 
     return data

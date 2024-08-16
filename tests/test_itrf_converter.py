@@ -3,12 +3,12 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from iceflow.ingest.models import IceFlowDataFrame, commonDataColumns
+from iceflow.ingest.models import IceflowDataFrame
 from iceflow.itrf.converter import _datetime_to_decimal_year, transform_itrf
 
 
 def test_transform_itrf():
-    synth_df = IceFlowDataFrame[commonDataColumns](
+    synth_df = IceflowDataFrame(
         pd.DataFrame(
             {
                 # Note: duplicate data here because otherwise a deprecation warning

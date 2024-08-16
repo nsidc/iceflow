@@ -7,7 +7,7 @@ import pandas as pd
 import pandera as pa
 from pyproj import Transformer
 
-from iceflow.ingest.models import IceFlowDataFrame, commonDataColumns
+from iceflow.ingest.models import IceflowDataFrame
 from iceflow.itrf import ITRF
 
 
@@ -37,7 +37,7 @@ def _datetime_to_decimal_year(date):
 
 @pa.check_types()
 def transform_itrf(
-    data: IceFlowDataFrame[commonDataColumns],
+    data: IceflowDataFrame,
     target_itrf: ITRF,
     # These two must both be specified to apply the plate model
     # step. Nothing happens if only one is given. TODO: raise an error if
