@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import os
+import time
+
 import pandas as pd
+import pytest
 
 from iceflow.itrf.converter import _datetime_to_decimal_year, transform_itrf
 
@@ -34,6 +38,9 @@ def test_transform_itrf():
     assert result.elevation.to_numpy()[0] == 1.0052761882543564
 
 
-def test__datetime_to_decimal_year():
+@pytest.mark.parametrize("timezone", ["America/Denver", "UTC"])
+def test__datetime_to_decimal_year(timezone):
+    os.environ["TZ"] = timezone
+    time.tzset()
     result = _datetime_to_decimal_year(pd.to_datetime("1993-07-02 12:00:00"))
     assert result == 1993.5
