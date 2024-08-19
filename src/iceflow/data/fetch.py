@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -11,7 +12,7 @@ def search_and_download(
     version: str,
     short_name: str,
     bounding_box: Sequence[float],
-    temporal: tuple[str, str],
+    temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date],
     output_dir: Path,
 ) -> list[Path]:
     """Search and download data.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Sequence
 from typing import Generic, Literal, TypeVar
 
@@ -62,4 +63,4 @@ class ATM1BDataset(Dataset):
 class DatasetSearchParameters(pydantic.BaseModel):
     dataset: Dataset
     bounding_box: Sequence[float]
-    temporal: tuple[str, str]
+    temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date]

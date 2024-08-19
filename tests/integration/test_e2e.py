@@ -10,6 +10,8 @@ this library.
 
 from __future__ import annotations
 
+import datetime as dt
+
 import pandas as pd
 
 from iceflow.api import fetch_iceflow_df
@@ -26,7 +28,7 @@ def test_e2e(tmp_path):
         dataset_search_params=DatasetSearchParameters(
             dataset=atm1b_v1_dataset,
             bounding_box=common_bounding_box,
-            temporal=("2009-11-01", "2009-12-01"),
+            temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
         ),
         output_dir=tmp_path,
         output_itrf=target_itrf,
@@ -36,7 +38,7 @@ def test_e2e(tmp_path):
         dataset_search_params=DatasetSearchParameters(
             dataset=atm1b_v1_dataset,
             bounding_box=common_bounding_box,
-            temporal=("2012-11-01", "2012-12-01"),
+            temporal=(dt.date(2012, 11, 1), dt.date(2012, 12, 1)),
         ),
         output_dir=tmp_path,
         output_itrf=target_itrf,
