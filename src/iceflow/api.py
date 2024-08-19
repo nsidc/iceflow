@@ -1,28 +1,22 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Literal
 
 import pandas as pd
 
-from iceflow.data.atm1b import atm1b_data
 from iceflow.data.fetch import search_and_download
-from iceflow.data.models import IceflowDataFrame
+from iceflow.data.models import (
+    DatasetSearchParameters,
+    IceflowDataFrame,
+)
+from iceflow.data.read import read_data
 from iceflow.itrf import ITRF
 from iceflow.itrf.converter import transform_itrf
-
-DatasetShortName = Literal["ILATM1B"]
 
 
 def fetch_iceflow_df(
     *,
-    # TODO: consider some container (typeddict/dataclass/pydantic) to contain &
-    # validate dataset search params
-    dataset_version: str,
-    dataset_short_name: DatasetShortName,
-    bounding_box: Sequence[float],
-    temporal: tuple[str, str],
+    dataset_search_params: DatasetSearchParameters,
     output_dir: Path,
     output_itrf: ITRF | None,
 ) -> IceflowDataFrame:
@@ -32,18 +26,16 @@ def fetch_iceflow_df(
     """
 
     results = search_and_download(
-        short_name=dataset_short_name,
-        version=dataset_version,
+        short_name=dataset_search_params.dataset.short_name,
+        version=dataset_search_params.dataset.version,
+        bounding_box=dataset_search_params.bounding_box,
+        temporal=dataset_search_params.temporal,
         output_dir=output_dir,
-        bounding_box=bounding_box,
-        temporal=temporal,
     )
 
     all_dfs = []
     for result in results:
-        # TODO: how parameterize on short_name? Perhaps with e.g.,
-        # https://docs.python.org/3.11/library/functools.html#functools.singledispatch
-        data_df = atm1b_data(result)
+        data_df = read_data(dataset_search_params.dataset, result)
         all_dfs.append(data_df)
 
     complete_df = IceflowDataFrame(pd.concat(all_dfs))
