@@ -58,8 +58,7 @@ def fetch_iceflow_df(
         data_df = read_data(dataset_search_params.dataset, result)
         all_dfs.append(data_df)
 
-    complete_df = pd.concat(all_dfs)
-    complete_df = IceflowDataFrame(complete_df)
+    complete_df = IceflowDataFrame(pd.concat(all_dfs))
 
     if output_itrf is not None:
         complete_df = transform_itrf(
