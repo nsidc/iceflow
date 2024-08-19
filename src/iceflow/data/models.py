@@ -14,25 +14,27 @@ from iceflow.itrf import ITRF_REGEX
 class CommonDataColumnsSchema(pa.DataFrameModel):
     utc_datetime: Index[pa.dtypes.DateTime] = pa.Field(check_name=True)
     ITRF: Series[str] = pa.Field(str_matches=ITRF_REGEX.pattern)
-    latitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
-    longitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
-    elevation: Series[pa.dtypes.Float] = pa.Field(coerce=True)
+    latitude: Series[float] = pa.Field(coerce=True)
+    longitude: Series[float] = pa.Field(coerce=True)
+    elevation: Series[float] = pa.Field(coerce=True)
 
 
 class ATM1BSchema(CommonDataColumnsSchema):
     # Data fields unique to ATM1B data.
-    rel_time: Series[pa.dtypes.Int32]
-    xmt_sigstr: Series[pa.dtypes.Int32]
-    rcv_sigstr: Series[pa.dtypes.Int32]
-    azimuth: Series[pa.dtypes.Int32]
-    pitch: Series[pa.dtypes.Int32]
-    roll: Series[pa.dtypes.Int32]
-    gps_pdop: Series[pa.dtypes.Int32]
-    gps_time: Series[pa.dtypes.Int32]
-    passive_signal: Series[pa.dtypes.Int32]
-    passive_footprint_latitude: Series[pa.dtypes.Int32]
-    passive_footprint_longitude: Series[pa.dtypes.Int32]
-    passive_footprint_synthesized_elevation: Series[pa.dtypes.Int32]
+    rel_time: Series[float] = pa.Field(nullable=True, coerce=True)
+    xmt_sigstr: Series[float] = pa.Field(nullable=True, coerce=True)
+    rcv_sigstr: Series[float] = pa.Field(nullable=True, coerce=True)
+    azimuth: Series[float] = pa.Field(nullable=True, coerce=True)
+    pitch: Series[float] = pa.Field(nullable=True, coerce=True)
+    roll: Series[float] = pa.Field(nullable=True, coerce=True)
+    gps_pdop: Series[float] = pa.Field(nullable=True, coerce=True)
+    gps_time: Series[float] = pa.Field(nullable=True, coerce=True)
+    passive_signal: Series[float] = pa.Field(nullable=True, coerce=True)
+    passive_footprint_latitude: Series[float] = pa.Field(nullable=True, coerce=True)
+    passive_footprint_longitude: Series[float] = pa.Field(nullable=True, coerce=True)
+    passive_footprint_synthesized_elevation: Series[float] = pa.Field(
+        nullable=True, coerce=True
+    )
 
 
 IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
