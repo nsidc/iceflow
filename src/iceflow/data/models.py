@@ -35,6 +35,7 @@ class ATM1BSchema(CommonDataColumnsSchema):
     passive_footprint_synthesized_elevation: Series[float] = pa.Field(
         nullable=True, coerce=True
     )
+    pulse_width: Series[float] = pa.Field(nullable=True, coerce=True)
 
 
 IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
