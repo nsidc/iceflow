@@ -110,6 +110,7 @@ ignore = [
   "EM101",    # Exceptions should not use string literals
   "SIM108",   # Use ternary operator. Sometimes this is less readable.
   "T201",     # Remove 'print' statements. Sometimes these are handy.
+  "SIM105",   # Use contextlib.suppress instead of try-except-pass. The recommended approach is slower and less flexible.
 ]
 isort.required-imports = ["from __future__ import annotations"]
 # Uncomment if using a _compat.typing backport

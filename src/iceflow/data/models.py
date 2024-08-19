@@ -2,28 +2,18 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Sequence
-from typing import Generic, Literal, TypeVar
+from typing import Literal
 
 import pandera as pa
 import pydantic
 from pandera.typing import DataFrame, Index, Series
 
-from iceflow.itrf import SUPPORTED_ITRFS
-
-# Covariant type vars end with `_co` by convention. See:
-# https://peps.python.org/pep-0484/#covariance-and-contravariance
-TDataFrame_co = TypeVar("TDataFrame_co", covariant=True)
-
-
-# Workaround for inheritance issue. See:
-# https://github.com/unionai-oss/pandera/issues/1170
-class DataFrame_co(DataFrame, Generic[TDataFrame_co]):  # type: ignore[type-arg]
-    pass
+from iceflow.itrf import ITRF_REGEX
 
 
 class CommonDataColumnsSchema(pa.DataFrameModel):
     utc_datetime: Index[pa.dtypes.DateTime] = pa.Field(check_name=True)
-    ITRF: Series[str] = pa.Field(isin=SUPPORTED_ITRFS)
+    ITRF: Series[str] = pa.Field(str_matches=ITRF_REGEX.pattern)
     latitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
     longitude: Series[pa.dtypes.Float] = pa.Field(coerce=True)
     elevation: Series[pa.dtypes.Float] = pa.Field(coerce=True)
@@ -45,8 +35,8 @@ class ATM1BSchema(CommonDataColumnsSchema):
     passive_footprint_synthesized_elevation: Series[pa.dtypes.Int32]
 
 
-IceflowDataFrame = DataFrame_co[CommonDataColumnsSchema]
-ATM1BDataFrame = DataFrame_co[ATM1BSchema]
+IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
+ATM1BDataFrame = DataFrame[ATM1BSchema]
 
 DatasetShortName = Literal["ILATM1B"]
 

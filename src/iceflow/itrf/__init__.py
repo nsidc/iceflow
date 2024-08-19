@@ -1,23 +1,19 @@
 from __future__ import annotations
 
-from typing import Literal, get_args
+import re
 
-# ITRF strings recognized by proj, which is used in the ITRF transformation
-# code.
-# TODO: pyproj does recognize e.g., `ITRF1993` to be an alias of
-# `ITRF93`. Instead of being a hard-coded list, we could create a custom
-# validator for pandera that ensures the value is e.g., `ITRF\d{4}`, and then
-# the itrf transformation code could handle unrecognized ITRFs.
-ITRF = Literal[
-    "ITRF93",
-    "ITRF94",
-    "ITRF96",
-    "ITRF97",
-    "ITRF2000",
-    "ITRF2005",
-    "ITRF2008",
-    "ITRF2014",
-    "ITRF2020",
-]
+ITRF_REGEX = re.compile(r"^ITRF\d{2}(\d{2})?$")
 
-SUPPORTED_ITRFS: list[ITRF] = list(get_args(ITRF))
+
+def check_itrf(itrf_str: str) -> bool:
+    """Check if the given string is  a valid ITRF.
+
+    Based on a regex match. ITRF strings are conventionally "ITRF" followed by
+    the 2-digit or 4-digit year (e.g., "ITRF93" or "ITRF2008").
+
+    ITRFs prior to the 2000s conventionally used a 2-digit year (e.g.,
+    "ITRF88")."""
+
+    match = ITRF_REGEX.match(itrf_str)
+
+    return match is not None

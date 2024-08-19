@@ -13,7 +13,7 @@ from iceflow.data.models import (
 
 
 @functools.singledispatch
-def read_data(dataset: Dataset, _filepath: Path) -> IceflowDataFrame:
+def read_data(dataset: Dataset, _filepath: Path) -> IceflowDataFrame | ATM1BDataFrame:
     msg = f"{dataset=} not recognized."
     raise RuntimeError(msg)
 
