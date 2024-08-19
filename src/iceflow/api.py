@@ -1,35 +1,17 @@
 from __future__ import annotations
 
-import functools
 from pathlib import Path
-from typing import Literal
 
 import pandas as pd
 
-from iceflow.data.atm1b import atm1b_data
 from iceflow.data.fetch import search_and_download
 from iceflow.data.models import (
-    ATM1BDataFrame,
-    ATM1BDataset,
-    Dataset,
     DatasetSearchParameters,
     IceflowDataFrame,
 )
+from iceflow.data.read import read_data
 from iceflow.itrf import ITRF
 from iceflow.itrf.converter import transform_itrf
-
-DatasetShortName = Literal["ILATM1B"]
-
-
-@functools.singledispatch
-def read_data(dataset: Dataset, _filepath: Path) -> IceflowDataFrame:
-    msg = f"{dataset=} not recognized."
-    raise RuntimeError(msg)
-
-
-@read_data.register
-def _(_dataset: ATM1BDataset, filepath: Path) -> ATM1BDataFrame:
-    return atm1b_data(filepath)
 
 
 def fetch_iceflow_df(
