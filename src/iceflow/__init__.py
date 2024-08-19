@@ -8,7 +8,7 @@ from __future__ import annotations
 
 # TODO: add bumpversion config to control this version number, and the conda
 # recipe/meta.yaml.
-__version__ = "v0.1.0"
+__version__ = "v0.2.0"
 
 
 __all__ = ["__version__"]
