@@ -27,6 +27,7 @@ requirements:
     - pyproj ~=3.6.1
     - shapely ~=2.0.5
     - pandera[mypy] ~= 0.20.3
+    - pydantic ~=2.8.2
 
 about:
   home: https://github.com/nsidc/iceflow
