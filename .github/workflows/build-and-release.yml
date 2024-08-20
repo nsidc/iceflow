@@ -1,41 +1,54 @@
-name: build_and_release
+name: Build & publish to PyPI
 
 on:
+  workflow_dispatch:
+  pull_request:
   push:
     tags:
-      - v*
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
-# Default to bash in login mode; key to activating conda environment
-# https://github.com/mamba-org/provision-with-micromamba#IMPORTANT
-defaults:
-  run:
-    shell: "bash -l {0}"
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+env:
+  # Many color libraries just need this to be set to any value, but at least
+  # one distinguishes color depth, where "3" -> "256-bit color".
+  FORCE_COLOR: 3
+
 
 jobs:
-  build-and-release:
-    name: "Run build and release"
-    runs-on: "ubuntu-latest"
+  dist:
+    name: Distribution build
+    runs-on: ubuntu-latest
+
     steps:
-      - name: "Check out repository"
-        uses: "actions/checkout@v4"
-
-      - name: "Install Conda environment"
-        uses: "mamba-org/setup-micromamba@v1"
+      - uses: actions/checkout@v4
         with:
-          environment-file: "conda-lock.yml"
-          # When using a lock-file, we have to set an environment name.
-          environment-name: "iceflow"
-          cache-environment: true
-          # Increase this key to trigger cache invalidation
-          cache-environment-key: 1
+          fetch-depth: 0
 
-      - name: "Run conda build"
-        run: "conda mambabuild recipe/"
+      - uses: hynek/build-and-inspect-python-package@v2
 
-      - name: "run anaconda upload"
-        env:
-          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
-        run: |
-          for ARTIFACT in $(ls /home/runner/micromamba/envs/iceflow/conda-bld/noarch/*.tar.bz2) ; do
-              anaconda -t $ANACONDA_TOKEN upload -u nsidc -l main $ARTIFACT
-          done
+  publish:
+    if: github.ref_type == 'tag'
+    name: Publish to PyPI
+    needs: [dist]
+    environment: pypi
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
+
+      - name: Generate artifact attestation for sdist and wheel
+        uses: actions/attest-build-provenance@v1.4.0
+        with:
+          subject-path: "dist/*"
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
