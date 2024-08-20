@@ -16,7 +16,6 @@ env:
   # one distinguishes color depth, where "3" -> "256-bit color".
   FORCE_COLOR: 3
 
-
 jobs:
   dist:
     name: Distribution build

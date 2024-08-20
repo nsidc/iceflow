@@ -5,8 +5,8 @@ description of best practices for developing scientific packages.
 
 # Setting up a development environment
 
-You can set up a development environment with `conda` or your environment manager of
-choice:
+You can set up a development environment with `conda` or your environment
+manager of choice:
 
 ```bash
 conda create -n iceflow-dev pip
@@ -53,8 +53,10 @@ $ bump-my-version bump {major|minor|patch}
 This will update files containing the software version number.
 
 > [!WARNING]
+>
 > Please do not attempt to update version numbers by hand!
 
-Commit these changes and, once ready, merge them into `main` (through the use of a Pull
-Request on a feature branch). Tag the commit you want to release on `main` to initiate a
-GitHub Action (GHA) that will release the package to anaconda.org.
+Commit these changes and, once ready, merge them into `main` (through the use of
+a Pull Request on a feature branch). Tag the commit you want to release on
+`main` to initiate a GitHub Action (GHA) that will release the package to
+anaconda.org.
