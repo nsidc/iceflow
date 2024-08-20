@@ -30,7 +30,19 @@ TODO
 
 ## Usage
 
-TODO
+### Install
+
+```bash
+pip install iceflow
+```
+
+### Using `iceflow`
+
+```python
+import iceflow
+
+# TODO
+```
 
 ## Credit
 
