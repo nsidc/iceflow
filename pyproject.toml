@@ -1,5 +1,6 @@
 [project]
 name = "iceflow"
+version = "v0.2.0"
 authors = [
   { name = "NSIDC", email = "nsidc@nsidc.org" },
 ]
@@ -22,13 +23,39 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Typing :: Typed",
 ]
-dynamic = ["version"]
+dependencies = [
+  "numpy >=2.0.1",
+  "earthaccess >=0.10.0",
+  "pandas >=2.2",
+  "h5py >=3.11",
+  "gps-timemachine >=1.1.4",
+  "pyproj >=3.6.1",
+  "shapely >=2.0.5",
+  "pandera[mypy] >= 0.20.3",
+  "pydantic >=2.8.2",
+]
 
 [project.urls]
 Homepage = "https://github.com/NSIDC/iceflow"
 "Bug Tracker" = "https://github.com/NSIDC/iceflow/issues"
 Discussions = "https://github.com/NSIDC/iceflow/discussions"
 Changelog = "https://github.com/NSIDC/iceflow/releases"
+
+[project.optional-dependencies]
+dev = [
+  "bump-my-version",
+  "conda-lock >=2.5.7",
+  "invoke",
+  "mypy >=1.11.1",
+  "pandas-stubs >=2.2",
+  "pre-commit",
+  "pytest",
+]
+
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
 
 
 [tool.pytest.ini_options]
