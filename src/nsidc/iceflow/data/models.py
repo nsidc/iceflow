@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Sequence
-from typing import Generic, Literal, TypeVar
+from typing import Literal
 
 import pandera as pa
 import pydantic
