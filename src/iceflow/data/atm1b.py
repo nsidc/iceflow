@@ -156,29 +156,27 @@ def _shift_lon(lon):
 
 
 def _augment_with_optional_values(df, original_shape):
-    """Add columns (w/ zeros) to the dataframe depending on what fields
+    """Add columns (w/ `np.nan`) to the dataframe depending on what fields
     the original data did not include.
-
-    TODO: should use nan instead of 0 for missing??
     """
     rows, cols = original_shape
-    zeros = np.zeros((rows,), dtype=np.int32)
+    missing = np.full(shape=(rows,), fill_value=np.nan)
 
     if cols == 10:
-        df["gps_pdop"] = zeros
-        df["pulse_width"] = zeros
-        df["passive_signal"] = zeros
-        df["passive_footprint_latitude"] = zeros
-        df["passive_footprint_longitude"] = zeros
-        df["passive_footprint_synthesized_elevation"] = zeros
+        df["gps_pdop"] = missing
+        df["pulse_width"] = missing
+        df["passive_signal"] = missing
+        df["passive_footprint_latitude"] = missing
+        df["passive_footprint_longitude"] = missing
+        df["passive_footprint_synthesized_elevation"] = missing
     elif cols == 12:
-        df["passive_signal"] = zeros
-        df["passive_footprint_latitude"] = zeros
-        df["passive_footprint_longitude"] = zeros
-        df["passive_footprint_synthesized_elevation"] = zeros
+        df["passive_signal"] = missing
+        df["passive_footprint_latitude"] = missing
+        df["passive_footprint_longitude"] = missing
+        df["passive_footprint_synthesized_elevation"] = missing
     elif cols == 14:
-        df["gps_pdop"] = zeros
-        df["pulse_width"] = zeros
+        df["gps_pdop"] = missing
+        df["pulse_width"] = missing
     else:
         raise ValueError("Unknown number of columns: cannot augment")
 
