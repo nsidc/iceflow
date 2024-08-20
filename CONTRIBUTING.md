@@ -5,10 +5,13 @@ description of best practices for developing scientific packages.
 
 # Setting up a development environment
 
-You can set up a development environment by running:
+You can set up a development environment with `conda` or your environment
+manager of choice:
 
 ```bash
-conda env create -f environment.yml
+conda create -n iceflow-dev pip
+conda activate iceflow-dev
+pip install --editable .[dev]
 ```
 
 # Pre-commit
@@ -17,12 +20,11 @@ You should prepare pre-commit, which will help you by checking that commits pass
 required checks:
 
 ```bash
-pip install pre-commit # or brew install pre-commit on macOS
 pre-commit install # Will install a pre-commit hook into the git repo
 ```
 
 You can also/alternatively run `pre-commit run` (changes only) or
-`pre-commit run --all-files` to check even without installing the hook.
+`pre-commit run --all-files` to check without installing the hook.
 
 # Common tasks
 
@@ -48,7 +50,13 @@ reflect the version you plan to release. Then, bump the version with
 $ bump-my-version bump {major|minor|patch}
 ```
 
-This will update files containing the software version number. Commit these
-changes and, once ready, merge them into `main` (through the use of a Pull
-Request on a feature branch). Tag the commit you want to release on `main` to
-initiate a GitHub Action (GHA) that will release the package to anaconda.org.
+This will update files containing the software version number.
+
+> [!WARNING]
+>
+> Please do not attempt to update version numbers by hand!
+
+Commit these changes and, once ready, merge them into `main` (through the use of
+a Pull Request on a feature branch). Tag the commit you want to release on
+`main` to initiate a GitHub Action (GHA) that will release the package to
+anaconda.org.

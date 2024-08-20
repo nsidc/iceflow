@@ -4,7 +4,7 @@ import pandas as pd
 import pandera as pa
 import pytest
 
-from iceflow.data.models import IceflowDataFrame
+from nsidc.iceflow.data.models import IceflowDataFrame
 
 _mock_bad_df = pd.DataFrame(
     {

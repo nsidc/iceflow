@@ -30,7 +30,19 @@ TODO
 
 ## Usage
 
-TODO
+### Install
+
+```bash
+pip install nsidc-iceflow
+```
+
+### Using `iceflow`
+
+```python
+from nsidc import iceflow
+
+# TODO
+```
 
 ## Credit
 

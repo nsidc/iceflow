@@ -4,13 +4,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from iceflow.data.fetch import search_and_download
-from iceflow.data.models import (
+from nsidc.iceflow.data.fetch import search_and_download
+from nsidc.iceflow.data.models import (
     DatasetSearchParameters,
     IceflowDataFrame,
 )
-from iceflow.data.read import read_data
-from iceflow.itrf.converter import transform_itrf
+from nsidc.iceflow.data.read import read_data
+from nsidc.iceflow.itrf.converter import transform_itrf
 
 
 def fetch_iceflow_df(

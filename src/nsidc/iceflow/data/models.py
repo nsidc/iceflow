@@ -8,7 +8,7 @@ import pandera as pa
 import pydantic
 from pandera.typing import DataFrame, Index, Series
 
-from iceflow.itrf import ITRF_REGEX
+from nsidc.iceflow.itrf import ITRF_REGEX
 
 
 class CommonDataColumnsSchema(pa.DataFrameModel):

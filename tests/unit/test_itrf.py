@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from iceflow.itrf import check_itrf
+from nsidc.iceflow.itrf import check_itrf
 
 
 def test_check_itrf():

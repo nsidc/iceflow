@@ -8,6 +8,6 @@ def test_gps_timemachine_import():
 
 
 def test_import_package():
-    import iceflow
+    from nsidc import iceflow
 
     assert iceflow is not None
