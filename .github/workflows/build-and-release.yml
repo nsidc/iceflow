@@ -30,7 +30,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@v2
 
   publish:
-    # if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag'
     name: Publish to PyPI
     needs: [dist]
     environment: pypi
@@ -52,7 +52,3 @@ jobs:
           subject-path: "dist/*"
 
       - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          # Remember to tell (test-)pypi about this repo before publishing
-          # Remove this line to publish to PyPI
-          repository-url: https://test.pypi.org/legacy/
