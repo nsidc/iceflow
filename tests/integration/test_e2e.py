@@ -16,11 +16,10 @@ import pandas as pd
 
 from iceflow.api import fetch_iceflow_df
 from iceflow.data.models import ATM1BDataset, DatasetSearchParameters, IceflowDataFrame
-from iceflow.itrf import ITRF
 
 
 def test_e2e(tmp_path):
-    target_itrf: ITRF = "ITRF2008"
+    target_itrf = "ITRF2008"
     common_bounding_box = (-103.125559, -75.180563, -102.677327, -74.798063)
     atm1b_v1_dataset = ATM1BDataset(version="1")
 

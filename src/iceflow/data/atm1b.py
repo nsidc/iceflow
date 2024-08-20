@@ -14,7 +14,6 @@ from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
 
 from iceflow.data.models import ATM1BDataFrame
-from iceflow.itrf import SUPPORTED_ITRFS
 
 """
 The dtypes used to read any of the input ATM1B input files.
@@ -312,16 +311,15 @@ def extract_itrf(filepath: Path) -> str:
 
     itrf = itrf.upper()
 
-    if itrf not in SUPPORTED_ITRFS:
-        # Try to normalize:
-        try:
-            itrf = {
-                "ITRF05": "ITRF2005",
-                "ITRF08": "ITRF2008",
-            }[itrf]
-        except KeyError as e:
-            err = f"Unrecognized ATM1B ITRF {itrf}"
-            raise RuntimeError(err) from e
+    # Try to normalize based on known ITRF strings in the ATM1B data:
+    # TODO: extract this for reuse with other data products.
+    try:
+        itrf = {
+            "ITRF05": "ITRF2005",
+            "ITRF08": "ITRF2008",
+        }[itrf]
+    except KeyError:
+        pass
 
     return itrf
 
@@ -410,6 +408,4 @@ def atm1b_data(filepath: Path) -> ATM1BDataFrame:
 
     data = data.set_index("utc_datetime")
 
-    data = ATM1BDataFrame(data)
-
-    return data
+    return ATM1BDataFrame(data)

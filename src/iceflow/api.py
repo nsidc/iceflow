@@ -10,7 +10,6 @@ from iceflow.data.models import (
     IceflowDataFrame,
 )
 from iceflow.data.read import read_data
-from iceflow.itrf import ITRF
 from iceflow.itrf.converter import transform_itrf
 
 
@@ -18,7 +17,7 @@ def fetch_iceflow_df(
     *,
     dataset_search_params: DatasetSearchParameters,
     output_dir: Path,
-    output_itrf: ITRF | None,
+    output_itrf: str | None,
 ) -> IceflowDataFrame:
     """Search for data matching parameters and return an IceflowDataframe.
 

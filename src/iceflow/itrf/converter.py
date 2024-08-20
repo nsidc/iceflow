@@ -8,7 +8,7 @@ import pandera as pa
 from pyproj import Transformer
 
 from iceflow.data.models import IceflowDataFrame
-from iceflow.itrf import ITRF
+from iceflow.itrf import check_itrf
 
 
 def _datetime_to_decimal_year(date):
@@ -38,7 +38,7 @@ def _datetime_to_decimal_year(date):
 @pa.check_types()
 def transform_itrf(
     data: IceflowDataFrame,
-    target_itrf: ITRF,
+    target_itrf: str,
     # These two must both be specified to apply the plate model
     # step. Nothing happens if only one is given. TODO: raise an error if
     # only one is given. Can we determine the plate from the data instead of
@@ -48,10 +48,14 @@ def transform_itrf(
 ) -> IceflowDataFrame:
     """Pipeline string for proj to transform from the source to the target
     ITRF frame and, optionally, epoch.
-
-    TODO:
-        * Update typing for function
     """
+    if not check_itrf(target_itrf):
+        err_msg = (
+            f"The provided ITRF string was not recognized: {target_itrf}."
+            " ITRF strings should be in the form 'ITRFYYYY'."
+        )
+        raise ValueError(err_msg)
+
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
         # If the source ITRF is the same as the target for this chunk, skip transformation.
@@ -100,6 +104,4 @@ def transform_itrf(
 
     transformed_df = pd.concat(transformed_chunks)
     transformed_df = transformed_df.reset_index().set_index("utc_datetime")
-    transformed_df = IceflowDataFrame(transformed_df)
-
-    return transformed_df
+    return IceflowDataFrame(transformed_df)
