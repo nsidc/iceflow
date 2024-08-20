@@ -30,7 +30,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@v2
 
   publish:
-    if: github.ref_type == 'tag'
+    # if: github.ref_type == 'tag'
     name: Publish to PyPI
     needs: [dist]
     environment: pypi
