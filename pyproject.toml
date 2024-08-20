@@ -1,5 +1,5 @@
 [project]
-name = "iceflow"
+name = "nsidc-iceflow"
 version = "v0.2.0"
 authors = [
   { name = "NSIDC", email = "nsidc@nsidc.org" },
@@ -56,6 +56,9 @@ dev = [
 [build-system]
 build-backend = "hatchling.build"
 requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nsidc"]
 
 
 [tool.pytest.ini_options]
@@ -168,7 +171,7 @@ commit = false
 tag = false
 
 [[tool.bumpversion.files]]
-filename = "src/iceflow/__init__.py"
+filename = "src/nsidc/iceflow/__init__.py"
 search   = '__version__ = "v{current_version}"'
 replace  = '__version__ = "v{new_version}"'
 

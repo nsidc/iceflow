@@ -3,8 +3,8 @@ from __future__ import annotations
 import functools
 from pathlib import Path
 
-from iceflow.data.atm1b import atm1b_data
-from iceflow.data.models import (
+from nsidc.iceflow.data.atm1b import atm1b_data
+from nsidc.iceflow.data.models import (
     ATM1BDataFrame,
     ATM1BDataset,
     Dataset,

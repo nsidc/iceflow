@@ -33,13 +33,13 @@ TODO
 ### Install
 
 ```bash
-pip install iceflow
+pip install nsidc-iceflow
 ```
 
 ### Using `iceflow`
 
 ```python
-import iceflow
+from nsidc import iceflow
 
 # TODO
 ```

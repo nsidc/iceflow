@@ -7,8 +7,8 @@ import pandas as pd
 import pandera as pa
 from pyproj import Transformer
 
-from iceflow.data.models import IceflowDataFrame
-from iceflow.itrf import check_itrf
+from nsidc.iceflow.data.models import IceflowDataFrame
+from nsidc.iceflow.itrf import check_itrf
 
 
 def _datetime_to_decimal_year(date):

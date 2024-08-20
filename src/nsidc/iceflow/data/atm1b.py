@@ -13,7 +13,7 @@ import pandera as pa
 from gps_timemachine.gps import leap_seconds
 from numpy.typing import DTypeLike
 
-from iceflow.data.models import ATM1BDataFrame
+from nsidc.iceflow.data.models import ATM1BDataFrame
 
 """
 The dtypes used to read any of the input ATM1B input files.

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import iceflow
+from nsidc import iceflow
 
 
 def test_version():

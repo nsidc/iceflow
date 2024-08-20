@@ -14,8 +14,8 @@ import datetime as dt
 
 import pandas as pd
 
-from iceflow.api import fetch_iceflow_df
-from iceflow.data.models import ATM1BDataset, DatasetSearchParameters, IceflowDataFrame
+from nsidc.iceflow.api import fetch_iceflow_df
+from nsidc.iceflow.data.models import ATM1BDataset, DatasetSearchParameters, IceflowDataFrame
 
 
 def test_e2e(tmp_path):

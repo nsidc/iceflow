@@ -3,8 +3,8 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from iceflow.data.models import IceflowDataFrame
-from iceflow.itrf.converter import _datetime_to_decimal_year, transform_itrf
+from nsidc.iceflow.data.models import IceflowDataFrame
+from nsidc.iceflow.itrf.converter import _datetime_to_decimal_year, transform_itrf
 
 
 def test_transform_itrf():
