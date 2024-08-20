@@ -312,6 +312,7 @@ def extract_itrf(filepath: Path) -> str:
     itrf = itrf.upper()
 
     # Try to normalize based on known ITRF strings in the ATM1B data:
+    # TODO: extract this for reuse with other data products.
     try:
         itrf = {
             "ITRF05": "ITRF2005",
