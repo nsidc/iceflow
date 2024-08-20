@@ -91,6 +91,10 @@ disallow_incomplete_defs = false
 check_untyped_defs = true
 plugins = "pandera.mypy"
 
+# Needed to work with our namespaced package! See: https://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-paths-to-modules
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+explicit_package_bases = true
+
 [[tool.mypy.overrides]]
 module = [
   "iceflow.*",
