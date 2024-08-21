@@ -1,0 +1,16 @@
+name: iceflow-notebooks
+channels:
+  - conda-forge
+  - nsidc
+  - nodefaults
+dependencies:
+  - python ~=3.10
+  - pangeo-notebook
+  - matplotlib-base
+  - ipyleaflet
+  - geopandas
+  - h5py
+  - ipympl
+  - cartopy
+  - leafmap
+  - pip
