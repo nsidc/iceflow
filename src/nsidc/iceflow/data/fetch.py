@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Sequence
 from pathlib import Path
 
 import earthaccess
+
+from nsidc.iceflow.data.models import BoundingBox
 
 
 def search_and_download(
     *,
     version: str,
     short_name: str,
-    bounding_box: Sequence[float],
+    bounding_box: BoundingBox,
     temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date],
     output_dir: Path,
 ) -> list[Path]:
@@ -27,7 +28,12 @@ def search_and_download(
     results = earthaccess.search_data(
         short_name=short_name,
         version=version,
-        bounding_box=bounding_box,
+        bounding_box=(
+            bounding_box.lower_left_lon,
+            bounding_box.lower_left_lat,
+            bounding_box.upper_right_lon,
+            bounding_box.upper_right_lat,
+        ),
         temporal=temporal,
     )
 
