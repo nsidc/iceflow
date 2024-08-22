@@ -5,13 +5,45 @@ from pathlib import Path
 
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
+import shapely
 
 from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
     ATM1BDataset,
+    BoundingBox,
     DatasetSearchParameters,
 )
 from nsidc.iceflow.itrf.converter import transform_itrf
+
+# bounding box is near Pine Island Glacier, Antarctica.
+BBOX = BoundingBox(
+    lower_left_lon=-103.125559,
+    lower_left_lat=-75.180563,
+    upper_right_lon=-102.677327,
+    upper_right_lat=-74.798063,
+)
+
+
+def vis_bounding_box_cartopy(bounding_box: BoundingBox):
+    ax = plt.axes(projection=ccrs.SouthPolarStereo(central_longitude=0))
+    box = shapely.box(
+        xmin=bounding_box.lower_left_lon,
+        ymin=bounding_box.lower_left_lat,
+        xmax=bounding_box.upper_right_lon,
+        ymax=bounding_box.upper_right_lat,
+    )
+    ax.stock_img()
+    ax.coastlines(resolution="50m", color="black", linewidth=1)
+    ax.add_geometries([box], crs=ccrs.PlateCarree())
+    ax.set_extent(
+        [
+            bounding_box.lower_left_lon - 3,
+            bounding_box.upper_right_lon + 3,
+            bounding_box.lower_left_lat - 3,
+            bounding_box.upper_right_lat + 3,
+        ]
+    )
+    plt.show()
 
 
 def viz_with_cartopy(results):
@@ -71,7 +103,7 @@ def viz_with_mpl_3d(df, transformed_df, sampled_epoch):
     plt.show()
 
 
-if __name__ == "__main__":
+def transform_example():
     data_path = Path("./downloaded-data/")
     atm1b_v1_dataset = ATM1BDataset(version="1")
 
@@ -81,7 +113,7 @@ if __name__ == "__main__":
     iceflow_df = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
             dataset=atm1b_v1_dataset,
-            bounding_box=(-103.125559, -75.180563, -102.677327, -74.798063),
+            bounding_box=BBOX,
             temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 31)),
         ),
         output_dir=data_path,
@@ -133,3 +165,8 @@ if __name__ == "__main__":
     # now visualize the untransformed points, the ITRF-2014 transformed points,
     # and the ITRF-2014 epoch-propagated points
     viz_with_mpl_3d(sampled_iceflow_df, sampled_itrf2014, sampled_itrf2014_epoch_2019_7)
+
+
+if __name__ == "__main__":
+    # transform_example()
+    vis_bounding_box_cartopy(BBOX)
