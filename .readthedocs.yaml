@@ -13,5 +13,9 @@ build:
     - asdf global uv latest
     - uv venv
     - uv pip install .[docs]
-    - .venv/bin/python -m sphinx -T -b html -d docs/_build/doctrees -D
-      language=en docs $READTHEDOCS_OUTPUT/html
+    # Generate api docs
+    - sphinx-apidoc -o $READTHEDOCS_OUTPUT/docs/api/ --no-toc --module-first
+      --implicit-namespaces --force src/nsidc
+    # Build the docs
+    - sphinx-build --keep-going -n -T -b=html -d docs/_build_doctrees -D
+      language=en docs/ $READTHEDOCS_OUTPUT/html/
