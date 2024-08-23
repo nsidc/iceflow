@@ -13,6 +13,12 @@ def _build_apidocs_cmd():
 
 
 @task()
+def clean(_ctx):
+    print_and_run(f"rm -rf {PROJECT_DIR}/docs/api/*")
+    print_and_run(f"rm -rf {PROJECT_DIR}/docs/_build/*")
+
+
+@task(pre=[clean])
 def build(_ctx):
     """Build docs."""
     # (re)generate the api docs
@@ -31,7 +37,7 @@ def build(_ctx):
     )
 
 
-@task()
+@task(pre=[clean])
 def watch(_ctx):
     print_and_run(
         (
