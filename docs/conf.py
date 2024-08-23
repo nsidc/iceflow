@@ -56,6 +56,12 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
 
+
+autodoc_mock_imports = [
+    "pydantic*",
+    "pandera*",
+]
+
 nitpick_ignore = [
     ("py:class", "_io.StringIO"),
     ("py:class", "_io.BytesIO"),
