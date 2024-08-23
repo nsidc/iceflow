@@ -60,6 +60,7 @@ intersphinx_mapping = {
 autodoc_mock_imports = [
     "pydantic*",
     "pandera*",
+    "pandera.api",
 ]
 
 nitpick_ignore = [
