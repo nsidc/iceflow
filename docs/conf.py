@@ -59,6 +59,10 @@ intersphinx_mapping = {
 nitpick_ignore = [
     ("py:class", "_io.StringIO"),
     ("py:class", "_io.BytesIO"),
+    ("py:class", "pandera.typing.pandas.DataFrame"),
+    ("py:class", "pydantic.main.BaseModel"),
+    ("py:class", "pandera.api.pandas.model_config.BaseConfig"),
+    ("py:class", "pandera.api.pandas.model.DataFrameModel"),
 ]
 
 always_document_param_types = True
