@@ -1,6 +1,5 @@
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
-
 version: 2
 
 build:
@@ -14,8 +13,7 @@ build:
     - uv venv
     - uv pip install .[docs]
     # Generate api docs
-    - uv run export UV_LINK_MODE=copy sphinx-apidoc -o
-      $READTHEDOCS_OUTPUT/docs/api/ --no-toc --module-first
+    - uv run --link-mode=copy sphinx-apidoc -o docs/api/ --no-toc --module-first
       --implicit-namespaces --force src/nsidc
     # Build the docs
     - uv run sphinx-build --keep-going -n -T -b=html -d docs/_build_doctrees -D
