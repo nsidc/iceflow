@@ -63,6 +63,8 @@ nitpick_ignore = [
     ("py:class", "pydantic.main.BaseModel"),
     ("py:class", "pandera.api.pandas.model_config.BaseConfig"),
     ("py:class", "pandera.api.pandas.model.DataFrameModel"),
+    ("py:class", "pandera.api.dataframe.model.Config"),
+    ("py:class", "data"),
 ]
 
 always_document_param_types = True
