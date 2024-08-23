@@ -3,15 +3,9 @@
 ```{toctree}
 :maxdepth: 2
 :hidden:
-
-```
-
-```{toctree}
-:maxdepth: 2
-:hidden:
 :caption: API
 
-api/*
+api/nsidc
 ```
 
 ```{include} ../README.md
