@@ -3,9 +3,10 @@
 ```{toctree}
 :maxdepth: 2
 :hidden:
-:caption: API
+:caption: content
 
 api/nsidc
+LICENSE
 ```
 
 ```{include} ../README.md
