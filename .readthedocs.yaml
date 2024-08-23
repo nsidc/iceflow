@@ -7,15 +7,17 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
-  commands:
-    - asdf plugin add uv
-    - asdf install uv latest
-    - asdf global uv latest
-    - uv venv
-    - uv pip install .[docs]
-    # Generate api docs
-    - uv run --link-mode=copy sphinx-apidoc -o $READTHEDOCS_OUTPUT/docs/api/
-      --no-toc --module-first --implicit-namespaces --force src/nsidc
-    # Build the docs
-    - uv run sphinx-build --keep-going -n -T -b=html -d docs/_build_doctrees -D
-      language=en docs/ $READTHEDOCS_OUTPUT/html/
+  jobs:
+    pre_build:
+      - sphinx-apidoc -o $READTHEDOCS_OUTPUT/docs/api/ --no-toc --module-first
+        --implicit-namespaces --force src/nsidc
+
+sphinx:
+  configuration: docs/conf.py
+
+python:
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
