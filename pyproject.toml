@@ -58,6 +58,11 @@ docs = [
   "furo>=2023.08.17",
   "sphinx-autobuild"
 ]
+notebooks = [
+  "jupyterlab",
+  "matplotlib",
+  "ipympl",
+]
 
 
 [build-system]
