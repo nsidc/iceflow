@@ -21,7 +21,7 @@ as part of work for <https://github.com/nsidc/tps-ecs-decom-notes/issues/8>
 - This repository is not actively supported by NSIDC but we welcome issue
   submissions and pull requests in order to foster community contribution.
 
-See the [LICENSE](LICENSE) for details on permissions and warranties. Please
+See the [LICENSE](./LICENSE) for details on permissions and warranties. Please
 contact nsidc@nsidc.org for more information.
 
 ## Requirements

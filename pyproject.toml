@@ -44,12 +44,19 @@ Changelog = "https://github.com/NSIDC/iceflow/releases"
 [project.optional-dependencies]
 dev = [
   "bump-my-version",
-  "conda-lock >=2.5.7",
   "invoke",
   "mypy >=1.11.1",
   "pandas-stubs >=2.2",
   "pre-commit",
   "pytest",
+]
+docs = [
+  "sphinx>=7.0",
+  "myst_parser>=0.13",
+  "sphinx_copybutton",
+  "sphinx_autodoc_typehints",
+  "furo>=2023.08.17",
+  "sphinx-autobuild"
 ]
 
 
