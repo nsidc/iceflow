@@ -9,7 +9,7 @@ author = "NSIDC"
 version = release = importlib.metadata.version("nsidc-iceflow")
 
 extensions = [
-    "myst_parser",
+    "myst_nb",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
@@ -77,3 +77,5 @@ nitpick_ignore = [
 ]
 
 always_document_param_types = True
+
+nb_execution_mode = "off"
