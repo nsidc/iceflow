@@ -40,6 +40,36 @@ Available tasks:
   test.typecheck (test.mypy)   Run mypy typechecking.
 ```
 
+# Documentation
+
+This project uses `sphinx` to generate documentation. To work on the docs,
+install the dependencies:
+
+```bash
+pip install -e .[docs]
+```
+
+Use the included `docs.watch` task to actively work on the docs with
+live-reloading:
+
+```
+inv docs.watch
+```
+
+The docs are generated and hosted by [ReadTheDocs]().
+
+When creating a PR, a ReadTheDocs will generate a preview of the documentation.
+Please review this carefully and ensure that any changes are accurately
+reflected. On a merge to main, changes to the documentation will be reflected on
+the main, public-facing documentation site.
+
+> [!NOTE] Most of the documentation is designed to be generated automatically.
+> E.g., changes to the API and markdown documents will be automatically
+> refelcted in the documentation. The one exception is the
+> `iceflow-example.ipynb`, which is static and must be re-generated manually.
+> Use the `invoke docs.generate-example-notebook` task to re-generate this file,
+> and then commit any changes to the repository.
+
 # Releasing
 
 To release a new version of the software, first update the CHANGELOG.md to
