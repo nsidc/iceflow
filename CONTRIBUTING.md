@@ -56,7 +56,8 @@ live-reloading:
 inv docs.watch
 ```
 
-The docs are generated and hosted by [ReadTheDocs]().
+The docs are generated and hosted by
+[ReadTheDocs](https://iceflow.readthedocs.io/en/latest/).
 
 When creating a PR, a ReadTheDocs will generate a preview of the documentation.
 Please review this carefully and ensure that any changes are accurately
