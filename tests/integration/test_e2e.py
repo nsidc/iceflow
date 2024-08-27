@@ -16,10 +16,10 @@ import pandas as pd
 
 from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
-    ATM1BDataset,
     BoundingBox,
     DatasetSearchParameters,
     IceflowDataFrame,
+    ILATM1BDataset,
 )
 
 
@@ -34,7 +34,7 @@ def test_e2e(tmp_path):
 
     results_ilatm1b_v1_2009 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ATM1BDataset(version="1"),
+            dataset=ILATM1BDataset(version="1"),
             bounding_box=common_bounding_box,
             temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
         ),
@@ -44,7 +44,7 @@ def test_e2e(tmp_path):
 
     results_ilatm1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ATM1BDataset(version="2"),
+            dataset=ILATM1BDataset(version="2"),
             bounding_box=common_bounding_box,
             temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
         ),

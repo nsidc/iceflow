@@ -40,7 +40,8 @@ class ATM1BSchema(CommonDataColumnsSchema):
 IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
 ATM1BDataFrame = DataFrame[ATM1BSchema]
 
-DatasetShortName = Literal["ILATM1B"]
+ATM1BShortName = Literal["ILATM1B", "BLATM1B"]
+DatasetShortName = ATM1BShortName
 
 
 class Dataset(pydantic.BaseModel):
@@ -49,7 +50,12 @@ class Dataset(pydantic.BaseModel):
 
 
 class ATM1BDataset(Dataset):
-    short_name: DatasetShortName = "ILATM1B"
+    short_name: ATM1BShortName
+
+
+class ILATM1BDataset(ATM1BDataset):
+    short_name: ATM1BShortName = "ILATM1B"
+    version: Literal["1", "2"]
 
 
 class BoundingBox(pydantic.BaseModel):
