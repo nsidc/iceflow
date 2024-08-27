@@ -12,7 +12,10 @@ def check_itrf(itrf_str: str) -> bool:
     the 2-digit or 4-digit year (e.g., "ITRF93" or "ITRF2008").
 
     ITRFs prior to the 2000s conventionally used a 2-digit year (e.g.,
-    "ITRF88")."""
+    "ITRF88").
+
+    ITRF2020 is recognized as "ITRF20".
+    """
 
     match = ITRF_REGEX.match(itrf_str)
 
