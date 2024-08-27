@@ -300,7 +300,7 @@ def extract_itrf(filepath: Path) -> str:
             err = f"Failed to extract ITRF from file: {filepath}"
             raise RuntimeError(err)
 
-    elif ext == "h5py":
+    elif ext == ".h5":
         with h5py.File(filepath, "r") as ds:
             itrf = str(ds["ancillary_data"]["reference_frame"][:][0], encoding="utf8")
     else:

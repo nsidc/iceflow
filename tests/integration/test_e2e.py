@@ -24,18 +24,17 @@ from nsidc.iceflow.data.models import (
 
 
 def test_e2e(tmp_path):
-    target_itrf = "ITRF2008"
+    target_itrf = "ITRF2014"
     common_bounding_box = BoundingBox(
         lower_left_lon=-103.125559,
         lower_left_lat=-75.180563,
         upper_right_lon=-102.677327,
         upper_right_lat=-74.798063,
     )
-    atm1b_v1_dataset = ATM1BDataset(version="1")
 
-    results2009 = fetch_iceflow_df(
+    results_ilatm1b_v1_2009 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=atm1b_v1_dataset,
+            dataset=ATM1BDataset(version="1"),
             bounding_box=common_bounding_box,
             temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
         ),
@@ -43,15 +42,18 @@ def test_e2e(tmp_path):
         output_itrf=target_itrf,
     )
 
-    results2012 = fetch_iceflow_df(
+    results_ilatm1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=atm1b_v1_dataset,
+            dataset=ATM1BDataset(version="2"),
             bounding_box=common_bounding_box,
-            temporal=(dt.date(2012, 11, 1), dt.date(2012, 12, 1)),
+            temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
         ),
         output_dir=tmp_path,
         output_itrf=target_itrf,
     )
 
-    complete_df = IceflowDataFrame(pd.concat([results2009, results2012]))
+    complete_df = IceflowDataFrame(
+        pd.concat([results_ilatm1b_v1_2009, results_ilatm1b_v2_2014])
+    )
+
     assert (complete_df.ITRF.unique() == target_itrf).all()
