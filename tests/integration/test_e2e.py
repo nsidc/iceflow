@@ -16,6 +16,7 @@ import pandas as pd
 
 from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
+    BLATM1BDataset,
     BoundingBox,
     DatasetSearchParameters,
     IceflowDataFrame,
@@ -23,7 +24,7 @@ from nsidc.iceflow.data.models import (
 )
 
 
-def test_atm1b_e2e(tmp_path):
+def test_atm1b_ilatm1b(tmp_path):
     target_itrf = "ITRF2014"
     common_bounding_box = BoundingBox(
         lower_left_lon=-103.125559,
@@ -59,3 +60,25 @@ def test_atm1b_e2e(tmp_path):
     )
 
     assert (complete_df.ITRF.unique() == target_itrf).all()
+
+
+def test_atm1b_blatm1b(tmp_path):
+    common_bounding_box = BoundingBox(
+        lower_left_lon=-120.0,
+        lower_left_lat=-75.1,
+        upper_right_lon=-92.0,
+        upper_right_lat=-65.0,
+    )
+
+    results_blamt1b_v2_2014 = fetch_iceflow_df(
+        dataset_search_params=DatasetSearchParameters(
+            dataset=BLATM1BDataset(),
+            bounding_box=common_bounding_box,
+            temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
+        ),
+        output_dir=tmp_path,
+    )
+
+    # Untransformed ITRF is expected to be ITRF2000 based on hard-coded ranges
+    # (qfit header lacks ITRF info)
+    assert (results_blamt1b_v2_2014.ITRF == "ITRF2000").all()
