@@ -378,31 +378,6 @@ def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
     Failing that, this function falls back to a hard-coded ITRF based on the
     date.
 
-    TODO: verify the hard-coded ITRF date-ranges are correct. These are based on
-    hard-coded ranges in the `valkyrie` service code, but no provenance is given.
-
-    TODO: verify that the ITRF information for qfit files is correct.
-
-    It is unclear what the hard-coded date-ranges are based on. There was some
-    work during the initial development of `valkyrie` in ~2019 to establish
-    these ranges from a combination of information in the headers (see below for
-    more on that) and ??. There is no clear provenance or documentation.
-
-    The QFIT headers are also not completely clear on the extracted ITRF being
-    the ITRF of the data. E.g., an example qfit header has this string in it,
-    from which we extract "ITRF2005":
-    `./090417_aa_l12_cfm_itrf05_12aug_898b`. The `_itrf05_` bit implies
-    ITRF2005, and we think this is correct.
-
-    The NSIDC documentation states:
-
-    > Data are given in geographic latitude and longitude coordinates. Data
-    > coordinates are referenced to the WGS84 ellipsoid. Reference frame is
-    > prescribed by the International Terrestrial Reference Frame (ITRF)
-    > convention in use at the time of the surveys.
-
-    However, it is not clear what the "convention" was during data collection.
-
     This function does its "best" based on prior work, and places trust in that
     prior work. However, this should be more closely reviewd. See
     https://github.com/nsidc/iceflow/issues/35.
