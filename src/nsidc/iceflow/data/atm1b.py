@@ -214,7 +214,7 @@ def _utc_datetime(
     tdf["month"] = file_date.month
     tdf["day"] = file_date.day
 
-    ls = int(leap_seconds(file_date))
+    ls = int(leap_seconds(dt.datetime(file_date.year, file_date.month, file_date.day)))
     utc = pd.to_datetime(tdf).to_numpy() - np.timedelta64(ls, "s")
 
     return pd.Series(utc)
