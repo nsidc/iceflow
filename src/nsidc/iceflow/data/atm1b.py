@@ -310,9 +310,12 @@ def _qfit_file_header(filepath: Path) -> str:
     raise RuntimeError(err)
 
 
-# NOTE: it is unknown how these ITRF date ranges were established. This is based
-# on prior work in `valkyrie`, and no documentation exists. See the docstring of
-# `_infer_qfit_itrf` for more context.
+# NOTE: it is unknown for sure how these ITRF date ranges were established. This
+# is based on prior work in `valkyrie`, and no formal documentation exists. I
+# think these were generated from reading the ITRF out of all of the ATM1B data
+# files (some context here:
+# https://nsidc.slack.com/archives/C4V5EFN1L/p1558544556037600). See the
+# docstring of `_infer_qfit_itrf` for more context.
 # TODO: a typed-dict might be better here.
 GranuleItrfRange = collections.namedtuple("GranuleItrfRange", "start end itrf")
 ATM1B_GRANULE_ITRFS = [
@@ -321,8 +324,6 @@ ATM1B_GRANULE_ITRFS = [
     GranuleItrfRange(dt.date(1998, 6, 27), dt.date(1999, 5, 25), "ITRF96"),
     GranuleItrfRange(dt.date(2000, 5, 12), dt.date(2001, 5, 27), "ITRF97"),
     GranuleItrfRange(dt.date(2001, 12, 18), dt.date(2002, 11, 21), "ITRF2000"),
-    # There appaer to be a couple of dates that use ITRF97 when we'd normally
-    # expect ITRF2000.
     GranuleItrfRange(dt.date(2002, 11, 22), dt.date(2002, 11, 22), "ITRF97"),
     GranuleItrfRange(dt.date(2002, 11, 23), dt.date(2002, 12, 13), "ITRF2000"),
     GranuleItrfRange(dt.date(2002, 12, 14), dt.date(2002, 12, 14), "ITRF97"),
@@ -382,10 +383,10 @@ def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
     more on that) and ??. There is no clear provenance or documentation.
 
     The QFIT headers are also not completely clear on the extracted ITRF being
-    the source. E.g., an example qfit header has this string in it, from which
-    we extract "ITRF2005": `./090417_aa_l12_cfm_itrf05_12aug_898b`. The
-    `_itrf05_` bit implies ITRF2005, and we think this is correct, but it may
-    not be.
+    the ITRF of the data. E.g., an example qfit header has this string in it,
+    from which we extract "ITRF2005":
+    `./090417_aa_l12_cfm_itrf05_12aug_898b`. The `_itrf05_` bit implies
+    ITRF2005, and we think this is correct.
 
     The NSIDC documentation states:
 
@@ -394,23 +395,13 @@ def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
     > prescribed by the International Terrestrial Reference Frame (ITRF)
     > convention in use at the time of the surveys.
 
-    However, there it is not clear what the "convention" was during data
-    collection.
+    However, it is not clear what the "convention" was during data collection.
 
-    This function does it's "best" based on prior work, and places trust in that
+    This function does its "best" based on prior work, and places trust in that
     prior work. However, this should be more closely reviewd. See <TODO: create
     an issue to capture this>
     """
     header = _qfit_file_header(filepath)
-    # Looking at this more closely, the header has "itrf" in it, but it's
-    # part of the input to the algorithm. E.g, for a random example, "itrf"
-    # is part of this:
-    # `./091109_aa_l12_cfm_itrf05_18may10_palm_roth_amu2`. That's not very
-    # authoritative, and there's no indication in the qfit readme that this
-    # is reliable. Encountered an issue with some qfit files not having a
-    # header, and so cannot extract from there. Maybe for qfit data, we
-    # should fallback on a hard-coded list?
-    # some info from me here: https://nsidc.slack.com/archives/C4V5EFN1L/p1558544556037600
     results = re.finditer(r"itrf\d{2,4}", header)
     itrfs = list({result.group() for result in results})
 
