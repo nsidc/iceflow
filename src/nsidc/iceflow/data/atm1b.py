@@ -310,12 +310,8 @@ def _qfit_file_header(filepath: Path) -> str:
     raise RuntimeError(err)
 
 
-# NOTE: it is unknown for sure how these ITRF date ranges were established. This
-# is based on prior work in `valkyrie`, and no formal documentation exists. I
-# think these were generated from reading the ITRF out of all of the ATM1B data
-# files (some context here:
-# https://nsidc.slack.com/archives/C4V5EFN1L/p1558544556037600). See the
-# docstring of `_infer_qfit_itrf` for more context.
+# NOTE: See the docstring of `_infer_qfit_itrf` for more context about these
+# hard-coded ITRF date-ranges.
 # TODO: a typed-dict might be better here.
 GranuleItrfRange = collections.namedtuple("GranuleItrfRange", "start end itrf")
 ATM1B_GRANULE_ITRFS = [
