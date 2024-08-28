@@ -17,7 +17,7 @@ def fetch_iceflow_df(
     *,
     dataset_search_params: DatasetSearchParameters,
     output_dir: Path,
-    output_itrf: str | None,
+    output_itrf: str | None = None,
 ) -> IceflowDataFrame:
     """Search for data matching parameters and return an IceflowDataframe.
 

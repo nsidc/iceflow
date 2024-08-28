@@ -23,7 +23,7 @@ from nsidc.iceflow.data.models import (
 )
 
 
-def test_e2e(tmp_path):
+def test_atm1b_e2e(tmp_path):
     target_itrf = "ITRF2014"
     common_bounding_box = BoundingBox(
         lower_left_lon=-103.125559,
@@ -32,6 +32,7 @@ def test_e2e(tmp_path):
         upper_right_lat=-74.798063,
     )
 
+    # Native ITRF is ITRF2005
     results_ilatm1b_v1_2009 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
             dataset=ILATM1BDataset(version="1"),
@@ -42,6 +43,7 @@ def test_e2e(tmp_path):
         output_itrf=target_itrf,
     )
 
+    # Native ITRF is ITRF2008
     results_ilatm1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
             dataset=ILATM1BDataset(version="2"),

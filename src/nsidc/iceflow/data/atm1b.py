@@ -1,16 +1,19 @@
 from __future__ import annotations
 
+import collections
 import datetime as dt
 import logging
 import re
 from enum import Enum
 from pathlib import Path
+from typing import cast
 
 import h5py
 import numpy as np
 import pandas as pd
 import pandera as pa
 from gps_timemachine.gps import leap_seconds
+from loguru import logger
 from numpy.typing import DTypeLike
 
 from nsidc.iceflow.data.models import ATM1BDataFrame
@@ -116,36 +119,38 @@ def _file_dtype(filepath: Path) -> DTypeLike:
     return dtype
 
 
-def _blatm1bv1_date(fn):
+def _blatm1bv1_date(fn) -> dt.date:
     """Return the date from the given BLATM1B filename."""
     fn_date = None
 
     m = re.search(r"BLATM1B_(\d{8})", fn)
     if m:
-        fn_date = m.group(1)
+        fn_date_str = m.group(1)
     else:
         m = re.search(r"BLATM1B_(\d{6})", fn)
-        if m:
-            fn_date = m.group(1)
-            if int(fn_date[:2]) > 9:
-                fn_date = "19" + fn_date
-            else:
-                fn_date = "20" + fn_date
+        if not m:
+            err_msg = f"Failed to extract date from BLATM1B v1 file: {fn}"
+            raise RuntimeError(err_msg)
 
-    if fn_date:
-        fn_date = dt.datetime.strptime(fn_date, "%Y%m%d")
+        fn_date_str = m.group(1)
+        if int(fn_date_str[:2]) > 9:
+            fn_date_str = "19" + fn_date_str
+        else:
+            fn_date_str = "20" + fn_date_str
+
+    fn_date = dt.datetime.strptime(fn_date_str, "%Y%m%d").date()
 
     return fn_date
 
 
-def _ilatm1b_date(fn: str) -> dt.datetime:
+def _ilatm1b_date(fn: str) -> dt.date:
     """Return the date from the given ILATM1B filename."""
     m = re.search(r"_(\d{8})_", fn)
     if not m:
         err = f"Failed to extract date from filepath: {fn}"
         raise RuntimeError(err)
     fn_date = m.group(1)
-    return dt.datetime.strptime(fn_date, "%Y%m%d")
+    return dt.datetime.strptime(fn_date, "%Y%m%d").date()
 
 
 def _shift_lon(lon):
@@ -260,6 +265,25 @@ def _atm1b_qfit_data(filepath: Path, file_date: dt.date) -> pd.DataFrame:
     return df
 
 
+# TODO: extract this for reuse with other data products.
+def _normalize_itrf_str(itrf_str: str) -> str:
+    """Normalizes common ITRF strings into ones recognizable by proj.
+
+    E.g., "ITRF2020" is common, but proj only recognizes "ITRF20".
+    """
+    itrf_str = itrf_str.upper()
+    try:
+        itrf_str = {
+            "ITRF05": "ITRF2005",
+            "ITRF08": "ITRF2008",
+            "ITRF2000": "ITRF20",
+        }[itrf_str]
+    except KeyError:
+        pass
+
+    return itrf_str
+
+
 def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
     dtype = np.dtype([("record_type", ">i4"), ("header", ">S44")])
@@ -286,40 +310,152 @@ def _qfit_file_header(filepath: Path) -> str:
     raise RuntimeError(err)
 
 
-def extract_itrf(filepath: Path) -> str:
+# NOTE: it is unknown how these ITRF date ranges were established. This is based
+# on prior work in `valkyrie`, and no documentation exists. See the docstring of
+# `_infer_qfit_itrf` for more context.
+# TODO: a typed-dict might be better here.
+GranuleItrfRange = collections.namedtuple("GranuleItrfRange", "start end itrf")
+ATM1B_GRANULE_ITRFS = [
+    GranuleItrfRange(dt.date(1993, 6, 23), dt.date(1996, 6, 5), "ITRF93"),
+    GranuleItrfRange(dt.date(1997, 4, 25), dt.date(1997, 5, 28), "ITRF94"),
+    GranuleItrfRange(dt.date(1998, 6, 27), dt.date(1999, 5, 25), "ITRF96"),
+    GranuleItrfRange(dt.date(2000, 5, 12), dt.date(2001, 5, 27), "ITRF97"),
+    GranuleItrfRange(dt.date(2001, 12, 18), dt.date(2002, 11, 21), "ITRF2000"),
+    # There appaer to be a couple of dates that use ITRF97 when we'd normally
+    # expect ITRF2000.
+    GranuleItrfRange(dt.date(2002, 11, 22), dt.date(2002, 11, 22), "ITRF97"),
+    GranuleItrfRange(dt.date(2002, 11, 23), dt.date(2002, 12, 13), "ITRF2000"),
+    GranuleItrfRange(dt.date(2002, 12, 14), dt.date(2002, 12, 14), "ITRF97"),
+    GranuleItrfRange(dt.date(2002, 12, 15), dt.date(2007, 5, 11), "ITRF2000"),
+    GranuleItrfRange(dt.date(2007, 9, 10), dt.date(2011, 5, 16), "ITRF2005"),
+    GranuleItrfRange(dt.date(2011, 10, 12), dt.date(2018, 5, 1), "ITRF2008"),
+]
+
+
+def _qfit_itrf_from_date(date: dt.date) -> str:
+    def _find(gdt, i, lower, upper) -> str | None:
+        # Binary search for the correct ITRF to make this fast. If we
+        # do a naive linear search, it can run up to 10x longer.
+        g = ATM1B_GRANULE_ITRFS[i]
+        if gdt < g.start:
+            if i > lower:
+                return _find(gdt, (i - lower) // 2, lower, i)
+            else:
+                return None
+        elif gdt <= g.end:
+            itrf_str = g.itrf
+            return cast(str, itrf_str)
+        elif i < (upper - 1):
+            return _find(gdt, (upper + i) // 2, i, upper)
+        else:
+            return None
+
+    lower, upper = (0, len(ATM1B_GRANULE_ITRFS))
+    i = (upper - lower) // 2
+    result = _find(date, i, lower, upper)
+    if result is None:
+        err_msg = f"Failed to find ITRF for {date=}"
+        raise RuntimeError(err_msg)
+
+    return result
+
+
+def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
+    """Takes an ILATM1B/BLATM1B qfit filepath and returns a string representing
+    the ITRF.
+
+    This function infers the ITRF based on the qfit file header, which is
+    described here:
+    https://nsidc.org/sites/nsidc.org/files/files/ReadMe_qfit.txt
+
+    Failing that, this function falls back to a hard-coded ITRF based on the
+    date.
+
+    TODO: verify the hard-coded ITRF date-ranges are correct. These are based on
+    hard-coded ranges in the `valkyrie` service code, but no provenance is given.
+
+    TODO: verify that the ITRF information for qfit files is correct.
+
+    It is unclear what the hard-coded date-ranges are based on. There was some
+    work during the initial development of `valkyrie` in ~2019 to establish
+    these ranges from a combination of information in the headers (see below for
+    more on that) and ??. There is no clear provenance or documentation.
+
+    The QFIT headers are also not completely clear on the extracted ITRF being
+    the source. E.g., an example qfit header has this string in it, from which
+    we extract "ITRF2005": `./090417_aa_l12_cfm_itrf05_12aug_898b`. The
+    `_itrf05_` bit implies ITRF2005, and we think this is correct, but it may
+    not be.
+
+    The NSIDC documentation states:
+
+    > Data are given in geographic latitude and longitude coordinates. Data
+    > coordinates are referenced to the WGS84 ellipsoid. Reference frame is
+    > prescribed by the International Terrestrial Reference Frame (ITRF)
+    > convention in use at the time of the surveys.
+
+    However, there it is not clear what the "convention" was during data
+    collection.
+
+    This function does it's "best" based on prior work, and places trust in that
+    prior work. However, this should be more closely reviewd. See <TODO: create
+    an issue to capture this>
+    """
+    header = _qfit_file_header(filepath)
+    # Looking at this more closely, the header has "itrf" in it, but it's
+    # part of the input to the algorithm. E.g, for a random example, "itrf"
+    # is part of this:
+    # `./091109_aa_l12_cfm_itrf05_18may10_palm_roth_amu2`. That's not very
+    # authoritative, and there's no indication in the qfit readme that this
+    # is reliable. Encountered an issue with some qfit files not having a
+    # header, and so cannot extract from there. Maybe for qfit data, we
+    # should fallback on a hard-coded list?
+    # some info from me here: https://nsidc.slack.com/archives/C4V5EFN1L/p1558544556037600
+    results = re.finditer(r"itrf\d{2,4}", header)
+    itrfs = list({result.group() for result in results})
+
+    itrf_for_date = _qfit_itrf_from_date(date)
+
+    if len(itrfs) == 1:
+        itrf_from_qfit_header = _normalize_itrf_str(itrfs[0])
+        if itrf_for_date != itrf_from_qfit_header:
+            warn_msg = (
+                f"ITRF in qfit header for {filepath=} is inconsistent with expected ITRF for {date=}."
+                f" qfit header has {itrf_from_qfit_header}. Expected {itrf_for_date}."
+                f" Using the ITRF found in the header: {itrf_from_qfit_header}"
+            )
+            logger.warning(warn_msg)
+
+        return itrf_from_qfit_header
+
+    warn_msg = (
+        f"Failed to find ITRF in qfit header file for {filepath}."
+        f" Falling back on hard-coded ITRF for {date=}: {itrf_for_date}"
+    )
+    logger.warning(warn_msg)
+
+    return itrf_for_date
+
+
+def _extract_itrf_from_h5_file(filepath: Path) -> str:
+    """Extract ITRF from the h5 filepath (ILATM1B v2)."""
+    with h5py.File(filepath, "r") as ds:
+        itrf = str(ds["ancillary_data"]["reference_frame"][:][0], encoding="utf8")
+    itrf = _normalize_itrf_str(itrf)
+
+    return itrf
+
+
+def extract_itrf(filepath: Path, date: dt.date) -> str:
     ext = filepath.suffix
 
     if ext == ".qi":
-        header = _qfit_file_header(filepath)
-        results = re.finditer(r"itrf\d{2,4}", header)
-        itrfs = list({result.group() for result in results})
-
-        if len(itrfs) == 1:
-            itrf = itrfs[0]
-        else:
-            err = f"Failed to extract ITRF from file: {filepath}"
-            raise RuntimeError(err)
-
+        return _infer_qfit_itrf(filepath, date=date)
     elif ext == ".h5":
-        with h5py.File(filepath, "r") as ds:
-            itrf = str(ds["ancillary_data"]["reference_frame"][:][0], encoding="utf8")
-    else:
-        err = f"Failed to read ITRF from unrecognized file: {filepath}"
-        raise RuntimeError(err)
+        return _extract_itrf_from_h5_file(filepath)
 
-    itrf = itrf.upper()
-
-    # Try to normalize based on known ITRF strings in the ATM1B data:
-    # TODO: extract this for reuse with other data products.
-    try:
-        itrf = {
-            "ITRF05": "ITRF2005",
-            "ITRF08": "ITRF2008",
-        }[itrf]
-    except KeyError:
-        pass
-
-    return itrf
+    err = f"Failed to read ITRF from unrecognized file: {filepath}"
+    raise RuntimeError(err)
 
 
 def _ilatm1bv2_dataframe(filepath: Path) -> pd.DataFrame:
@@ -384,10 +520,11 @@ def atm1b_data(filepath: Path) -> ATM1BDataFrame:
     # ILATM1B_20140430_110310.ATM4BT4.h5
     # ILATM1B_20111104_181304.ATM4BT4.qi
     # BLATM1B_20060522_145449.qi
+    # BLATM1B_20041127atm2_210316jr.lutF.qi
     filename = filepath.name
 
     # Find the date, which corresponds to the product version.
-    match = re.search(r".*_(\d{4})\d{4}_.*", filename)
+    match = re.search(r".*_(\d{4})\d{4}.*", filename)
     if not match:
         err = f"Failed to recognize {filename} as ATM1B data."
         raise RuntimeError(err)
@@ -395,13 +532,16 @@ def atm1b_data(filepath: Path) -> ATM1BDataFrame:
     year = int(match.group(1))
 
     if year >= 2013:
-        data = _ilatm1bv2_data(filepath, _ilatm1b_date(filename))
+        file_date = _ilatm1b_date(filename)
+        data = _ilatm1bv2_data(filepath, file_date)
     elif year >= 2009:
-        data = _atm1b_qfit_data(filepath, _ilatm1b_date(filename))
+        file_date = _ilatm1b_date(filename)
+        data = _atm1b_qfit_data(filepath, file_date)
     else:
-        data = _atm1b_qfit_data(filepath, _blatm1bv1_date(filename))
+        file_date = _blatm1bv1_date(filename)
+        data = _atm1b_qfit_data(filepath, file_date)
 
-    itrf = extract_itrf(filepath)
+    itrf = extract_itrf(filepath, date=file_date)
     data["ITRF"] = itrf
 
     data = data.set_index("utc_datetime")

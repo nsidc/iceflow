@@ -58,6 +58,12 @@ class ILATM1BDataset(ATM1BDataset):
     version: Literal["1", "2"]
 
 
+class BLATM1BDataset(ATM1BDataset):
+    short_name: ATM1BShortName = "BLATM1B"
+    # There is only 1 version of BLATM1B
+    version: Literal["1"] = "1"
+
+
 class BoundingBox(pydantic.BaseModel):
     lower_left_lon: float
     lower_left_lat: float
