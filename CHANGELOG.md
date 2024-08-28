@@ -4,6 +4,9 @@
   `DatasetSearchParameters`.
 - `transform_itrf` will calculate plate for source ITRF if not given with
   `target_epoch`.
+- Source ITRF for ATM1B qfit data is set by hard-coded ranges based on date if
+  the qfit file header does not contain any mention of the ITRF.
+- Add support for ILATM1B v2 and BLATM1B v1.
 
 # v0.2.0
 

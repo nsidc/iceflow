@@ -33,6 +33,7 @@ dependencies = [
   "shapely >=2.0.5",
   "pandera[mypy] >= 0.20.3",
   "pydantic >=2.8.2",
+  "loguru",
 ]
 
 [project.urls]
@@ -158,6 +159,7 @@ ignore = [
   "SIM108",   # Use ternary operator. Sometimes this is less readable.
   "T201",     # Remove 'print' statements. Sometimes these are handy.
   "SIM105",   # Use contextlib.suppress instead of try-except-pass. The recommended approach is slower and less flexible.
+  "RET505",   # Unnecessary else/elif: sometimes this is just more readable & explicit.
 ]
 isort.required-imports = ["from __future__ import annotations"]
 # Uncomment if using a _compat.typing backport
