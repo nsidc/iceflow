@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import datetime as dt
-import glob
-import os
 import re
 from collections import namedtuple
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -109,9 +108,9 @@ fields will be shifted to the range [-180,180)."""
 ILVIS2_LONGITUDE_FIELD_NAMES = ["CLON", "GLON", "HLON", "TLON"]
 
 
-def _file_date(fn):
+def _file_date(filename: str) -> dt.date:
     """Return the datetime from the ILVIS2 filename."""
-    return dt.datetime.strptime(fn[9:18], "%Y_%m%d")
+    return dt.datetime.strptime(filename[9:18], "%Y_%m%d").date()
 
 
 def _shift_lon(lon):
@@ -121,21 +120,18 @@ def _shift_lon(lon):
     return lon
 
 
-def _add_utc_datetime(df, file_date):
+def _add_utc_datetime(df: pd.DataFrame, file_date) -> pd.DataFrame:
     """Add a `utc_datetime` column to the DataFrame, with values
     calculated from the given date and the `TIME` values in the
     dataset (seconds of the day).
     """
     df["utc_datetime"] = pd.to_datetime(file_date)
     df["utc_datetime"] = df["utc_datetime"] + pd.to_timedelta(df["TIME"], unit="s")
-    df["utc_datetime"] = pd.Series(
-        np.datetime_as_string(df["utc_datetime"]).astype("|S")
-    )
 
     return df
 
 
-def _scale_and_convert(df, fields):
+def _scale_and_convert(df: pd.DataFrame, fields):
     """For any column in the list of Field named tuples, optionally scale
     the corresponding column in the DataFrame and convert the column
     type.
@@ -149,12 +145,12 @@ def _scale_and_convert(df, fields):
     return df
 
 
-def _ilvis2_data(filename, file_date, fields):
+def _ilvis2_data(filepath: Path, file_date: dt.date, fields) -> pd.DataFrame:
     """Return an ILVIS2 file DataFrame, performing all necessary
     conversions / augmentation on the data.
     """
     field_names = [name for name, _, _ in fields]
-    df = pd.read_csv(filename, delim_whitespace=True, comment="#", names=field_names)
+    df = pd.read_csv(filepath, delim_whitespace=True, comment="#", names=field_names)
 
     for col in ILVIS2_LONGITUDE_FIELD_NAMES:
         if col in df.columns:
@@ -167,196 +163,9 @@ def _ilvis2_data(filename, file_date, fields):
     return df
 
 
-def ilvis2_filenames(year):
-    """Use the default search path to find all ILVIS2 files for the
-    specified year.
-
-    Parameters
-    ----------
-    year
-        The year for which to find matching files.
-
-    Returns
-    -------
-    filenames
-        The list of absolute filenames that match the given year.
-    """
-    filepaths = []
-    for input_dir in SEARCH_PATHS:
-        filepaths.extend(glob.glob(os.path.join(input_dir, f"{year}*/*.TXT")))
-
-    return filepaths
-
-
-def df_columns(df):
-    """Return a list of column names corresponding to the data encoded
-    and returned by the `row_values` function. This should be the
-    database column names corresponding to the values returned by that
-    function.
-
-    Parameters
-    ----------
-    df
-        The dataframe for which to generate the column names.
-
-    Returns
-    -------
-    names
-        The list of column names for the data frame.
-
-    """
-    if len(df.columns) == (len(ILVIS2_V104_FIELDS) + 1):
-        return [
-            "utc_datetime",
-            "point",
-            "lfid",
-            "shotnumber",
-            "time",
-            "clon",
-            "clat",
-            "zc",
-            "hlon",
-            "hlat",
-            "zh",
-        ]
-    elif len(df.columns) == (len(ILVIS2_V202b_FIELDS) + 1):
-        return [
-            "utc_datetime",
-            "point",
-            "lfid",
-            "shotnumber",
-            "time",
-            "hlon",
-            "hlat",
-            "zh",
-            "tlon",
-            "tlat",
-            "zt",
-            "rh10",
-            "rh15",
-            "rh20",
-            "rh25",
-            "rh30",
-            "rh35",
-            "rh40",
-            "rh45",
-            "rh50",
-            "rh55",
-            "rh60",
-            "rh65",
-            "rh70",
-            "rh75",
-            "rh80",
-            "rh85",
-            "rh90",
-            "rh95",
-            "rh96",
-            "rh97",
-            "rh98",
-            "rh99",
-            "rh100",
-            "azimuth",
-            "incident_angle",
-            "range",
-            "complexity",
-            "channel_zt",
-            "channel_zg",
-            "channel_rh",
-        ]
-    else:
-        raise ValueError("Unknown row type: cannot convert to SQL str.")
-
-
-def row_values(row):
-    """Return a bytestring containing comma-delimited values for a given
-    row in the dataset. This string can be used in a SQL statement to
-    insert the data into a matching database table.
-
-    Parameters
-    ----------
-    row
-        The row tuple from a pandas.DataFrame obtained by calling
-        ilvis2_data and augmented with `utc_datetime`.
-
-    Returns
-    -------
-    row
-        The row as a comma-delimited bytestring (`bytes`).
-    """
-    # The row will have one more value in it than the input file
-    # because we add utc_datetime.
-    if len(row) == (len(ILVIS2_V104_FIELDS) + 1):
-        return b"%s,SRID=4326;POINT(%f %f %f),%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
-            row.utc_datetime,
-            row.GLON,
-            row.GLAT,
-            row.ZG,
-            row.LFID,
-            row.SHOTNUMBER,
-            row.TIME,
-            row.CLON,
-            row.CLAT,
-            row.ZC,
-            row.HLON,
-            row.HLAT,
-            row.ZH,
-        )
-    elif len(row) == (len(ILVIS2_V202b_FIELDS) + 1):
-        return (
-            b"%s,SRID=4326;POINT(%f %f %f),%d,%d,%d,%d,%d,%d,%d,"
-            b"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,"
-            b"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n"
-        ) % (
-            row.utc_datetime,
-            row.GLON,
-            row.GLAT,
-            row.ZG,
-            row.LFID,
-            row.SHOTNUMBER,
-            row.TIME,
-            row.HLON,
-            row.HLAT,
-            row.ZH,
-            row.TLON,
-            row.TLAT,
-            row.ZT,
-            row.RH10,
-            row.RH15,
-            row.RH20,
-            row.RH25,
-            row.RH30,
-            row.RH35,
-            row.RH40,
-            row.RH45,
-            row.RH50,
-            row.RH55,
-            row.RH60,
-            row.RH65,
-            row.RH70,
-            row.RH75,
-            row.RH80,
-            row.RH85,
-            row.RH90,
-            row.RH95,
-            row.RH96,
-            row.RH97,
-            row.RH98,
-            row.RH99,
-            row.RH100,
-            row.AZIMUTH,
-            row.INCIDENT_ANGLE,
-            row.RANGE,
-            row.COMPLEXITY,
-            row.CHANNEL_ZT,
-            row.CHANNEL_ZG,
-            row.CHANNEL_RH,
-        )
-    else:
-        raise ValueError("Unknown row type: cannot convert to SQL str.")
-
-
-def ilvis2_data(fn):
-    """Return the ilvis2 data given a filename.
+@pa.check_types()
+def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
+    """Return the ilvis2 data given a filepath.
 
     Parameters
     ----------
@@ -372,16 +181,28 @@ def ilvis2_data(fn):
         The ilvis2 (pandas.DataFrame) data.
 
     """
-    m = re.search(r"_\D{2}(\d{4})_", fn)
-    year = int(m.group(1))
+    filename = filepath.name
+    match = re.search(r"_\D{2}(\d{4})_", filename)
+    if not match:
+        err = f"Failed to recognize {filename} as ILVIS2 data."
+        raise RuntimeError(err)
+
+    year = int(match.group(1))
 
     if year < 2017:
         the_fields = ILVIS2_V104_FIELDS
     else:
         the_fields = ILVIS2_V202b_FIELDS
 
-    return _ilvis2_data(fn, _file_date(os.path.basename(fn)), the_fields)
+    file_date = _file_date(filename)
 
+    data = _ilvis2_data(filepath, file_date, the_fields)
+    data["ITRF"] = ILVIS2_ITRF
 
-@pa.check_types()
-def ilvis2_data(filepath: Path) -> ILVIS2DataFrame: ...
+    # TODO: this data does not have latitude, longitude, and elevation
+    # fields. Instead, it has e.g., "CLON" and "GLON" and "HLON". Which should
+    # be chosen for e.g., ITRF transformations? Look at the NSIDC data tutorials
+    # iceflow notebooks to see how the "harmonization" was done.
+    data = data.set_index("utc_datetime")
+
+    return ILVIS2DataFrame(data)

@@ -37,11 +37,17 @@ class ATM1BSchema(CommonDataColumnsSchema):
     pulse_width: Series[float] = pa.Field(nullable=True, coerce=True)
 
 
+class ILVIS2Schema(CommonDataColumnsSchema):
+    # TODO!
+    ...
+
+
 IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
 ATM1BDataFrame = DataFrame[ATM1BSchema]
+ILVIS2DataFrame = DataFrame[ILVIS2Schema]
 
 ATM1BShortName = Literal["ILATM1B", "BLATM1B"]
-DatasetShortName = ATM1BShortName
+DatasetShortName = ATM1BShortName | Literal["ILVIS2"]
 
 
 class Dataset(pydantic.BaseModel):
@@ -61,6 +67,11 @@ class ILATM1BDataset(ATM1BDataset):
 class BLATM1BDataset(ATM1BDataset):
     short_name: ATM1BShortName = "BLATM1B"
     # There is only 1 version of BLATM1B
+    version: Literal["1"] = "1"
+
+
+class ILVIS2Dataset(Dataset):
+    short_name: DatasetShortName = "ILVIS2"
     version: Literal["1"] = "1"
 
 
