@@ -404,8 +404,8 @@ def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
     However, it is not clear what the "convention" was during data collection.
 
     This function does its "best" based on prior work, and places trust in that
-    prior work. However, this should be more closely reviewd. See <TODO: create
-    an issue to capture this>
+    prior work. However, this should be more closely reviewd. See
+    https://github.com/nsidc/iceflow/issues/35.
     """
     header = _qfit_file_header(filepath)
     results = re.finditer(r"itrf\d{2,4}", header)
