@@ -334,6 +334,12 @@ ATM1B_GRANULE_ITRFS = [
 
 
 def _qfit_itrf_from_date(date: dt.date) -> str:
+    """Return a strting representing the ITRF for a qfit file based on date.
+
+    This function should only be used for looking up the ITRF for qfit files that
+    lack a header. It is based on a hard-coded list with no formal provenance.
+    """
+
     def _find(gdt, i, lower, upper) -> str | None:
         # Binary search for the correct ITRF to make this fast. If we
         # do a naive linear search, it can run up to 10x longer.
