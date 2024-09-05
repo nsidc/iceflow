@@ -1,3 +1,10 @@
+# v0.3.0
+
+- Use `pydantic` to create custom BoundingBox class for
+  `DatasetSearchParameters`.
+- `transform_itrf` will calculate plate for source ITRF if not given with
+  `target_epoch`.
+
 # v0.2.0
 
 - Use `pydantic` to manage and validate dataset & dataset search parameters.

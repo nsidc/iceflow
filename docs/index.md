@@ -5,6 +5,7 @@
 :hidden:
 :caption: content
 
+iceflow-example.ipynb
 api/nsidc
 LICENSE
 ```

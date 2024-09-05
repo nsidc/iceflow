@@ -6,9 +6,11 @@ import datetime as dt
 import pandas as pd
 import pandera as pa
 from pyproj import Transformer
+from shapely.geometry.point import Point
 
 from nsidc.iceflow.data.models import IceflowDataFrame
 from nsidc.iceflow.itrf import check_itrf
+from nsidc.iceflow.itrf.plate_boundaries import plate_name
 
 
 def _datetime_to_decimal_year(date):
@@ -39,12 +41,11 @@ def _datetime_to_decimal_year(date):
 def transform_itrf(
     data: IceflowDataFrame,
     target_itrf: str,
-    # These two must both be specified to apply the plate model
-    # step. Nothing happens if only one is given. TODO: raise an error if
-    # only one is given. Can we determine the plate from the data instead of
-    # requiring the user to pass?
-    plate: str | None = None,
     target_epoch: str | None = None,
+    # If a target epoch is given, the plate name can be given. If a target_epoch
+    # is given but the plate name is not, each source ITRF is grouped together
+    # and the mean of that chunk is used to determine the plate name.
+    plate: str | None = None,
 ) -> IceflowDataFrame:
     """Pipeline string for proj to transform from the source to the target
     ITRF frame and, optionally, epoch.
@@ -64,7 +65,9 @@ def transform_itrf(
             continue
 
         plate_model_step = ""
-        if plate and target_epoch:
+        if target_epoch:
+            if not plate:
+                plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
             plate_model_step = (
                 f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )

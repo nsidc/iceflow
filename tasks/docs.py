@@ -47,3 +47,12 @@ def watch(_ctx):
         ),
         pty=True,
     )
+
+
+@task()
+def generate_example_notebook(_ctx):
+    """Generate the example iceflow notebook for the docs."""
+    print_and_run(
+        (f"{PROJECT_DIR}/notebooks/generate_rendered_notebook_for_docs.sh"),
+        pty=True,
+    )

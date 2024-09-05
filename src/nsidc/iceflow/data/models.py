@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Sequence
 from typing import Literal
 
 import pandera as pa
@@ -53,7 +52,14 @@ class ATM1BDataset(Dataset):
     short_name: DatasetShortName = "ILATM1B"
 
 
+class BoundingBox(pydantic.BaseModel):
+    lower_left_lon: float
+    lower_left_lat: float
+    upper_right_lon: float
+    upper_right_lat: float
+
+
 class DatasetSearchParameters(pydantic.BaseModel):
     dataset: Dataset
-    bounding_box: Sequence[float]
+    bounding_box: BoundingBox
     temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date]
