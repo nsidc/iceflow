@@ -287,14 +287,18 @@ def _normalize_itrf_str(itrf_str: str) -> str:
 
 def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
-    dtype = np.dtype([("record_type", ">i4"), ("header", ">S44")])
-
     record_size = np.fromfile(filepath, dtype=">i4", count=1)[0]
+    # The header length for each record is the number of bytes after the first
+    # word.
+    header_size = record_size - 4
+    dtype = np.dtype([("record_type", ">i4"), ("header", f">S{header_size}")])
+
     if record_size >= 100:
         record_size = np.fromfile(filepath, dtype="<i4", count=1)[0]
         if record_size >= 100:
             raise ValueError("invalid record size found")
-        dtype = np.dtype([("record_type", "<i4"), ("header", "<S44")])
+        header_size = record_size - 4
+        dtype = np.dtype([("record_type", "<i4"), ("header", f"<S{header_size}")])
 
     raw_data = np.fromfile(filepath, dtype=dtype)
 
