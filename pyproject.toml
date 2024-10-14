@@ -56,7 +56,13 @@ docs = [
   "sphinx_copybutton",
   "sphinx_autodoc_typehints",
   "furo>=2023.08.17",
-  "sphinx-autobuild"
+  "sphinx-autobuild",
+  "myst-nb",
+]
+notebooks = [
+  "jupyterlab",
+  "matplotlib",
+  "ipympl",
 ]
 
 
@@ -190,3 +196,6 @@ replace  = '__version__ = "v{new_version}"'
 filename = "pyproject.toml"
 search = 'version = "{current_version}"'
 replace = 'version = "{new_version}"'
+
+[tool.codespell]
+skip="docs/iceflow-example.ipynb"

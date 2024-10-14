@@ -17,6 +17,7 @@ import pandas as pd
 from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
     ATM1BDataset,
+    BoundingBox,
     DatasetSearchParameters,
     IceflowDataFrame,
 )
@@ -24,7 +25,12 @@ from nsidc.iceflow.data.models import (
 
 def test_e2e(tmp_path):
     target_itrf = "ITRF2008"
-    common_bounding_box = (-103.125559, -75.180563, -102.677327, -74.798063)
+    common_bounding_box = BoundingBox(
+        lower_left_lon=-103.125559,
+        lower_left_lat=-75.180563,
+        upper_right_lon=-102.677327,
+        upper_right_lat=-74.798063,
+    )
     atm1b_v1_dataset = ATM1BDataset(version="1")
 
     results2009 = fetch_iceflow_df(
