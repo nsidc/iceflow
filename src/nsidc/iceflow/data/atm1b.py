@@ -274,9 +274,10 @@ def _normalize_itrf_str(itrf_str: str) -> str:
     itrf_str = itrf_str.upper()
     try:
         itrf_str = {
+            "ITRF00": "ITRF2000",
             "ITRF05": "ITRF2005",
             "ITRF08": "ITRF2008",
-            "ITRF2000": "ITRF20",
+            "ITRF2020": "ITRF20",
         }[itrf_str]
     except KeyError:
         pass
