@@ -1,19 +1,16 @@
 from __future__ import annotations
 
-import collections
 import datetime as dt
 import logging
 import re
 from enum import Enum
 from pathlib import Path
-from typing import cast
 
 import h5py
 import numpy as np
 import pandas as pd
 import pandera as pa
 from gps_timemachine.gps import leap_seconds
-from loguru import logger
 from numpy.typing import DTypeLike
 
 from nsidc.iceflow.data.models import ATM1BDataFrame
@@ -274,9 +271,10 @@ def _normalize_itrf_str(itrf_str: str) -> str:
     itrf_str = itrf_str.upper()
     try:
         itrf_str = {
+            "ITRF00": "ITRF2000",
             "ITRF05": "ITRF2005",
             "ITRF08": "ITRF2008",
-            "ITRF2000": "ITRF20",
+            "ITRF2020": "ITRF20",
         }[itrf_str]
     except KeyError:
         pass
@@ -286,14 +284,18 @@ def _normalize_itrf_str(itrf_str: str) -> str:
 
 def _qfit_file_header(filepath: Path) -> str:
     """Return the header string from a QFIT file."""
-    dtype = np.dtype([("record_type", ">i4"), ("header", ">S44")])
-
     record_size = np.fromfile(filepath, dtype=">i4", count=1)[0]
+    # The header length for each record is the number of bytes after the first
+    # word.
+    header_size = record_size - 4
+    dtype = np.dtype([("record_type", ">i4"), ("header", f">S{header_size}")])
+
     if record_size >= 100:
         record_size = np.fromfile(filepath, dtype="<i4", count=1)[0]
         if record_size >= 100:
             raise ValueError("invalid record size found")
-        dtype = np.dtype([("record_type", "<i4"), ("header", "<S44")])
+        header_size = record_size - 4
+        dtype = np.dtype([("record_type", "<i4"), ("header", f"<S{header_size}")])
 
     raw_data = np.fromfile(filepath, dtype=dtype)
 
@@ -310,60 +312,7 @@ def _qfit_file_header(filepath: Path) -> str:
     raise RuntimeError(err)
 
 
-# NOTE: See the docstring of `_infer_qfit_itrf` for more context about these
-# hard-coded ITRF date-ranges.
-# TODO: a typed-dict might be better here.
-GranuleItrfRange = collections.namedtuple("GranuleItrfRange", "start end itrf")
-ATM1B_GRANULE_ITRFS = [
-    GranuleItrfRange(dt.date(1993, 6, 23), dt.date(1996, 6, 5), "ITRF93"),
-    GranuleItrfRange(dt.date(1997, 4, 25), dt.date(1997, 5, 28), "ITRF94"),
-    GranuleItrfRange(dt.date(1998, 6, 27), dt.date(1999, 5, 25), "ITRF96"),
-    GranuleItrfRange(dt.date(2000, 5, 12), dt.date(2001, 5, 27), "ITRF97"),
-    GranuleItrfRange(dt.date(2001, 12, 18), dt.date(2002, 11, 21), "ITRF2000"),
-    GranuleItrfRange(dt.date(2002, 11, 22), dt.date(2002, 11, 22), "ITRF97"),
-    GranuleItrfRange(dt.date(2002, 11, 23), dt.date(2002, 12, 13), "ITRF2000"),
-    GranuleItrfRange(dt.date(2002, 12, 14), dt.date(2002, 12, 14), "ITRF97"),
-    GranuleItrfRange(dt.date(2002, 12, 15), dt.date(2007, 5, 11), "ITRF2000"),
-    GranuleItrfRange(dt.date(2007, 9, 10), dt.date(2011, 5, 16), "ITRF2005"),
-    GranuleItrfRange(dt.date(2011, 10, 12), dt.date(2018, 5, 1), "ITRF2008"),
-]
-
-
-def _qfit_itrf_from_date(date: dt.date) -> str:
-    """Return a strting representing the ITRF for a qfit file based on date.
-
-    This function should only be used for looking up the ITRF for qfit files that
-    lack a header. It is based on a hard-coded list with no formal provenance.
-    """
-
-    def _find(gdt, i, lower, upper) -> str | None:
-        # Binary search for the correct ITRF to make this fast. If we
-        # do a naive linear search, it can run up to 10x longer.
-        g = ATM1B_GRANULE_ITRFS[i]
-        if gdt < g.start:
-            if i > lower:
-                return _find(gdt, (i - lower) // 2, lower, i)
-            else:
-                return None
-        elif gdt <= g.end:
-            itrf_str = g.itrf
-            return cast(str, itrf_str)
-        elif i < (upper - 1):
-            return _find(gdt, (upper + i) // 2, i, upper)
-        else:
-            return None
-
-    lower, upper = (0, len(ATM1B_GRANULE_ITRFS))
-    i = (upper - lower) // 2
-    result = _find(date, i, lower, upper)
-    if result is None:
-        err_msg = f"Failed to find ITRF for {date=}"
-        raise RuntimeError(err_msg)
-
-    return result
-
-
-def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
+def _infer_qfit_itrf(filepath: Path) -> str:
     """Takes an ILATM1B/BLATM1B qfit filepath and returns a string representing
     the ITRF.
 
@@ -371,38 +320,27 @@ def _infer_qfit_itrf(filepath: Path, date: dt.date) -> str:
     described here:
     https://nsidc.org/sites/nsidc.org/files/files/ReadMe_qfit.txt
 
-    Failing that, this function falls back to a hard-coded ITRF based on the
-    date.
+    The string we extract the ITRF from looks like this:
 
-    This function does its "best" based on prior work, and places trust in that
-    prior work. However, this should be more closely reviewd. See
-    https://github.com/nsidc/iceflow/issues/35.
+        `./091109_aa_l12_cfm_itrf05_18may10_palm_roth_amu2`
+
+    From which we extract an ITRF of `ITRF2005` from the `_itrf05_` bit.
+
+    According to Michael Studinger (see
+    https://github.com/nsidc/iceflow/issues/35#issuecomment-2408619586), This
+    string represents the "GPS trajectory that was used to reference the lidar
+    data and that has the ITRF epoch in its file name."
     """
     header = _qfit_file_header(filepath)
     results = re.finditer(r"itrf\d{2,4}", header)
     itrfs = list({result.group() for result in results})
 
-    itrf_for_date = _qfit_itrf_from_date(date)
-
     if len(itrfs) == 1:
         itrf_from_qfit_header = _normalize_itrf_str(itrfs[0])
-        if itrf_for_date != itrf_from_qfit_header:
-            warn_msg = (
-                f"ITRF in qfit header for {filepath=} is inconsistent with expected ITRF for {date=}."
-                f" qfit header has {itrf_from_qfit_header}. Expected {itrf_for_date}."
-                f" Using the ITRF found in the header: {itrf_from_qfit_header}"
-            )
-            logger.warning(warn_msg)
-
         return itrf_from_qfit_header
 
-    warn_msg = (
-        f"Failed to find ITRF in qfit header file for {filepath}."
-        f" Falling back on hard-coded ITRF for {date=}: {itrf_for_date}"
-    )
-    logger.warning(warn_msg)
-
-    return itrf_for_date
+    err_msg = f"Failed to extract ITRF from qfit header: {filepath}"
+    raise RuntimeError(err_msg)
 
 
 def _extract_itrf_from_h5_file(filepath: Path) -> str:
@@ -414,11 +352,11 @@ def _extract_itrf_from_h5_file(filepath: Path) -> str:
     return itrf
 
 
-def extract_itrf(filepath: Path, date: dt.date) -> str:
+def extract_itrf(filepath: Path) -> str:
     ext = filepath.suffix
 
     if ext == ".qi":
-        return _infer_qfit_itrf(filepath, date=date)
+        return _infer_qfit_itrf(filepath)
     elif ext == ".h5":
         return _extract_itrf_from_h5_file(filepath)
 
@@ -509,7 +447,7 @@ def atm1b_data(filepath: Path) -> ATM1BDataFrame:
         file_date = _blatm1bv1_date(filename)
         data = _atm1b_qfit_data(filepath, file_date)
 
-    itrf = extract_itrf(filepath, date=file_date)
+    itrf = extract_itrf(filepath)
     data["ITRF"] = itrf
 
     data = data.set_index("utc_datetime")
