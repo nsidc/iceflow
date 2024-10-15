@@ -21,6 +21,7 @@ from nsidc.iceflow.data.models import (
     DatasetSearchParameters,
     IceflowDataFrame,
     ILATM1BDataset,
+    ILVIS2Dataset,
 )
 
 
@@ -80,3 +81,23 @@ def test_atm1b_blatm1b(tmp_path):
     )
 
     assert (results_blamt1b_v2_2014.ITRF == "ITRF2000").all()
+
+
+def test_ivlis2(tmp_path):
+    common_bounding_box = BoundingBox(
+        lower_left_lon=-120.0,
+        lower_left_lat=-80.0,
+        upper_right_lon=-90.0,
+        upper_right_lat=-65.0,
+    )
+
+    results = fetch_iceflow_df(
+        dataset_search_params=DatasetSearchParameters(
+            dataset=ILVIS2Dataset(),
+            bounding_box=common_bounding_box,
+            temporal=(dt.datetime(2009, 10, 25, 15), dt.datetime(2009, 10, 25, 17)),
+        ),
+        output_dir=tmp_path,
+    )
+
+    assert (results.ITRF == "ITRF2000").all()

@@ -150,7 +150,7 @@ def _ilvis2_data(filepath: Path, file_date: dt.date, fields) -> pd.DataFrame:
     conversions / augmentation on the data.
     """
     field_names = [name for name, _, _ in fields]
-    df = pd.read_csv(filepath, delim_whitespace=True, comment="#", names=field_names)
+    df = pd.read_csv(filepath, sep=r"\s+", comment="#", names=field_names)
 
     for col in ILVIS2_LONGITUDE_FIELD_NAMES:
         if col in df.columns:
@@ -199,10 +199,19 @@ def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
     data = _ilvis2_data(filepath, file_date, the_fields)
     data["ITRF"] = ILVIS2_ITRF
 
-    # TODO: this data does not have latitude, longitude, and elevation
-    # fields. Instead, it has e.g., "CLON" and "GLON" and "HLON". Which should
-    # be chosen for e.g., ITRF transformations? Look at the NSIDC data tutorials
-    # iceflow notebooks to see how the "harmonization" was done.
+    # TODO: this data does not have a single set of latitude, longitude, and
+    # elevation fields. Instead, it has e.g., "CLON" and "GLON" and "HLON". In
+    # the original `valkyrie` service code, it looks like "GLON", "GLAT", and
+    # "ZG" cols were used as for the points stored in the valkyrie database and
+    # transformed by the ITRF transformation service. Ideally, we support
+    # consistent transformation of the ITRF across all lat/lon/elev
+    # fields. E.g., a user may be more interested in looking at the "CLON",
+    # "CLAT", and "ZC" fields instead.
+    # For now, we will replicate the behavior of `valkyrie`:
+    data["latitude"] = data["GLAT"]
+    data["longitude"] = data["GLON"]
+    data["elevation"] = data["ZG"]
+
     data = data.set_index("utc_datetime")
 
     return ILVIS2DataFrame(data)
