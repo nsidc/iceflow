@@ -28,6 +28,15 @@ def unit(_ctx):
 
 
 @task()
+def integration(_ctx):
+    """Run integration tests with pytest."""
+    print_and_run(
+        f"PYTHONPATH={PROJECT_DIR}/src:$PYTHONPATH pytest tests/integration --capture=no",
+        pty=True,
+    )
+
+
+@task()
 def pytest(_ctx):
     """Run all tests with pytest."""
     print_and_run(
