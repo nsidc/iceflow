@@ -79,6 +79,4 @@ def test_atm1b_blatm1b(tmp_path):
         output_dir=tmp_path,
     )
 
-    # Untransformed ITRF is expected to be ITRF2000 based on hard-coded ranges
-    # (qfit header lacks ITRF info)
     assert (results_blamt1b_v2_2014.ITRF == "ITRF2000").all()
