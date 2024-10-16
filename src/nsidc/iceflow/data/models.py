@@ -130,7 +130,7 @@ class BLATM1BDataset(ATM1BDataset):
 
 class ILVIS2Dataset(Dataset):
     short_name: DatasetShortName = "ILVIS2"
-    version: Literal["1"] = "1"
+    version: Literal["1", "2"]
 
 
 class BoundingBox(pydantic.BaseModel):

@@ -11,10 +11,6 @@ import pandera as pa
 
 from nsidc.iceflow.data.models import ILVIS2DataFrame
 
-# The user guide indicates ILVIS2 data uses ITRF2000 as a reference frame:
-# https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v001-userguide.pdf
-ILVIS2_ITRF = "ITRF2000"
-
 Field = namedtuple("Field", ["name", "type", "scale_factor"])
 
 """
@@ -190,14 +186,22 @@ def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
     year = int(match.group(1))
 
     if year < 2017:
+        # This corresponds to ILVIS v1
         the_fields = ILVIS2_V104_FIELDS
+        # The user guide indicates ILVIS2 v1 data uses ITRF2000 as a reference frame:
+        # https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v001-userguide.pdf
+        itrf_str = "ITRF2000"
     else:
+        # This corresponds to ILVIS v2
         the_fields = ILVIS2_V202b_FIELDS
+        # The user guide indicates ILVIS2 v1 data uses ITRF2008 as a reference frame:
+        # https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v002-userguide.pdf
+        itrf_str = "ITRF2008"
 
     file_date = _file_date(filename)
 
     data = _ilvis2_data(filepath, file_date, the_fields)
-    data["ITRF"] = ILVIS2_ITRF
+    data["ITRF"] = itrf_str
 
     # TODO: this data does not have a single set of latitude, longitude, and
     # elevation fields. Instead, it has e.g., "CLON" and "GLON" and "HLON". In

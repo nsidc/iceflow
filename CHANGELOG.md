@@ -5,7 +5,7 @@
 - `transform_itrf` will calculate plate for source ITRF if not given with
   `target_epoch`.
 - Add support for ILATM1B v2 and BLATM1B v1.
-- Add support for ILVIS2.
+- Add support for ILVIS2 v1 and v2.
 
 # v0.2.0
 
