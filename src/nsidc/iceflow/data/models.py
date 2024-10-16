@@ -37,11 +37,75 @@ class ATM1BSchema(CommonDataColumnsSchema):
     pulse_width: Series[float] = pa.Field(nullable=True, coerce=True)
 
 
+# Note/TODO: the ILVIS2 data contain multiple sets of lat/lon/elev. The common
+# schema assumes one set of lat/lon/elev which is used for the ITRF
+# transformation code.
+class ILVIS2Schema(CommonDataColumnsSchema):
+    # Common columns
+    LFID: Series[float] = pa.Field(nullable=True, coerce=True)
+    SHOTNUMBER: Series[float] = pa.Field(nullable=True, coerce=True)
+    TIME: Series[float] = pa.Field(nullable=True, coerce=True)
+    ZG: Series[float] = pa.Field(nullable=True, coerce=True)
+    GLAT: Series[float] = pa.Field(nullable=True, coerce=True)
+    GLON: Series[float] = pa.Field(nullable=True, coerce=True)
+    HLAT: Series[float] = pa.Field(nullable=True, coerce=True)
+    HLON: Series[float] = pa.Field(nullable=True, coerce=True)
+    ZH: Series[float] = pa.Field(nullable=True, coerce=True)
+
+    # V104-specific
+    CLAT: Series[float] = pa.Field(nullable=True, coerce=True)
+    CLON: Series[float] = pa.Field(nullable=True, coerce=True)
+    ZC: Series[float] = pa.Field(nullable=True, coerce=True)
+
+    # V202B-specific
+    AZIMUTH: Series[float] = pa.Field(nullable=True, coerce=True)
+    CHANNEL_RH: Series[float] = pa.Field(nullable=True, coerce=True)
+    CHANNEL_ZG: Series[float] = pa.Field(nullable=True, coerce=True)
+    CHANNEL_ZT: Series[float] = pa.Field(nullable=True, coerce=True)
+    COMPLEXITY: Series[float] = pa.Field(nullable=True, coerce=True)
+    INCIDENT_ANGLE: Series[float] = pa.Field(nullable=True, coerce=True)
+    RANGE: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH10: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH15: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH20: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH25: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH30: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH35: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH40: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH45: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH50: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH55: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH60: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH65: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH70: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH75: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH80: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH85: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH90: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH95: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH96: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH97: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH98: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH99: Series[float] = pa.Field(nullable=True, coerce=True)
+    RH100: Series[float] = pa.Field(nullable=True, coerce=True)
+    TLAT: Series[float] = pa.Field(nullable=True, coerce=True)
+    TLON: Series[float] = pa.Field(nullable=True, coerce=True)
+    ZT: Series[float] = pa.Field(nullable=True, coerce=True)
+
+    class Config:
+        # This ensures all columns are present, regardless of the date. Granules
+        # before 2017 use the V104 fields and anything after uses the v202b
+        # fields. The data type for all values must be `float` because the null
+        # value is `np.nan` - a float.
+        add_missing_columns = True
+
+
 IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
 ATM1BDataFrame = DataFrame[ATM1BSchema]
+ILVIS2DataFrame = DataFrame[ILVIS2Schema]
 
 ATM1BShortName = Literal["ILATM1B", "BLATM1B"]
-DatasetShortName = ATM1BShortName
+DatasetShortName = ATM1BShortName | Literal["ILVIS2"]
 
 
 class Dataset(pydantic.BaseModel):
@@ -62,6 +126,11 @@ class BLATM1BDataset(ATM1BDataset):
     short_name: ATM1BShortName = "BLATM1B"
     # There is only 1 version of BLATM1B
     version: Literal["1"] = "1"
+
+
+class ILVIS2Dataset(Dataset):
+    short_name: DatasetShortName = "ILVIS2"
+    version: Literal["1", "2"]
 
 
 class BoundingBox(pydantic.BaseModel):

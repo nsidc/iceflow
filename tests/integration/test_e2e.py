@@ -21,6 +21,7 @@ from nsidc.iceflow.data.models import (
     DatasetSearchParameters,
     IceflowDataFrame,
     ILATM1BDataset,
+    ILVIS2Dataset,
 )
 
 
@@ -80,3 +81,42 @@ def test_atm1b_blatm1b(tmp_path):
     )
 
     assert (results_blamt1b_v2_2014.ITRF == "ITRF2000").all()
+
+
+def test_ivlis2(tmp_path):
+    results_v1 = fetch_iceflow_df(
+        dataset_search_params=DatasetSearchParameters(
+            dataset=ILVIS2Dataset(version="1"),
+            bounding_box=BoundingBox(
+                lower_left_lon=-120.0,
+                lower_left_lat=-80.0,
+                upper_right_lon=-90.0,
+                upper_right_lat=-65.0,
+            ),
+            temporal=(dt.datetime(2009, 10, 25, 15), dt.datetime(2009, 10, 25, 17)),
+        ),
+        output_dir=tmp_path,
+    )
+
+    assert (results_v1.ITRF == "ITRF2000").all()
+
+    results_v2 = fetch_iceflow_df(
+        dataset_search_params=DatasetSearchParameters(
+            dataset=ILVIS2Dataset(version="2"),
+            bounding_box=BoundingBox(
+                lower_left_lon=-180,
+                lower_left_lat=60.0,
+                upper_right_lon=180,
+                upper_right_lat=90,
+            ),
+            temporal=(dt.datetime(2017, 8, 25, 0), dt.datetime(2017, 8, 25, 14, 30)),
+        ),
+        output_dir=tmp_path,
+    )
+
+    assert (results_v2.ITRF == "ITRF2008").all()
+
+    # test that v1 and 2 can be concatenated
+    complete_df = IceflowDataFrame(pd.concat([results_v1, results_v2]))
+
+    assert complete_df is not None
