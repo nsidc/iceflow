@@ -19,6 +19,7 @@ from nsidc.iceflow.data.models import (
     BLATM1BDataset,
     BoundingBox,
     DatasetSearchParameters,
+    GLAH06Dataset,
     IceflowDataFrame,
     ILATM1BDataset,
     ILVIS2Dataset,
@@ -120,3 +121,26 @@ def test_ivlis2(tmp_path):
     complete_df = IceflowDataFrame(pd.concat([results_v1, results_v2]))
 
     assert complete_df is not None
+
+
+def test_glah06(tmp_path):
+    common_bounding_box = BoundingBox(
+        lower_left_lon=-180,
+        lower_left_lat=-90,
+        upper_right_lon=180,
+        upper_right_lat=90,
+    )
+
+    results = fetch_iceflow_df(
+        dataset_search_params=DatasetSearchParameters(
+            dataset=GLAH06Dataset(),
+            bounding_box=common_bounding_box,
+            temporal=(
+                dt.datetime(2003, 2, 20, 22, 25),
+                dt.datetime(2003, 2, 20, 22, 25, 38),
+            ),
+        ),
+        output_dir=tmp_path,
+    )
+
+    assert (results.ITRF == "ITRF2008").all()

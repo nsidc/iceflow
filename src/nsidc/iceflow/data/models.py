@@ -100,12 +100,18 @@ class ILVIS2Schema(CommonDataColumnsSchema):
         add_missing_columns = True
 
 
+class GLAH06Schema(CommonDataColumnsSchema):
+    # TODO
+    ...
+
+
 IceflowDataFrame = DataFrame[CommonDataColumnsSchema]
 ATM1BDataFrame = DataFrame[ATM1BSchema]
 ILVIS2DataFrame = DataFrame[ILVIS2Schema]
+GLAH06DataFrame = DataFrame[GLAH06Schema]
 
 ATM1BShortName = Literal["ILATM1B", "BLATM1B"]
-DatasetShortName = ATM1BShortName | Literal["ILVIS2"]
+DatasetShortName = ATM1BShortName | Literal["ILVIS2"] | Literal["GLAH06"]
 
 
 class Dataset(pydantic.BaseModel):
@@ -131,6 +137,14 @@ class BLATM1BDataset(ATM1BDataset):
 class ILVIS2Dataset(Dataset):
     short_name: DatasetShortName = "ILVIS2"
     version: Literal["1", "2"]
+
+
+class GLAH06Dataset(Dataset):
+    short_name: DatasetShortName = "GLAH06"
+    # Note: some dataset versions are padded with zeros like GLAH06. NSIDC
+    # documentation refers to "version 34", but CMR only recognizes "034".  As a
+    # rule-of-thumb, ICESat-2, SMAP, and GLAH/GLA datasets have zero padding.
+    version: Literal["034"] = "034"
 
 
 class BoundingBox(pydantic.BaseModel):
