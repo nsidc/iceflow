@@ -60,7 +60,7 @@ def transform_itrf(
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
         # If the source ITRF is the same as the target for this chunk, skip transformation.
-        if source_itrf == target_itrf:
+        if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
             continue
 
@@ -68,16 +68,27 @@ def transform_itrf(
         if target_epoch:
             if not plate:
                 plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
+            # TODO: i removed the `+inv` here because I think it is
+            # incorrect. This step is supposed to do coordinate propagation to
+            # the given epoch using the given plate motion model. The `inv`
+            # undoes this, assuming the `t_epoch` is the source epoch and we're
+            # going back to the ITRF's reference epoch instead!  The comment on
+            # this commit would seem to support that:
+            # https://github.com/OSGeo/PROJ/commit/403f930355926aced5caba5bfbcc230ad152cf86
             plate_model_step = (
-                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
+                f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )
+
+        itrf_transformation_step = ""
+        if source_itrf != target_itrf:
+            itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
 
         pipeline = (
             f"+proj=pipeline +ellps=WGS84 "
             f"+step +proj=unitconvert +xy_in=deg +xy_out=rad "
             f"+step +proj=latlon "
             f"+step +proj=cart "
-            f"+step +inv +init={target_itrf}:{source_itrf} "
+            f"{itrf_transformation_step}"
             f"{plate_model_step}"
             f"+step +inv +proj=cart "
             f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
