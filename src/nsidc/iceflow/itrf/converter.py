@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import calendar
 import datetime as dt
+from typing import cast
 
 import pandas as pd
 import pandera as pa
-from pyproj import Transformer
+import pyproj
 from shapely.geometry.point import Point
 
 from nsidc.iceflow.data.models import IceflowDataFrame
@@ -37,6 +38,39 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
+def _check_valid_proj_step(proj_str) -> bool:
+    """Check if the source/target ITRF pair can be expanded.
+
+    Returns `True` if the combination is valid. Otherwise `False`.
+
+    The combination is valid only if there is an init file on the proj data path
+    matching the `source_itrf` that has an entry matching the `target_itrf`. See
+    https://proj.org/en/9.3/resource_files.html#init-files for more info.
+    """
+    try:
+        pyproj.Transformer.from_pipeline(proj_str)
+        return True
+    except pyproj.exceptions.ProjError:
+        return False
+
+
+def _get_itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
+    """Get the ITRF transformation step for the given source/target ITRF."""
+
+    itrf_transformation_step = f"+step +init={source_itrf}:{target_itrf}"
+    if _check_valid_proj_step(itrf_transformation_step):
+        return itrf_transformation_step
+
+    itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf}"
+    if _check_valid_proj_step(itrf_transformation_step):
+        return itrf_transformation_step
+
+    # There may not be a pre-defined helmert transformation. The user may want
+    # to craft their own transformation pipeline.
+    err_msg = f"Failed to find a pre-defined ITRF transformation between {source_itrf} and {target_itrf}."
+    raise RuntimeError(err_msg)
+
+
 @pa.check_types()
 def transform_itrf(
     data: IceflowDataFrame,
@@ -61,6 +95,7 @@ def transform_itrf(
 
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
+        source_itrf = cast(str, source_itrf)
         # If the source ITRF is the same as the target for this chunk, skip transformation.
         if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
@@ -75,8 +110,11 @@ def transform_itrf(
                 # provided plate motion model (PMM).  An example is given in the
                 # message of this commit:
                 # https://github.com/OSGeo/PROJ/commit/403f930355926aced5caba5bfbcc230ad152cf86
-                f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch} "
+                f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch}"
             )
+            if not _check_valid_proj_step(plate_model_step):
+                err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
+                raise RuntimeError(err_msg)
 
         itrf_transformation_step = ""
         if source_itrf != target_itrf:
@@ -88,7 +126,9 @@ def transform_itrf(
             # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
             # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
             # performs a helmert transform from ITRF2008 to ITRF2014.
-            itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
+            itrf_transformation_step = _get_itrf_transformation_step(
+                source_itrf, target_itrf
+            )
 
         pipeline = (
             # This initializes the pipeline and declares the use of the WGS84
@@ -109,9 +149,9 @@ def transform_itrf(
             # See: https://proj.org/en/9.5/operations/conversions/cart.html
             f"+step +proj=cart "
             # ITRF transformation. See above for definition.
-            f"{itrf_transformation_step}"
+            f"{itrf_transformation_step} "
             # See above for definition.
-            f"{plate_model_step}"
+            f"{plate_model_step} "
             # Convert back from cartesian to lat/lon coordinates
             f"+step +inv +proj=cart "
             # Convert lon/lat from radians back to degrees.
@@ -119,7 +159,7 @@ def transform_itrf(
             f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
         )
 
-        transformer = Transformer.from_pipeline(pipeline)
+        transformer = pyproj.Transformer.from_pipeline(pipeline)
 
         decimalyears = (
             chunk.reset_index().utc_datetime.apply(_datetime_to_decimal_year).to_numpy()
