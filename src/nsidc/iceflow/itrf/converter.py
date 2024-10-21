@@ -47,8 +47,10 @@ def transform_itrf(
     # and the mean of that chunk is used to determine the plate name.
     plate: str | None = None,
 ) -> IceflowDataFrame:
-    """Pipeline string for proj to transform from the source to the target
-    ITRF frame and, optionally, epoch.
+    """Transform the data's lon/lat/elev from the source ITRF to the target ITRF.
+
+    If a `target_epoch` is given, coordinate propagation is performed via a
+    plate motion model.
     """
     if not check_itrf(target_itrf):
         err_msg = (
@@ -68,29 +70,51 @@ def transform_itrf(
         if target_epoch:
             if not plate:
                 plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
-            # TODO: i removed the `+inv` here because I think it is
-            # incorrect. This step is supposed to do coordinate propagation to
-            # the given epoch using the given plate motion model. The `inv`
-            # undoes this, assuming the `t_epoch` is the source epoch and we're
-            # going back to the ITRF's reference epoch instead!  The comment on
-            # this commit would seem to support that:
-            # https://github.com/OSGeo/PROJ/commit/403f930355926aced5caba5bfbcc230ad152cf86
             plate_model_step = (
+                # Perform coordinate propagation to the given epoch using the
+                # provided plate motion model (PMM).  An example is given in the
+                # message of this commit:
+                # https://github.com/OSGeo/PROJ/commit/403f930355926aced5caba5bfbcc230ad152cf86
                 f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )
 
         itrf_transformation_step = ""
         if source_itrf != target_itrf:
+            # This performs a helmert transform (see
+            # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
+            # looks up the ITRF2008 helmert transformation step in the ITRF2014
+            # data file (see e.g.,
+            # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
+            # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
+            # performs a helmert transform from ITRF2008 to ITRF2014.
             itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
 
         pipeline = (
+            # This initializes the pipeline and declares the use of the WGS84
+            # ellipsoid for all of the following steps. See
+            # https://proj.org/en/9.5/operations/pipeline.html.
             f"+proj=pipeline +ellps=WGS84 "
+            # Performs unit conversion from lon/lat degrees to radians.
+            # TODO: This step appears to be unnecessary. Removing it does not appear to
+            # affect the output. The following steps require that the
+            # coordinates be geodedic, which could be radians or degrees.
             f"+step +proj=unitconvert +xy_in=deg +xy_out=rad "
+            # This step explicitly sets the projection as lat/lon. It won't
+            # change the coordinates, but they will be identified as geodetic,
+            # which is necessary for the next steps.
             f"+step +proj=latlon "
+            # Convert from lat/lon/elev geodetic coordinates to cartesian
+            # coordinates, which are required for the following steps.
+            # See: https://proj.org/en/9.5/operations/conversions/cart.html
             f"+step +proj=cart "
+            # ITRF transformation. See above for definition.
             f"{itrf_transformation_step}"
+            # See above for definition.
             f"{plate_model_step}"
+            # Convert back from cartesian to lat/lon coordinates
             f"+step +inv +proj=cart "
+            # Convert lon/lat from radians back to degrees.
+            # TODO: remove this if the initial conversion to radians above is not needed
             f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
         )
 
