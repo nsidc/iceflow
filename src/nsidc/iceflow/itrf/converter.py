@@ -83,7 +83,8 @@ def transform_itrf(
             # This performs a helmert transform (see
             # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
             # looks up the ITRF2008 helmert transformation step in the ITRF2014
-            # data file (see e.g.,
+            # data file (see
+            # https://proj.org/en/9.3/resource_files.html#init-files and e.g.,
             # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
             # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
             # performs a helmert transform from ITRF2008 to ITRF2014.
