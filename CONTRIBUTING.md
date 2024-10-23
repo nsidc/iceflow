@@ -9,7 +9,7 @@ You can set up a development environment with `conda` or your environment
 manager of choice:
 
 ```bash
-conda create -n iceflow-dev pip
+conda create -n iceflow-dev pip "python =3.12"
 conda activate iceflow-dev
 pip install --editable .[dev]
 ```
