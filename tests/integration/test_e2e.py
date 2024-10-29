@@ -12,9 +12,10 @@ from __future__ import annotations
 
 import datetime as dt
 
+import dask.dataframe as dd
 import pandas as pd
 
-from nsidc.iceflow.api import fetch_iceflow_df
+from nsidc.iceflow.api import create_iceflow_parquet, fetch_iceflow_df
 from nsidc.iceflow.data.models import (
     BLATM1BDataset,
     BoundingBox,
@@ -38,7 +39,7 @@ def test_atm1b_ilatm1b(tmp_path):
     # Native ITRF is ITRF2005
     results_ilatm1b_v1_2009 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILATM1BDataset(version="1"),
+            datasets=[ILATM1BDataset(version="1")],
             bounding_box=common_bounding_box,
             temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
         ),
@@ -49,7 +50,7 @@ def test_atm1b_ilatm1b(tmp_path):
     # Native ITRF is ITRF2008
     results_ilatm1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILATM1BDataset(version="2"),
+            datasets=[ILATM1BDataset(version="2")],
             bounding_box=common_bounding_box,
             temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
         ),
@@ -74,7 +75,7 @@ def test_atm1b_blatm1b(tmp_path):
 
     results_blamt1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=BLATM1BDataset(),
+            datasets=[BLATM1BDataset()],
             bounding_box=common_bounding_box,
             temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
         ),
@@ -87,7 +88,7 @@ def test_atm1b_blatm1b(tmp_path):
 def test_ivlis2(tmp_path):
     results_v1 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILVIS2Dataset(version="1"),
+            datasets=[ILVIS2Dataset(version="1")],
             bounding_box=BoundingBox(
                 lower_left_lon=-120.0,
                 lower_left_lat=-80.0,
@@ -103,7 +104,7 @@ def test_ivlis2(tmp_path):
 
     results_v2 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILVIS2Dataset(version="2"),
+            datasets=[ILVIS2Dataset(version="2")],
             bounding_box=BoundingBox(
                 lower_left_lon=-180,
                 lower_left_lat=60.0,
@@ -133,7 +134,7 @@ def test_glah06(tmp_path):
 
     results = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=GLAH06Dataset(),
+            datasets=[GLAH06Dataset()],
             bounding_box=common_bounding_box,
             temporal=(
                 dt.datetime(2003, 2, 20, 22, 25),
@@ -144,3 +145,35 @@ def test_glah06(tmp_path):
     )
 
     assert (results.ITRF == "ITRF2008").all()
+
+
+def test_create_iceflow_parquet(tmp_path):
+    target_itrf = "ITRF2014"
+    common_bounding_box = BoundingBox(
+        lower_left_lon=-49.149,
+        lower_left_lat=69.186,
+        upper_right_lon=-48.949,
+        upper_right_lat=69.238,
+    )
+
+    # This should finds 4 results for ILATM1B v1 and 3 results for v2.
+    parquet_path = create_iceflow_parquet(
+        dataset_search_params=DatasetSearchParameters(
+            datasets=[ILATM1BDataset(version="1"), ILATM1BDataset(version="2")],
+            bounding_box=common_bounding_box,
+            temporal=((dt.date(2007, 1, 1), dt.date(2014, 10, 28))),
+        ),
+        output_dir=tmp_path,
+        target_itrf=target_itrf,
+    )
+
+    df = dd.read_parquet(parquet_path)  # type: ignore[attr-defined]
+
+    # Assert that the parquet data has the expected columns
+    expected_columns = sorted(["latitude", "longitude", "elevation", "dataset"])
+    assert expected_columns == sorted(df.columns)
+
+    # Assert that the two datasets we expect are present.
+    assert sorted(["ILATM1Bv1", "ILATM1Bv2"]) == sorted(
+        df.dataset.unique().compute().values
+    )

@@ -232,6 +232,6 @@ class BoundingBox(pydantic.BaseModel):
 
 
 class DatasetSearchParameters(pydantic.BaseModel):
-    dataset: Dataset
+    datasets: list[Dataset]
     bounding_box: BoundingBox
     temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date]
