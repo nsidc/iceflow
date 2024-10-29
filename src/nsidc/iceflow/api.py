@@ -95,10 +95,10 @@ def create_iceflow_parquet(
     overwrite: bool = False,
     target_epoch: str | None = None,
 ) -> Path:
-    """Create a parquet file containing the lat/lon/elev data matching the dataset search params.
+    """Create a parquet dataset containing the lat/lon/elev data matching the dataset search params.
 
-    This function creates a parquet file that can be easily used alongside dask,
-    containing lat/lon/elev data compatible with a comparison to icesat 2 data.
+    This function creates a parquet dataset that can be easily used alongside dask,
+    containing lat/lon/elev data.
 
     Note: this function writes a single `iceflow.parquet` to the output
     dir. This code does not currently support updates to the parquet after being
