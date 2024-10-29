@@ -34,7 +34,7 @@ dependencies = [
   "pandera[mypy] >= 0.20.3",
   "pydantic >=2.8.2",
   "loguru >=0.7.2",
-  "dask >=2024.10.0",
+  "dask[dataframe] >=2024.10.0",
 ]
 
 [project.urls]
