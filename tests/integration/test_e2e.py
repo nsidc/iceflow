@@ -38,7 +38,7 @@ def test_atm1b_ilatm1b(tmp_path):
     # Native ITRF is ITRF2005
     results_ilatm1b_v1_2009 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILATM1BDataset(version="1"),
+            datasets=[ILATM1BDataset(version="1")],
             bounding_box=common_bounding_box,
             temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
         ),
@@ -49,7 +49,7 @@ def test_atm1b_ilatm1b(tmp_path):
     # Native ITRF is ITRF2008
     results_ilatm1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILATM1BDataset(version="2"),
+            datasets=[ILATM1BDataset(version="2")],
             bounding_box=common_bounding_box,
             temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
         ),
@@ -74,7 +74,7 @@ def test_atm1b_blatm1b(tmp_path):
 
     results_blamt1b_v2_2014 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=BLATM1BDataset(),
+            datasets=[BLATM1BDataset()],
             bounding_box=common_bounding_box,
             temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
         ),
@@ -87,7 +87,7 @@ def test_atm1b_blatm1b(tmp_path):
 def test_ivlis2(tmp_path):
     results_v1 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILVIS2Dataset(version="1"),
+            datasets=[ILVIS2Dataset(version="1")],
             bounding_box=BoundingBox(
                 lower_left_lon=-120.0,
                 lower_left_lat=-80.0,
@@ -103,7 +103,7 @@ def test_ivlis2(tmp_path):
 
     results_v2 = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=ILVIS2Dataset(version="2"),
+            datasets=[ILVIS2Dataset(version="2")],
             bounding_box=BoundingBox(
                 lower_left_lon=-180,
                 lower_left_lat=60.0,
@@ -133,7 +133,7 @@ def test_glah06(tmp_path):
 
     results = fetch_iceflow_df(
         dataset_search_params=DatasetSearchParameters(
-            dataset=GLAH06Dataset(),
+            datasets=[GLAH06Dataset()],
             bounding_box=common_bounding_box,
             temporal=(
                 dt.datetime(2003, 2, 20, 22, 25),
