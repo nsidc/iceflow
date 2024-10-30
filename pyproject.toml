@@ -204,4 +204,4 @@ search = 'version = "{current_version}"'
 replace = 'version = "{new_version}"'
 
 [tool.codespell]
-skip="docs/iceflow-example.ipynb"
+skip="docs/*.ipynb"
