@@ -29,8 +29,7 @@ def _df_for_one_dataset(
     output_itrf: str | None,
 ) -> IceflowDataFrame:
     results = search_and_download(
-        short_name=dataset.short_name,
-        version=dataset.version,
+        dataset=dataset,
         bounding_box=bounding_box,
         temporal=temporal,
         output_dir=output_dir,
@@ -120,8 +119,7 @@ def create_iceflow_parquet(
 
     for dataset in dataset_search_params.datasets:
         results = search_and_download(
-            short_name=dataset.short_name,
-            version=dataset.version,
+            dataset=dataset,
             temporal=dataset_search_params.temporal,
             bounding_box=dataset_search_params.bounding_box,
             output_dir=output_dir,
