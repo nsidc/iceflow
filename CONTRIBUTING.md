@@ -66,10 +66,10 @@ the main, public-facing documentation site.
 
 > [!NOTE] Most of the documentation is designed to be generated automatically.
 > E.g., changes to the API and markdown documents will be automatically
-> refelcted in the documentation. The one exception is the
-> `iceflow-example.ipynb`, which is static and must be re-generated manually.
-> Use the `invoke docs.generate-example-notebook` task to re-generate this file,
-> and then commit any changes to the repository.
+> refelcted in the documentation. The one exception are the jupyter notebooks
+> (e.g., `iceflow-example.ipynb`), which are static and must be re-generated
+> manually. Use the `invoke docs.render-notebooks-for-docs` task to re-generate
+> these files, and then commit any changes to the repository.
 
 # Releasing
 
