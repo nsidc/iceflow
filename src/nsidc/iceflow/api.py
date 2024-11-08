@@ -1,54 +1,18 @@
 from __future__ import annotations
 
-import datetime as dt
 import shutil
 from pathlib import Path
 
 import dask.dataframe as dd
-import pandas as pd
 from loguru import logger
 
-from nsidc.iceflow.data.fetch import search_and_download
+from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
-    BoundingBox,
-    Dataset,
     DatasetSearchParameters,
     IceflowDataFrame,
 )
-from nsidc.iceflow.data.read import read_data
+from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.itrf.converter import transform_itrf
-
-
-def _df_for_one_dataset(
-    *,
-    dataset: Dataset,
-    bounding_box: BoundingBox,
-    temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date],
-    output_dir: Path,
-    # TODO: also add option for target epoch!!
-    output_itrf: str | None,
-) -> IceflowDataFrame:
-    results = search_and_download(
-        dataset=dataset,
-        bounding_box=bounding_box,
-        temporal=temporal,
-        output_dir=output_dir,
-    )
-
-    all_dfs = []
-    for result in results:
-        data_df = read_data(dataset, result)
-        all_dfs.append(data_df)
-
-    complete_df = IceflowDataFrame(pd.concat(all_dfs))
-
-    if output_itrf is not None:
-        complete_df = transform_itrf(
-            data=complete_df,
-            target_itrf=output_itrf,
-        )
-
-    return complete_df
 
 
 def fetch_iceflow_df(
@@ -70,20 +34,24 @@ def fetch_iceflow_df(
     format.
     """
 
-    dfs = []
-    for dataset in dataset_search_params.datasets:
-        result = _df_for_one_dataset(
-            dataset=dataset,
-            temporal=dataset_search_params.temporal,
-            bounding_box=dataset_search_params.bounding_box,
-            output_dir=output_dir,
-            output_itrf=output_itrf,
+    iceflow_search_reuslts = find_iceflow_data(
+        dataset_search_params=dataset_search_params,
+    )
+
+    downloaded_files = download_iceflow_results(
+        iceflow_search_results=iceflow_search_reuslts,
+        output_dir=output_dir,
+    )
+
+    iceflow_df = read_iceflow_datafiles(downloaded_files)
+
+    if output_itrf is not None:
+        iceflow_df = transform_itrf(
+            data=iceflow_df,
+            target_itrf=output_itrf,
         )
-        dfs.append(result)
 
-    complete_df = IceflowDataFrame(pd.concat(dfs))
-
-    return complete_df
+    return iceflow_df
 
 
 def create_iceflow_parquet(
@@ -117,41 +85,42 @@ def create_iceflow_parquet(
                 "An iceflow parquet file already exists. Use `overwrite=True` to overwrite."
             )
 
-    for dataset in dataset_search_params.datasets:
-        results = search_and_download(
-            dataset=dataset,
-            temporal=dataset_search_params.temporal,
-            bounding_box=dataset_search_params.bounding_box,
+    iceflow_search_results = find_iceflow_data(
+        dataset_search_params=dataset_search_params,
+    )
+
+    for iceflow_search_result in iceflow_search_results:
+        downloaded_files = download_iceflow_results(
+            iceflow_search_results=[iceflow_search_result],
             output_dir=output_dir,
         )
 
-        for result in results:
-            data_df = read_data(dataset, result)
-            df = IceflowDataFrame(data_df)
+        iceflow_df = read_iceflow_datafiles(downloaded_files)
 
-            df = transform_itrf(
-                data=df,
-                target_itrf=target_itrf,
-                target_epoch=target_epoch,
-            )
+        iceflow_df = transform_itrf(
+            data=iceflow_df,
+            target_itrf=target_itrf,
+            target_epoch=target_epoch,
+        )
 
-            # Add a string col w/ dataset name and version.
-            df["dataset"] = [f"{dataset.short_name}v{dataset.version}"] * len(
-                df.latitude
+        # Add a string col w/ dataset name and version.
+        dataset = iceflow_search_result.dataset
+        iceflow_df["dataset"] = [f"{dataset.short_name}v{dataset.version}"] * len(
+            iceflow_df.latitude
+        )
+        common_columns = ["latitude", "longitude", "elevation", "dataset"]
+        common_dask_df = dd.from_pandas(iceflow_df[common_columns])  # type: ignore[attr-defined]
+        if output_subdir.exists():
+            dd.to_parquet(  # type: ignore[attr-defined]
+                df=common_dask_df,
+                path=output_subdir,
+                append=True,
+                ignore_divisions=True,
             )
-            common_columns = ["latitude", "longitude", "elevation", "dataset"]
-            common_dask_df = dd.from_pandas(df[common_columns])  # type: ignore[attr-defined]
-            if output_subdir.exists():
-                dd.to_parquet(  # type: ignore[attr-defined]
-                    df=common_dask_df,
-                    path=output_subdir,
-                    append=True,
-                    ignore_divisions=True,
-                )
-            else:
-                dd.to_parquet(  # type: ignore[attr-defined]
-                    df=common_dask_df,
-                    path=output_subdir,
-                )
+        else:
+            dd.to_parquet(  # type: ignore[attr-defined]
+                df=common_dask_df,
+                path=output_subdir,
+            )
 
     return output_subdir

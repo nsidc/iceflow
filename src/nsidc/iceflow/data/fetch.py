@@ -121,3 +121,18 @@ def find_iceflow_data(
         iceflow_search_results.append(iceflow_search_result)
 
     return iceflow_search_results
+
+
+def download_iceflow_results(
+    iceflow_search_results: IceflowSearchResults,
+    output_dir: Path,
+) -> list[Path]:
+    all_downloaded_files = []
+    for iceflow_search_result in iceflow_search_results:
+        downloaded_filepaths = _download_iceflow_search_result(
+            iceflow_search_result=iceflow_search_result,
+            output_dir=output_dir,
+        )
+        all_downloaded_files.extend(downloaded_filepaths)
+
+    return all_downloaded_files
