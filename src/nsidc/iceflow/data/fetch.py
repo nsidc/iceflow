@@ -58,8 +58,10 @@ def _download_iceflow_search_result(
     iceflow_search_result: IceflowSearchResult,
     output_dir: Path,
 ) -> list[Path]:
-    # short_name based subdir for data.
-    output_subdir = output_dir / iceflow_search_result.dataset.short_name
+    # short_name and version-based subdir for data.
+    subdir_name = f"{iceflow_search_result.dataset.short_name}_{iceflow_search_result.dataset.version}"
+    output_subdir = output_dir / subdir_name
+
     logger.info(
         f"Downloading {len(iceflow_search_result.granules)} granules"
         f" to {output_subdir}."
@@ -89,7 +91,7 @@ def search_and_download(
     Wraps EDL auth and CMR search using `earthaccess`.
 
     Data matching the given parameters are downloaded to a subfolder of the
-    given `output_dir` named after the `short_name`.
+    given `output_dir` named after the `short_name` and `version`.
     """
     iceflow_search_result = _find_iceflow_data(
         dataset=dataset,
