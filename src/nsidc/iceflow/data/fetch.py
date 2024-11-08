@@ -79,34 +79,6 @@ def _download_iceflow_search_result(
     return downloaded_filepaths
 
 
-def search_and_download(
-    *,
-    dataset: Dataset,
-    bounding_box: BoundingBox,
-    temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date],
-    output_dir: Path,
-) -> list[Path]:
-    """Search and download data.
-
-    Wraps EDL auth and CMR search using `earthaccess`.
-
-    Data matching the given parameters are downloaded to a subfolder of the
-    given `output_dir` named after the `short_name` and `version`.
-    """
-    iceflow_search_result = _find_iceflow_data(
-        dataset=dataset,
-        bounding_box=bounding_box,
-        temporal=temporal,
-    )
-
-    downloaded_filepaths = _download_iceflow_search_result(
-        iceflow_search_result=iceflow_search_result,
-        output_dir=output_dir,
-    )
-
-    return downloaded_filepaths
-
-
 def find_iceflow_data(
     *,
     dataset_search_params: DatasetSearchParameters,
