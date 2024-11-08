@@ -232,8 +232,18 @@ class BoundingBox(pydantic.BaseModel):
     upper_right_lat: float
 
 
+ALL_DATASETS: list[Dataset] = [
+    ILATM1BDataset(version="1"),
+    ILATM1BDataset(version="2"),
+    BLATM1BDataset(version="1"),
+    ILVIS2Dataset(version="1"),
+    ILVIS2Dataset(version="2"),
+    GLAH06Dataset(),
+]
+
+
 class DatasetSearchParameters(pydantic.BaseModel):
-    datasets: list[Dataset]
+    datasets: list[Dataset] = ALL_DATASETS
     bounding_box: BoundingBox
     temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date]
 
