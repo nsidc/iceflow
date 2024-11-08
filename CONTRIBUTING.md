@@ -40,6 +40,30 @@ Available tasks:
   test.typecheck (test.mypy)   Run mypy typechecking.
 ```
 
+# Jupyter Notebooks
+
+There are Jupyter Notebooks showing `iceflow` functionality under `notebooks/`.
+
+To get started with developing existing or new notebooks, first install the
+notebook-specific dependencies:
+
+```
+pip install --editable .[notebooks]
+```
+
+Then:
+
+```
+cd notebooks/
+jupyter lab
+```
+
+Develop notebooks and confirm that they work as expected. Before committing
+changes, clear all outputs.
+
+See below for information about adding rendered versions of notebooks to
+ReadTheDocs.
+
 # Documentation
 
 This project uses `sphinx` to generate documentation. To work on the docs,
@@ -69,7 +93,9 @@ the main, public-facing documentation site.
 > refelcted in the documentation. The one exception are the jupyter notebooks
 > (e.g., `iceflow-example.ipynb`), which are static and must be re-generated
 > manually. Use the `invoke docs.render-notebooks-for-docs` task to re-generate
-> these files, and then commit any changes to the repository.
+> these files, and then commit any changes to the repository. See the
+> `notebooks/generate_rendered_notebooks_for_docs.sh` for how to add new
+> rendered notebooks to the docs.
 
 # Releasing
 
