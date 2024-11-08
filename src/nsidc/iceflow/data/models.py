@@ -245,3 +245,6 @@ class IceflowSearchResult(pydantic.BaseModel):
     # Pydantic can't infer what `DataGranule` is. This ignores validation for
     # this that type
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
+
+IceflowSearchResults = list[IceflowSearchResult]

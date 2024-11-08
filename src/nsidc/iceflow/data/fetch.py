@@ -6,7 +6,13 @@ from pathlib import Path
 import earthaccess
 from loguru import logger
 
-from nsidc.iceflow.data.models import BoundingBox, Dataset, IceflowSearchResult
+from nsidc.iceflow.data.models import (
+    BoundingBox,
+    Dataset,
+    DatasetSearchParameters,
+    IceflowSearchResult,
+    IceflowSearchResults,
+)
 
 
 def _find_iceflow_data(
@@ -47,18 +53,21 @@ def _find_iceflow_data(
     return iceflow_search_result
 
 
-def _download_iceflow_results(
-    *, iceflow_results: IceflowSearchResult, output_dir: Path
+def _download_iceflow_search_result(
+    *,
+    iceflow_search_result: IceflowSearchResult,
+    output_dir: Path,
 ) -> list[Path]:
     # short_name based subdir for data.
-    output_subdir = output_dir / iceflow_results.dataset.short_name
+    output_subdir = output_dir / iceflow_search_result.dataset.short_name
     logger.info(
-        f"Downloading {len(iceflow_results.granules)} granules" f" to {output_subdir}."
+        f"Downloading {len(iceflow_search_result.granules)} granules"
+        f" to {output_subdir}."
     )
 
     output_subdir.mkdir(exist_ok=True)
     downloaded_files = earthaccess.download(
-        iceflow_results.granules, str(output_subdir)
+        iceflow_search_result.granules, str(output_subdir)
     )
     downloaded_filepaths = [Path(filepath_str) for filepath_str in downloaded_files]
     # There may be duplicate filepaths returned by earthaccess because of data
@@ -82,14 +91,31 @@ def search_and_download(
     Data matching the given parameters are downloaded to a subfolder of the
     given `output_dir` named after the `short_name`.
     """
-    iceflow_results = _find_iceflow_data(
+    iceflow_search_result = _find_iceflow_data(
         dataset=dataset,
         bounding_box=bounding_box,
         temporal=temporal,
     )
 
-    downloaded_filepaths = _download_iceflow_results(
-        iceflow_results=iceflow_results, output_dir=output_dir
+    downloaded_filepaths = _download_iceflow_search_result(
+        iceflow_search_result=iceflow_search_result,
+        output_dir=output_dir,
     )
 
     return downloaded_filepaths
+
+
+def find_iceflow_data(
+    *,
+    dataset_search_params: DatasetSearchParameters,
+) -> IceflowSearchResults:
+    iceflow_search_results = []
+    for dataset in dataset_search_params.datasets:
+        iceflow_search_result = _find_iceflow_data(
+            dataset=dataset,
+            bounding_box=dataset_search_params.bounding_box,
+            temporal=dataset_search_params.temporal,
+        )
+        iceflow_search_results.append(iceflow_search_result)
+
+    return iceflow_search_results
