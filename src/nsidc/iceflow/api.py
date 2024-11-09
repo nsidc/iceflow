@@ -8,6 +8,7 @@ from loguru import logger
 
 from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
+    ALL_DATASETS,
     DatasetSearchParameters,
     IceflowDataFrame,
 )
@@ -54,6 +55,72 @@ def fetch_iceflow_df(
     return iceflow_df
 
 
+def make_iceflow_parquet(
+    *,
+    data_dir: Path,
+    target_itrf: str,
+    overwrite: bool = False,
+    target_epoch: str | None = None,
+) -> Path:
+    """Create a parquet dataset containing the lat/lon/elev data in `data_dir`.
+
+    This function creates a parquet dataset that can be easily used alongside dask,
+    containing lat/lon/elev data.
+
+    Note: this function writes a single `iceflow.parquet` to the output
+    dir. This code does not currently support updates to the parquet after being
+    written. This is intended to help facilitate analysis of a specific area
+    over time. If an existing `iceflow.parquet` exists and the user wants to
+    create a new `iceflow.parquet` for a different area or timespan, they will
+    need to move/remove the existing `iceflow.parquet` first (e.g., with the
+    `overwrite=True` kwarg).
+    """
+    parquet_subdir = data_dir / "iceflow.parquet"
+    if parquet_subdir.exists():
+        if overwrite:
+            logger.info("Removing existing iceflow.parquet")
+            shutil.rmtree(parquet_subdir)
+        else:
+            raise RuntimeError(
+                "An iceflow parquet file already exists. Use `overwrite=True` to overwrite."
+            )
+
+    all_subdirs = [
+        data_dir / ds.subdir_name
+        for ds in ALL_DATASETS
+        if (data_dir / ds.subdir_name).is_dir()
+    ]
+    for subdir in all_subdirs:
+        iceflow_filepaths = [path for path in subdir.iterdir() if path.is_file()]
+        iceflow_df = read_iceflow_datafiles(iceflow_filepaths)
+
+        iceflow_df = transform_itrf(
+            data=iceflow_df,
+            target_itrf=target_itrf,
+            target_epoch=target_epoch,
+        )
+
+        # Add a string col w/ dataset name and version.
+        short_name, version = subdir.name.split("_")
+        iceflow_df["dataset"] = [f"{short_name}v{version}"] * len(iceflow_df.latitude)
+        common_columns = ["latitude", "longitude", "elevation", "dataset"]
+        common_dask_df = dd.from_pandas(iceflow_df[common_columns])  # type: ignore[attr-defined]
+        if parquet_subdir.exists():
+            dd.to_parquet(  # type: ignore[attr-defined]
+                df=common_dask_df,
+                path=parquet_subdir,
+                append=True,
+                ignore_divisions=True,
+            )
+        else:
+            dd.to_parquet(  # type: ignore[attr-defined]
+                df=common_dask_df,
+                path=parquet_subdir,
+            )
+
+    return parquet_subdir
+
+
 def create_iceflow_parquet(
     *,
     dataset_search_params: DatasetSearchParameters,
@@ -75,52 +142,20 @@ def create_iceflow_parquet(
     need to move/remove the existing `iceflow.parquet` first (e.g., with the
     `overwrite=True` kwarg).
     """
-    output_subdir = output_dir / "iceflow.parquet"
-    if output_subdir.exists():
-        if overwrite:
-            logger.info("Removing existing iceflow.parquet")
-            shutil.rmtree(output_subdir)
-        else:
-            raise RuntimeError(
-                "An iceflow parquet file already exists. Use `overwrite=True` to overwrite."
-            )
-
     iceflow_search_results = find_iceflow_data(
         dataset_search_params=dataset_search_params,
     )
 
-    for iceflow_search_result in iceflow_search_results:
-        downloaded_files = download_iceflow_results(
-            iceflow_search_results=[iceflow_search_result],
-            output_dir=output_dir,
-        )
+    download_iceflow_results(
+        iceflow_search_results=iceflow_search_results,
+        output_dir=output_dir,
+    )
 
-        iceflow_df = read_iceflow_datafiles(downloaded_files)
+    parquet_path = make_iceflow_parquet(
+        data_dir=output_dir,
+        target_itrf=target_itrf,
+        overwrite=overwrite,
+        target_epoch=target_epoch,
+    )
 
-        iceflow_df = transform_itrf(
-            data=iceflow_df,
-            target_itrf=target_itrf,
-            target_epoch=target_epoch,
-        )
-
-        # Add a string col w/ dataset name and version.
-        dataset = iceflow_search_result.dataset
-        iceflow_df["dataset"] = [f"{dataset.short_name}v{dataset.version}"] * len(
-            iceflow_df.latitude
-        )
-        common_columns = ["latitude", "longitude", "elevation", "dataset"]
-        common_dask_df = dd.from_pandas(iceflow_df[common_columns])  # type: ignore[attr-defined]
-        if output_subdir.exists():
-            dd.to_parquet(  # type: ignore[attr-defined]
-                df=common_dask_df,
-                path=output_subdir,
-                append=True,
-                ignore_divisions=True,
-            )
-        else:
-            dd.to_parquet(  # type: ignore[attr-defined]
-                df=common_dask_df,
-                path=output_subdir,
-            )
-
-    return output_subdir
+    return parquet_path

@@ -196,6 +196,10 @@ class Dataset(pydantic.BaseModel):
     short_name: DatasetShortName
     version: str
 
+    @property
+    def subdir_name(self):
+        return f"{self.short_name}_{self.version}"
+
 
 class ATM1BDataset(Dataset):
     short_name: ATM1BShortName
