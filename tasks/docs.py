@@ -53,6 +53,6 @@ def watch(_ctx):
 def render_notebooks_for_docs(_ctx):
     """Render jupyter notebooks for docs."""
     print_and_run(
-        (f"{PROJECT_DIR}/notebooks/generate_rendered_notebook_for_docs.sh"),
+        (f"{PROJECT_DIR}/notebooks/generate_rendered_notebooks_for_docs.sh"),
         pty=True,
     )

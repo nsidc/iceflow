@@ -47,11 +47,9 @@ pip install nsidc-iceflow
 
 ### Using `iceflow`
 
-```python
-from nsidc import iceflow
-
-# TODO
-```
+See
+[Getting started with iceflow](https://iceflow.readthedocs.io/en/latest/getting-started.html)
+for information and examples about how to use `iceflow`.
 
 ## Credit
 
