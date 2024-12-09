@@ -46,7 +46,7 @@ def _find_iceflow_data(
     num_results = len(granules_list)
 
     if not num_results:
-        logger.error(f"Found no results for {ctx_string}")
+        logger.warning(f"Found no results for {ctx_string}")
         granules_list = []
 
     iceflow_search_result = IceflowSearchResult(dataset=dataset, granules=granules_list)
@@ -58,6 +58,9 @@ def _download_iceflow_search_result(
     iceflow_search_result: IceflowSearchResult,
     output_dir: Path,
 ) -> list[Path]:
+    # No granules found for this search result object.
+    if not iceflow_search_result.granules:
+        return []
     # short_name and version-based subdir for data.
     subdir_name = f"{iceflow_search_result.dataset.short_name}_{iceflow_search_result.dataset.version}"
     output_subdir = output_dir / subdir_name

@@ -11,11 +11,17 @@ this library.
 from __future__ import annotations
 
 import datetime as dt
+from pathlib import Path
 
 import dask.dataframe as dd
 import pandas as pd
 
-from nsidc.iceflow.api import create_iceflow_parquet, fetch_iceflow_df
+from nsidc.iceflow import (
+    download_iceflow_results,
+    find_iceflow_data,
+    make_iceflow_parquet,
+)
+from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
     BLATM1BDataset,
     BoundingBox,
@@ -147,6 +153,46 @@ def test_glah06(tmp_path):
     assert (results.ITRF == "ITRF2008").all()
 
 
+def _create_iceflow_parquet(
+    *,
+    dataset_search_params: DatasetSearchParameters,
+    output_dir: Path,
+    target_itrf: str,
+    overwrite: bool = False,
+    target_epoch: str | None = None,
+) -> Path:
+    """Create a parquet dataset containing the lat/lon/elev data matching the dataset search params.
+
+    This function creates a parquet dataset that can be easily used alongside dask,
+    containing lat/lon/elev data.
+
+    Note: this function writes a single `iceflow.parquet` to the output
+    dir. This code does not currently support updates to the parquet after being
+    written. This is intended to help facilitate analysis of a specific area
+    over time. If an existing `iceflow.parquet` exists and the user wants to
+    create a new `iceflow.parquet` for a different area or timespan, they will
+    need to move/remove the existing `iceflow.parquet` first (e.g., with the
+    `overwrite=True` kwarg).
+    """
+    iceflow_search_results = find_iceflow_data(
+        dataset_search_params=dataset_search_params,
+    )
+
+    download_iceflow_results(
+        iceflow_search_results=iceflow_search_results,
+        output_dir=output_dir,
+    )
+
+    parquet_path = make_iceflow_parquet(
+        data_dir=output_dir,
+        target_itrf=target_itrf,
+        overwrite=overwrite,
+        target_epoch=target_epoch,
+    )
+
+    return parquet_path
+
+
 def test_create_iceflow_parquet(tmp_path):
     target_itrf = "ITRF2014"
     common_bounding_box = BoundingBox(
@@ -157,7 +203,7 @@ def test_create_iceflow_parquet(tmp_path):
     )
 
     # This should finds 4 results for ILATM1B v1 and 3 results for v2.
-    parquet_path = create_iceflow_parquet(
+    parquet_path = _create_iceflow_parquet(
         dataset_search_params=DatasetSearchParameters(
             datasets=[ILATM1BDataset(version="1"), ILATM1BDataset(version="2")],
             bounding_box=common_bounding_box,
