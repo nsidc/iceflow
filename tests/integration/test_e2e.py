@@ -213,7 +213,7 @@ def test_create_iceflow_parquet(tmp_path):
         target_itrf=target_itrf,
     )
 
-    df = dd.read_parquet(parquet_path)  # type: ignore[attr-defined]
+    df = dd.read_parquet(parquet_path)
 
     # Assert that the parquet data has the expected columns
     expected_columns = sorted(["latitude", "longitude", "elevation", "dataset"])

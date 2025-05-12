@@ -24,14 +24,14 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "numpy >=2.0.1",
+  "numpy ~=2.0.1",
   "earthaccess >=0.10.0",
   "pandas >=2.2",
   "h5py >=3.11",
   "gps-timemachine >=1.1.4",
-  "pyproj >=3.6.1",
+  "pyproj ~=3.6.1",
   "shapely >=2.0.5",
-  "pandera[mypy] ~= 0.20.3",
+  "pandera[mypy] ~=0.23.0",
   "pydantic >=2.8.2",
   "loguru >=0.7.2",
   "dask[dataframe] >=2024.10.0",
@@ -47,7 +47,7 @@ Changelog = "https://github.com/NSIDC/iceflow/releases"
 dev = [
   "bump-my-version",
   "invoke",
-  "mypy >=1.11.1",
+  "mypy >=1.15.0",
   "pandas-stubs >=2.2",
   "pre-commit",
   "pytest",
@@ -83,6 +83,7 @@ addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "error",
+  "ignore:The 'shapely.geos' module is deprecated",
 ]
 log_cli_level = "INFO"
 
