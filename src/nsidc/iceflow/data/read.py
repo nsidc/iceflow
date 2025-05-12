@@ -1,41 +1,45 @@
 from __future__ import annotations
 
-import functools
 from pathlib import Path
+
+import pandas as pd
 
 from nsidc.iceflow.data.atm1b import atm1b_data
 from nsidc.iceflow.data.glah06 import glah06_data
 from nsidc.iceflow.data.ilvis2 import ilvis2_data
 from nsidc.iceflow.data.models import (
     ATM1BDataFrame,
-    ATM1BDataset,
-    Dataset,
     GLAH06DataFrame,
-    GLAH06Dataset,
     IceflowDataFrame,
     ILVIS2DataFrame,
-    ILVIS2Dataset,
 )
 
 
-@functools.singledispatch
-def read_data(
-    dataset: Dataset, _filepath: Path
+def read_iceflow_datafile(
+    filepath: Path,
 ) -> IceflowDataFrame | ATM1BDataFrame | ILVIS2DataFrame | GLAH06DataFrame:
-    msg = f"{dataset=} not recognized."
-    raise RuntimeError(msg)
+    # iceflow data are expected to exist in a directory named like
+    # `{short_name}_{version}`
+    dataset_subdir = filepath.parent.name
+    short_name, _version = dataset_subdir.split("_")
+
+    if short_name in ["ILATM1B", "BLATM1B"]:
+        return atm1b_data(filepath)
+    elif short_name == "ILVIS2":
+        return ilvis2_data(filepath)
+    elif short_name == "GLAH06":
+        return glah06_data(filepath)
+    else:
+        err_msg = f"Unrecognized dataset {short_name=} extracted from {filepath.parent}"
+        raise RuntimeError(err_msg)
 
 
-@read_data.register
-def _(_dataset: ATM1BDataset, filepath: Path) -> ATM1BDataFrame:
-    return atm1b_data(filepath)
+def read_iceflow_datafiles(filepaths: list[Path]) -> IceflowDataFrame:
+    all_dfs = []
+    for filepath in filepaths:
+        df = read_iceflow_datafile(filepath)
+        all_dfs.append(df)
 
+    complete_df = IceflowDataFrame(pd.concat(all_dfs))
 
-@read_data.register
-def _(_dataset: ILVIS2Dataset, filepath: Path) -> ILVIS2DataFrame:
-    return ilvis2_data(filepath)
-
-
-@read_data.register
-def _(_dataset: GLAH06Dataset, filepath: Path) -> GLAH06DataFrame:
-    return glah06_data(filepath)
+    return complete_df
