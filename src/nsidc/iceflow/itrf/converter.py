@@ -37,6 +37,22 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
+def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
+    itrf_transformation_step = ""
+    if source_itrf != target_itrf:
+        # This performs a helmert transform (see
+        # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
+        # looks up the ITRF2008 helmert transformation step in the ITRF2014
+        # data file (see
+        # https://proj.org/en/9.3/resource_files.html#init-files and e.g.,
+        # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
+        # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
+        # performs a helmert transform from ITRF2008 to ITRF2014.
+        itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
+
+    return itrf_transformation_step
+
+
 @pa.check_types()
 def transform_itrf(
     data: IceflowDataFrame,
@@ -78,17 +94,7 @@ def transform_itrf(
                 f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )
 
-        itrf_transformation_step = ""
-        if source_itrf != target_itrf:
-            # This performs a helmert transform (see
-            # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
-            # looks up the ITRF2008 helmert transformation step in the ITRF2014
-            # data file (see
-            # https://proj.org/en/9.3/resource_files.html#init-files and e.g.,
-            # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
-            # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
-            # performs a helmert transform from ITRF2008 to ITRF2014.
-            itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
+        itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
 
         pipeline = (
             # This initializes the pipeline and declares the use of the WGS84
