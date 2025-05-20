@@ -66,7 +66,20 @@ def transform_itrf(
     """Transform the data's lon/lat/elev from the source ITRF to the target ITRF.
 
     If a `target_epoch` is given, coordinate propagation is performed via a
-    plate motion model.
+    plate motion model (PMM) defined for the target_itrf. The target epoch
+    determines the number of years into the future/past the observed points
+    should be propagated. For example, if a point's observation date
+    (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the target_epoch is
+    2011.0 (2011-01-01T00:00:00), the point will be propagated forward 18
+    years. Note that not all ITRFs have PMMs defined for them. The PMM used is
+    defined for the target_epoch, so it is likely to be most accurate for points
+    observed near the ITRF's defined epoch.
+
+    All ITRF and PMM transformations are dependent on the user's `proj`
+    installation's ITRF init files (see
+    https://proj.org/en/9.3/resource_files.html#init-files). For example,
+    ITRF2014 parameters are defined here:
+    https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
     """
     if not check_itrf(target_itrf):
         err_msg = (
@@ -87,11 +100,25 @@ def transform_itrf(
             if not plate:
                 plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
             plate_model_step = (
-                # Perform coordinate propagation to the given epoch using the
-                # provided plate motion model (PMM).  An example is given in the
-                # message of this commit:
-                # https://github.com/OSGeo/PROJ/commit/403f930355926aced5caba5bfbcc230ad152cf86
-                f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch} "
+                # Perform coordinate propagation to the target epoch using the
+                # provided plate motion model (PMM).
+                # This step uses the target_itrf's init file to lookup the
+                # associated plate's PMM parameters. For example, ITRF2014
+                # parameters are defined here:
+                # https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
+                # The step is inverted because proj defined `t_epoch` as the
+                # "central epoch" - not the "target epoch. The transformation
+                # uses a delta defined by `t_observed - t_epoch` that are
+                # applied to the PMM's rate of change to propagate the point
+                # into the past/future. See
+                # https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
+                # for more information.
+                # For example, if a point's observation date
+                # (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch
+                # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
+                # 2011: -18. We need to invert the step so that the point is
+                # propagated forward in time, from 1993 to 2011.
+                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )
 
         itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
