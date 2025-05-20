@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import calendar
 import datetime as dt
+from typing import cast
 
 import pandas as pd
 import pandera as pa
@@ -37,6 +38,22 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
+def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
+    itrf_transformation_step = ""
+    if source_itrf != target_itrf:
+        # This performs a helmert transform (see
+        # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
+        # looks up the ITRF2008 helmert transformation step in the ITRF2014
+        # data file (see
+        # https://proj.org/en/9.3/resource_files.html#init-files and e.g.,
+        # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
+        # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
+        # performs a helmert transform from ITRF2008 to ITRF2014.
+        itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
+
+    return itrf_transformation_step
+
+
 @pa.check_types()
 def transform_itrf(
     data: IceflowDataFrame,
@@ -47,8 +64,23 @@ def transform_itrf(
     # and the mean of that chunk is used to determine the plate name.
     plate: str | None = None,
 ) -> IceflowDataFrame:
-    """Pipeline string for proj to transform from the source to the target
-    ITRF frame and, optionally, epoch.
+    """Transform the data's lon/lat/elev from the source ITRF to the target ITRF.
+
+    If a `target_epoch` is given, coordinate propagation is performed via a
+    plate motion model (PMM) defined for the target_itrf. The target epoch
+    determines the number of years into the future/past the observed points
+    should be propagated. For example, if a point's observation date
+    (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the target_epoch is
+    2011.0 (2011-01-01T00:00:00), the point will be propagated forward 18
+    years. Note that not all ITRFs have PMMs defined for them. The PMM used is
+    defined for the target_epoch, so it is likely to be most accurate for points
+    observed near the ITRF's defined epoch.
+
+    All ITRF and PMM transformations are dependent on the user's `proj`
+    installation's ITRF init files (see
+    https://proj.org/en/9.3/resource_files.html#init-files). For example,
+    ITRF2014 parameters are defined here:
+    https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
     """
     if not check_itrf(target_itrf):
         err_msg = (
@@ -60,7 +92,8 @@ def transform_itrf(
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
         # If the source ITRF is the same as the target for this chunk, skip transformation.
-        if source_itrf == target_itrf:
+        source_itrf = cast(str, source_itrf)
+        if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
             continue
 
@@ -69,17 +102,55 @@ def transform_itrf(
             if not plate:
                 plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
             plate_model_step = (
+                # Perform coordinate propagation to the target epoch using the
+                # provided plate motion model (PMM).
+                # This step uses the target_itrf's init file to lookup the
+                # associated plate's PMM parameters. For example, ITRF2014
+                # parameters are defined here:
+                # https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
+                # The step is inverted because proj defined `t_epoch` as the
+                # "central epoch" - not the "target epoch. The transformation
+                # uses a delta defined by `t_observed - t_epoch` that are
+                # applied to the PMM's rate of change to propagate the point
+                # into the past/future. See
+                # https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
+                # for more information.
+                # For example, if a point's observation date
+                # (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch
+                # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
+                # 2011: -18. We need to invert the step so that the point is
+                # propagated forward in time, from 1993 to 2011.
                 f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )
 
+        itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
+
         pipeline = (
+            # This initializes the pipeline and declares the use of the WGS84
+            # ellipsoid for all of the following steps. See
+            # https://proj.org/en/9.5/operations/pipeline.html.
             f"+proj=pipeline +ellps=WGS84 "
+            # Performs unit conversion from lon/lat degrees to radians.
+            # TODO: This step appears to be unnecessary. Removing it does not appear to
+            # affect the output. The following steps require that the
+            # coordinates be geodedic, which could be radians or degrees.
             f"+step +proj=unitconvert +xy_in=deg +xy_out=rad "
+            # This step explicitly sets the projection as lat/lon. It won't
+            # change the coordinates, but they will be identified as geodetic,
+            # which is necessary for the next steps.
             f"+step +proj=latlon "
+            # Convert from lat/lon/elev geodetic coordinates to cartesian
+            # coordinates, which are required for the following steps.
+            # See: https://proj.org/en/9.5/operations/conversions/cart.html
             f"+step +proj=cart "
-            f"+step +inv +init={target_itrf}:{source_itrf} "
+            # ITRF transformation. See above for definition.
+            f"{itrf_transformation_step}"
+            # See above for definition.
             f"{plate_model_step}"
+            # Convert back from cartesian to lat/lon coordinates
             f"+step +inv +proj=cart "
+            # Convert lon/lat from radians back to degrees.
+            # TODO: remove this if the initial conversion to radians above is not needed
             f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
         )
 
