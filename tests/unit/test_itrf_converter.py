@@ -40,7 +40,12 @@ def test_transform_itrf():
     # https://github.com/nsidc/NSIDC-Data-Tutorials/blob/a35203f18841456d258fac3a11dc04f44f839d9d/notebooks/iceflow/corrections.ipynb
     assert result.latitude.to_numpy()[0] == 69.99999974953995
     assert result.longitude.to_numpy()[0] == -50.0000001319163
-    assert result.elevation.to_numpy()[0] == 1.0052761882543564
+    # Rounding to 8 decimals in a field assumed to be measured in meters is 10nm accuracy!
+    # This rounding became necessary when pyproj updated to a newer than 3.6.1
+    # version, leading to a difference of ~1nm in the resulting calculation.
+    assert np.round(result.elevation.to_numpy()[0], 8) == np.round(
+        1.0052761882543564, 8
+    )
 
 
 def _itrf_cart_coords_to_wgs84(x, y, z):
