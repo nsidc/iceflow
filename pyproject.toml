@@ -24,7 +24,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "numpy ~=2.0.1",
+  "numpy >=2.0.1",
   "earthaccess >=0.10.0",
   "pandas >=2.2",
   "h5py >=3.11",
