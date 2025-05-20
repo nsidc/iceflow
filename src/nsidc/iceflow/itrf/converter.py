@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import calendar
 import datetime as dt
+from typing import cast
 
 import pandas as pd
 import pandera as pa
@@ -91,6 +92,7 @@ def transform_itrf(
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
         # If the source ITRF is the same as the target for this chunk, skip transformation.
+        source_itrf = cast(str, source_itrf)
         if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
             continue
