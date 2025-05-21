@@ -166,6 +166,16 @@ def test__itrf_transformation_step():
     assert np.round(actual_z, 4) == expected_z
 
 
+def test__itrf_transformation_step_failure():
+    """Test that the _itrf_transformation_step raises an error if there is no
+    pre-defined transform."""
+
+    with pytest.raises(
+        RuntimeError, match="Failed to find a pre-defined ITRF transformation"
+    ):
+        _itrf_transformation_step("ITRF2022", "ITRF93")
+
+
 @pytest.mark.parametrize("timezone", ["America/Denver", "UTC"])
 def test__datetime_to_decimal_year(timezone, monkeypatch):
     monkeypatch.setenv("TZ", timezone)
