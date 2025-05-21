@@ -1,5 +1,5 @@
 """
-Copyright (c) 2024 NSIDC. All rights reserved.
+Copyright (c) 2025 NSIDC. All rights reserved.
 
 iceflow: Harmonized access to (pre)OIB/IceSAT/IceSAT2 data
 

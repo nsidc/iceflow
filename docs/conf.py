@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import datetime as dt
 import importlib.metadata
 from typing import Any
 
 project = "nsidc-iceflow"
-copyright = "2024, NSIDC"
+copyright = f"{dt.date.today().year}, NSIDC"
 author = "NSIDC"
 version = release = importlib.metadata.version("nsidc-iceflow")
 
@@ -72,7 +73,7 @@ nitpick_ignore = [
     ("py:class", "pandera.api.pandas.model.DataFrameModel"),
     ("py:class", "pandera.api.dataframe.model.Config"),
     # avoids warning:
-    # `valkyrie-lib/docs/api/nsidc.iceflow.data.rst:13: WARNING: py:class reference target not found: data [ref.class]`
+    # `iceflow/docs/api/nsidc.iceflow.data.rst:13: WARNING: py:class reference target not found: data [ref.class]`
     ("py:class", "data"),
 ]
 
