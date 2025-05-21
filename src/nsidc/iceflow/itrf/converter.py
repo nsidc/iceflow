@@ -6,7 +6,7 @@ from typing import cast
 
 import pandas as pd
 import pandera as pa
-from pyproj import Transformer
+import pyproj
 from shapely.geometry.point import Point
 
 from nsidc.iceflow.data.models import IceflowDataFrame
@@ -38,20 +38,61 @@ def _datetime_to_decimal_year(date):
     return date.year + fraction
 
 
-def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
-    itrf_transformation_step = ""
-    if source_itrf != target_itrf:
-        # This performs a helmert transform (see
-        # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
-        # looks up the ITRF2008 helmert transformation step in the ITRF2014
-        # data file (see
-        # https://proj.org/en/9.3/resource_files.html#init-files and e.g.,
-        # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
-        # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
-        # performs a helmert transform from ITRF2008 to ITRF2014.
-        itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf} "
+def _check_valid_proj_step(proj_str) -> bool:
+    """Check if the source/target ITRF pair can be expanded.
 
-    return itrf_transformation_step
+    Returns `True` if the combination is valid. Otherwise `False`.
+
+    The combination is valid only if there is an init file on the proj data path
+    matching the `source_itrf` that has an entry matching the `target_itrf`. See
+    https://proj.org/en/9.3/resource_files.html#init-files for more info.
+    """
+    try:
+        pyproj.Transformer.from_pipeline(proj_str)
+        return True
+    except pyproj.exceptions.ProjError:
+        return False
+
+
+def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
+    """Get the ITRF transformation step for the given source/target ITRF.
+
+    The transformation step returned by this function performs a helmert
+    transform (see
+    https://proj.org/en/9.4/operations/transformations/helmert.html).
+
+    The parameters for the helmert transform come from proj init files (see
+    https://proj.org/en/9.3/resource_files.html#init-files). For example,
+    `+init=ITRF2014:ITRF2008` looks up the ITRF2008 helmert transformation step
+    in the ITRF2014 data file (see
+    https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014).
+    """
+    # The `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
+    # performs a helmert transform from ITRF2008 to ITRF2014.  This is the most
+    # common case for `iceflow`, because we tend to be targeting pre-icesat2
+    # data for transformation to ITRF2014 (icesat2), so try this first.
+    inv_itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf}"
+    if _check_valid_proj_step(inv_itrf_transformation_step):
+        return inv_itrf_transformation_step
+
+    # Forward helmert transformation. `+init=ITRF2014:ITRF2008`
+    # performs a helmert transform from ITRF2014 to ITRF2008.
+    fwd_itrf_transformation_step = f"+step +init={source_itrf}:{target_itrf}"
+    if _check_valid_proj_step(fwd_itrf_transformation_step):
+        return fwd_itrf_transformation_step
+
+    # There may not be a pre-defined helmert transformation. The user may want
+    # to craft their own transformation pipeline.
+    err_msg = (
+        f"Failed to find a pre-defined ITRF transformation between {source_itrf} and {target_itrf}."
+        " ITRF transformation parameters are provided by proj's ITRF init files."
+        " Consider upgrading proj to ensure the latest data is available and try again."
+        " See https://proj.org/en/latest/resource_files.html#init-files for more information."
+        f" If no pre-defined transformation is available for {source_itrf} -> {target_itrf},"
+        " it may be possible to define your own transformation using parameters found at https://itrf.ign.fr/."
+        " See https://proj.org/en/latest/operations/transformations/helmert.html for more information."
+    )
+    raise RuntimeError(err_msg)
 
 
 @pa.check_types()
@@ -91,8 +132,8 @@ def transform_itrf(
 
     transformed_chunks = []
     for source_itrf, chunk in data.groupby(by="ITRF"):
-        # If the source ITRF is the same as the target for this chunk, skip transformation.
         source_itrf = cast(str, source_itrf)
+        # If the source ITRF is the same as the target for this chunk, skip transformation.
         if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
             continue
@@ -120,8 +161,11 @@ def transform_itrf(
                 # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
                 # 2011: -18. We need to invert the step so that the point is
                 # propagated forward in time, from 1993 to 2011.
-                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
+                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch}"
             )
+            if not _check_valid_proj_step(plate_model_step):
+                err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
+                raise RuntimeError(err_msg)
 
         itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
 
@@ -144,9 +188,9 @@ def transform_itrf(
             # See: https://proj.org/en/9.5/operations/conversions/cart.html
             f"+step +proj=cart "
             # ITRF transformation. See above for definition.
-            f"{itrf_transformation_step}"
+            f"{itrf_transformation_step} "
             # See above for definition.
-            f"{plate_model_step}"
+            f"{plate_model_step} "
             # Convert back from cartesian to lat/lon coordinates
             f"+step +inv +proj=cart "
             # Convert lon/lat from radians back to degrees.
@@ -154,7 +198,7 @@ def transform_itrf(
             f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
         )
 
-        transformer = Transformer.from_pipeline(pipeline)
+        transformer = pyproj.Transformer.from_pipeline(pipeline)
 
         decimalyears = (
             chunk.reset_index().utc_datetime.apply(_datetime_to_decimal_year).to_numpy()
