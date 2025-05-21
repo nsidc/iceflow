@@ -34,7 +34,7 @@ from nsidc.iceflow.itrf.converter import transform_itrf
 
 # TODO: add bumpversion config to control this version number, and the conda
 # recipe/meta.yaml.
-__version__ = "v0.3.0"
+__version__ = "v1.0.0"
 
 
 __all__ = [
