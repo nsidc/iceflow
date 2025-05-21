@@ -1,3 +1,9 @@
+# v1.0.0
+
+- Update `transform_itrf` function to be more flexible. Both forward and reverse
+  transformations between proj-supported ITRFs are now supported, which means
+  that more ITRF-to-ITRF transformations are handled.
+
 # v0.3.0
 
 - Use `pydantic` to create custom BoundingBox class for
