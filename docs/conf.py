@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import datetime as dt
 import importlib.metadata
 from typing import Any
 
 project = "nsidc-iceflow"
-copyright = "2024, NSIDC"
+copyright = f"{dt.date.today().year}, NSIDC"
 author = "NSIDC"
 version = release = importlib.metadata.version("nsidc-iceflow")
 
