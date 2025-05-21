@@ -176,6 +176,22 @@ def test__itrf_transformation_step_failure():
         _itrf_transformation_step("ITRF2022", "ITRF93")
 
 
+def test__itrf_transformation_step_fwd():
+    """Test that the forward transform is returned."""
+    expected = "+step +init=ITRF2014:ITRF2008"
+    actual_step = _itrf_transformation_step("ITRF2014", "ITRF2008")
+
+    assert expected == actual_step
+
+
+def test__itrf_transformation_step_inv():
+    """Test that the forward transform is returned."""
+    expected = "+step +inv +init=ITRF2014:ITRF2008"
+    actual_step = _itrf_transformation_step("ITRF2008", "ITRF2014")
+
+    assert expected == actual_step
+
+
 @pytest.mark.parametrize("timezone", ["America/Denver", "UTC"])
 def test__datetime_to_decimal_year(timezone, monkeypatch):
     monkeypatch.setenv("TZ", timezone)
