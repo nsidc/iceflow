@@ -154,7 +154,7 @@ def transform_itrf(
                 # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
                 # 2011: -18. We need to invert the step so that the point is
                 # propagated forward in time, from 1993 to 2011.
-                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
+                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch}"
             )
             if not _check_valid_proj_step(plate_model_step):
                 err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
