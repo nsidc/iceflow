@@ -126,7 +126,6 @@ def transform_itrf(
     for source_itrf, chunk in data.groupby(by="ITRF"):
         source_itrf = cast(str, source_itrf)
         # If the source ITRF is the same as the target for this chunk, skip transformation.
-        source_itrf = cast(str, source_itrf)
         if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
             continue
