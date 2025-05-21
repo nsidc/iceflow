@@ -83,7 +83,15 @@ def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
 
     # There may not be a pre-defined helmert transformation. The user may want
     # to craft their own transformation pipeline.
-    err_msg = f"Failed to find a pre-defined ITRF transformation between {source_itrf} and {target_itrf}."
+    err_msg = (
+        f"Failed to find a pre-defined ITRF transformation between {source_itrf} and {target_itrf}."
+        " ITRF transformation parameters are provided by proj's ITRF init files."
+        " Consider upgrading proj to ensure the latest data is available and try again."
+        " See https://proj.org/en/latest/resource_files.html#init-files for more information."
+        f" If no pre-defined transformation is available for {source_itrf} -> {target_itrf},"
+        " it may be possible to define your own transformation using parameters found at https://itrf.ign.fr/."
+        " See https://proj.org/en/latest/operations/transformations/helmert.html for more information."
+    )
     raise RuntimeError(err_msg)
 
 
