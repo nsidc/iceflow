@@ -73,7 +73,7 @@ nitpick_ignore = [
     ("py:class", "pandera.api.pandas.model.DataFrameModel"),
     ("py:class", "pandera.api.dataframe.model.Config"),
     # avoids warning:
-    # `valkyrie-lib/docs/api/nsidc.iceflow.data.rst:13: WARNING: py:class reference target not found: data [ref.class]`
+    # `iceflow/docs/api/nsidc.iceflow.data.rst:13: WARNING: py:class reference target not found: data [ref.class]`
     ("py:class", "data"),
 ]
 
