@@ -5,7 +5,9 @@
 :hidden:
 :caption: content
 
+getting-started.md
 iceflow-example.ipynb
+iceflow-with-icepyx.ipynb
 api/nsidc
 LICENSE
 ```

@@ -54,16 +54,32 @@ def _check_valid_proj_step(proj_str) -> bool:
         return False
 
 
-def _get_itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
-    """Get the ITRF transformation step for the given source/target ITRF."""
+def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
+    """Get the ITRF transformation step for the given source/target ITRF.
 
-    itrf_transformation_step = f"+step +init={source_itrf}:{target_itrf}"
-    if _check_valid_proj_step(itrf_transformation_step):
-        return itrf_transformation_step
+    The transformation step returned by this function performs a helmert
+    transform (see
+    https://proj.org/en/9.4/operations/transformations/helmert.html).
 
-    itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf}"
-    if _check_valid_proj_step(itrf_transformation_step):
-        return itrf_transformation_step
+    The parameters for the helmert transform come from proj init files (see
+    https://proj.org/en/9.3/resource_files.html#init-files). For example,
+    `+init=ITRF2014:ITRF2008` looks up the ITRF2008 helmert transformation step
+    in the ITRF2014 data file (see
+    https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014).
+    """
+    # The `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
+    # performs a helmert transform from ITRF2008 to ITRF2014.  This is the most
+    # common case for `iceflow`, because we tend to be targeting pre-icesat2
+    # data for transformation to ITRF2014 (icesat2), so try this first.
+    inv_itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf}"
+    if _check_valid_proj_step(inv_itrf_transformation_step):
+        return inv_itrf_transformation_step
+
+    # Forward helmert transformation. `+init=ITRF2014:ITRF2008`
+    # performs a helmert transform from ITRF2014 to ITRF2008.
+    fwd_itrf_transformation_step = f"+step +init={source_itrf}:{target_itrf}"
+    if _check_valid_proj_step(fwd_itrf_transformation_step):
+        return fwd_itrf_transformation_step
 
     # There may not be a pre-defined helmert transformation. The user may want
     # to craft their own transformation pipeline.
@@ -84,7 +100,20 @@ def transform_itrf(
     """Transform the data's lon/lat/elev from the source ITRF to the target ITRF.
 
     If a `target_epoch` is given, coordinate propagation is performed via a
-    plate motion model.
+    plate motion model (PMM) defined for the target_itrf. The target epoch
+    determines the number of years into the future/past the observed points
+    should be propagated. For example, if a point's observation date
+    (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the target_epoch is
+    2011.0 (2011-01-01T00:00:00), the point will be propagated forward 18
+    years. Note that not all ITRFs have PMMs defined for them. The PMM used is
+    defined for the target_epoch, so it is likely to be most accurate for points
+    observed near the ITRF's defined epoch.
+
+    All ITRF and PMM transformations are dependent on the user's `proj`
+    installation's ITRF init files (see
+    https://proj.org/en/9.3/resource_files.html#init-files). For example,
+    ITRF2014 parameters are defined here:
+    https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
     """
     if not check_itrf(target_itrf):
         err_msg = (
@@ -97,6 +126,7 @@ def transform_itrf(
     for source_itrf, chunk in data.groupby(by="ITRF"):
         source_itrf = cast(str, source_itrf)
         # If the source ITRF is the same as the target for this chunk, skip transformation.
+        source_itrf = cast(str, source_itrf)
         if source_itrf == target_itrf and target_epoch is None:
             transformed_chunks.append(chunk)
             continue
@@ -106,29 +136,31 @@ def transform_itrf(
             if not plate:
                 plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
             plate_model_step = (
-                # Perform coordinate propagation to the given epoch using the
-                # provided plate motion model (PMM).  An example is given in the
-                # message of this commit:
-                # https://github.com/OSGeo/PROJ/commit/403f930355926aced5caba5bfbcc230ad152cf86
-                f"+step +init={target_itrf}:{plate} +t_epoch={target_epoch}"
+                # Perform coordinate propagation to the target epoch using the
+                # provided plate motion model (PMM).
+                # This step uses the target_itrf's init file to lookup the
+                # associated plate's PMM parameters. For example, ITRF2014
+                # parameters are defined here:
+                # https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
+                # The step is inverted because proj defined `t_epoch` as the
+                # "central epoch" - not the "target epoch. The transformation
+                # uses a delta defined by `t_observed - t_epoch` that are
+                # applied to the PMM's rate of change to propagate the point
+                # into the past/future. See
+                # https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
+                # for more information.
+                # For example, if a point's observation date
+                # (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch
+                # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
+                # 2011: -18. We need to invert the step so that the point is
+                # propagated forward in time, from 1993 to 2011.
+                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch} "
             )
             if not _check_valid_proj_step(plate_model_step):
                 err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
                 raise RuntimeError(err_msg)
 
-        itrf_transformation_step = ""
-        if source_itrf != target_itrf:
-            # This performs a helmert transform (see
-            # https://proj.org/en/9.4/operations/transformations/helmert.html). `+init=ITRF2014:ITRF2008`
-            # looks up the ITRF2008 helmert transformation step in the ITRF2014
-            # data file (see
-            # https://proj.org/en/9.3/resource_files.html#init-files and e.g.,
-            # https://github.com/OSGeo/PROJ/blob/master/data/ITRF2014). The
-            # `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
-            # performs a helmert transform from ITRF2008 to ITRF2014.
-            itrf_transformation_step = _get_itrf_transformation_step(
-                source_itrf, target_itrf
-            )
+        itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
 
         pipeline = (
             # This initializes the pipeline and declares the use of the WGS84

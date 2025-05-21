@@ -1,6 +1,6 @@
 [project]
 name = "nsidc-iceflow"
-version = "v0.2.0"
+version = "v0.3.0"
 authors = [
   { name = "NSIDC", email = "nsidc@nsidc.org" },
 ]
@@ -29,11 +29,12 @@ dependencies = [
   "pandas >=2.2",
   "h5py >=3.11",
   "gps-timemachine >=1.1.4",
-  "pyproj >=3.7.0",
+  "pyproj >=3.6.1",
   "shapely >=2.0.5",
-  "pandera[mypy] >= 0.20.3",
+  "pandera[mypy] ~=0.23.0",
   "pydantic >=2.8.2",
-  "loguru",
+  "loguru >=0.7.2",
+  "dask[dataframe] >=2024.10.0",
 ]
 
 [project.urls]
@@ -46,7 +47,7 @@ Changelog = "https://github.com/NSIDC/iceflow/releases"
 dev = [
   "bump-my-version",
   "invoke",
-  "mypy >=1.11.1",
+  "mypy >=1.15.0",
   "pandas-stubs >=2.2",
   "pre-commit",
   "pytest",
@@ -64,6 +65,7 @@ notebooks = [
   "jupyterlab",
   "matplotlib",
   "ipympl",
+  "icepyx >=1.3.0",
 ]
 
 
@@ -81,6 +83,7 @@ addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "error",
+  "ignore:The 'shapely.geos' module is deprecated",
 ]
 log_cli_level = "INFO"
 
@@ -117,6 +120,8 @@ module = [
   "h5py.*",
   "numpy.*",
   "gps_timemachine.*",
+  "dask.*",
+  "dask.dataframe.*",
 ]
 disallow_incomplete_defs = true
 ignore_missing_imports = true
@@ -185,7 +190,7 @@ messages_control.disable = [
 ]
 
 [tool.bumpversion]
-current_version = "0.2.0"
+current_version = "0.3.0"
 commit = false
 tag = false
 
@@ -196,8 +201,8 @@ replace  = '__version__ = "v{new_version}"'
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
-search = 'version = "{current_version}"'
-replace = 'version = "{new_version}"'
+search = 'version = "v{current_version}"'
+replace = 'version = "v{new_version}"'
 
 [tool.codespell]
-skip="docs/iceflow-example.ipynb"
+skip="docs/*.ipynb"

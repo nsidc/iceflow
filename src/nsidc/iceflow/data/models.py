@@ -5,6 +5,7 @@ from typing import Literal
 
 import pandera as pa
 import pydantic
+from earthaccess.results import DataGranule
 from pandera.typing import DataFrame, Index, Series
 
 from nsidc.iceflow.itrf import ITRF_REGEX
@@ -195,6 +196,10 @@ class Dataset(pydantic.BaseModel):
     short_name: DatasetShortName
     version: str
 
+    @property
+    def subdir_name(self):
+        return f"{self.short_name}_{self.version}"
+
 
 class ATM1BDataset(Dataset):
     short_name: ATM1BShortName
@@ -231,7 +236,29 @@ class BoundingBox(pydantic.BaseModel):
     upper_right_lat: float
 
 
+ALL_DATASETS: list[Dataset] = [
+    ILATM1BDataset(version="1"),
+    ILATM1BDataset(version="2"),
+    BLATM1BDataset(version="1"),
+    ILVIS2Dataset(version="1"),
+    ILVIS2Dataset(version="2"),
+    GLAH06Dataset(),
+]
+
+
 class DatasetSearchParameters(pydantic.BaseModel):
-    dataset: Dataset
+    datasets: list[Dataset] = ALL_DATASETS
     bounding_box: BoundingBox
     temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date]
+
+
+class IceflowSearchResult(pydantic.BaseModel):
+    dataset: Dataset
+    granules: list[DataGranule]
+
+    # Pydantic can't infer what `DataGranule` is. This ignores validation for
+    # this that type
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
+
+IceflowSearchResults = list[IceflowSearchResult]
