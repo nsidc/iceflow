@@ -108,16 +108,16 @@ def make_iceflow_parquet(
         short_name, version = subdir.name.split("_")
         iceflow_df["dataset"] = [f"{short_name}v{version}"] * len(iceflow_df.latitude)
         common_columns = ["latitude", "longitude", "elevation", "dataset"]
-        common_dask_df = dd.from_pandas(iceflow_df[common_columns])
+        common_dask_df = dd.from_pandas(iceflow_df[common_columns])  # type:ignore[attr-defined]
         if parquet_subdir.exists():
-            dd.to_parquet(
+            dd.to_parquet(  # type: ignore[attr-defined]
                 df=common_dask_df,
                 path=parquet_subdir,
                 append=True,
                 ignore_divisions=True,
             )
         else:
-            dd.to_parquet(
+            dd.to_parquet(  # type: ignore[attr-defined]
                 df=common_dask_df,
                 path=parquet_subdir,
             )
