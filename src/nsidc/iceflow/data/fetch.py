@@ -31,6 +31,10 @@ def _find_iceflow_data(
         granules_list = earthaccess.search_data(
             short_name=dataset.short_name,
             version=dataset.version,
+            # Select only cloud-hosted granules. Without specifying cloud vs
+            # non-cloud, we may get duplicate granules as long as the ECS copy
+            # remains.
+            cloud_hosted=True,
             bounding_box=(
                 bounding_box.lower_left_lon,
                 bounding_box.lower_left_lat,
