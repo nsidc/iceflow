@@ -3,6 +3,10 @@
 - Update `transform_itrf` function to be more flexible. Both forward and reverse
   transformations between proj-supported ITRFs are now supported, which means
   that more ITRF-to-ITRF transformations are handled.
+- Update `icepyx` dependency to >=2.0.0 for the "Using iceflow with icepyx to
+  Generate an Elevation Timeseries" notebook.
+- Filter for cloud-hosted data, avoiding duplicate granule results from
+  `fetch.find_iceflow_data`
 
 # v0.3.0
 
