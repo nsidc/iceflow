@@ -235,6 +235,55 @@ class BoundingBox(pydantic.BaseModel):
     upper_right_lon: float
     upper_right_lat: float
 
+    def __init__(self, *args, **kwargs):
+        """Accept either named args, one arg for each coord, or an iterable of
+        `(lower_left_lon, lower_left_lat, upper_right_lon, upper_right_lat)`."""
+        if args:
+            if len(args) == 1 and isinstance(args[0], list | tuple):
+                # The first arg should be treated like a tuple of
+                # (lower_left_lon, lower_left_lat, upper_right_lon,
+                # upper_right_lat)
+                args = tuple(args[0])
+            # Each arg should be treated as one of (lower_left_lon,
+            # lower_left_lat, upper_right_lon, upper_right_lat).
+            if len(args) != 4:
+                raise ValueError(
+                    "Expected four values for bounding box:"
+                    " (lower_left_lon, lower_left_lat, upper_right_lon, upper_right_lat)"
+                )
+            # Set kwargs if args are given.
+            kwargs = {
+                "lower_left_lon": args[0],
+                "lower_left_lat": args[1],
+                "upper_right_lon": args[2],
+                "upper_right_lat": args[3],
+            }
+
+        # Initialize the model.
+        super().__init__(**kwargs)
+
+    def __iter__(self):
+        """Return bounding box as a iter (list/tuple)."""
+        return iter(
+            (
+                self.lower_left_lon,
+                self.lower_left_lat,
+                self.upper_right_lon,
+                self.upper_right_lat,
+            )
+        )
+
+    def __getitem__(self, idx):
+        if isinstance(idx, int):
+            return list(self.__iter__())[idx]
+        elif isinstance(idx, str):
+            return getattr(self, idx)
+        else:
+            raise TypeError(
+                "Getitem on BoundingBox must be int (e.g. 0)"
+                " or str (e.g., 'lower_left_lon')."
+            )
+
 
 ALL_DATASETS: list[Dataset] = [
     ILATM1BDataset(version="1"),
