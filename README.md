@@ -26,8 +26,17 @@ access laser altimetry data from (pre-)Operation Icebridge and ICESat datasets.
 
 ## Level of Support
 
-- This repository is not actively supported by NSIDC but we welcome issue
-  submissions and pull requests in order to foster community contribution.
+This repository is not actively supported by NSIDC but we welcome issue
+submissions and pull requests in order to foster community contribution. We will
+strive to respond to contributions in a timely manner, but make no guarantees.
+
+If you discover any problems or bugs, please submit an
+[Issue](https://github.com/nsidc/iceflow/issues/new).
+
+If you would like to contribute to this repository, you may fork the repository
+and submit a pull request. See our
+[contributing documentation](https://iceflow.readthedocs.io/en/latest/contributing.html)
+for more information about how to contribute to `iceflow`.
 
 See the [LICENSE](./LICENSE) for details on permissions and warranties. Please
 contact nsidc@nsidc.org for more information.
