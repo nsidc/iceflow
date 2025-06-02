@@ -127,7 +127,7 @@ def _add_utc_datetime(df: pd.DataFrame, file_date) -> pd.DataFrame:
     return df
 
 
-def _scale_and_convert(df: pd.DataFrame, fields):
+def _scale_and_convert(df: pd.DataFrame, fields) -> pd.DataFrame:
     """For any column in the list of Field named tuples, optionally scale
     the corresponding column in the DataFrame and convert the column
     type.
