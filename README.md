@@ -4,13 +4,6 @@
 
 # Iceflow Python Library
 
-<!-- prettier-ignore -->
-> [!WARNING]
-> This repository is under active development. Major changes to the structure of
-> this repository and its code are expected. We are striving to develop code
-> that is well-tested and peer-reviewed, but nothing contained here should be
-> expected to work correctly (or at all!) in this early phase.
-
 `iceflow` is a Python library that provides the ability to search, download, and
 access laser altimetry data from (pre-)Operation Icebridge and ICESat datasets.
 `iceflow` supports the following datasets:
