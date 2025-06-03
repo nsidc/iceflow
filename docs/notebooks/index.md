@@ -5,10 +5,10 @@
 :hidden:
 :caption: content
 
-./0_introduction.ipynb
-./corrections.ipynb
-./iceflow-example.ipynb
-./iceflow-with-icepyx.ipynb
+./0_introduction
+./corrections
+./iceflow-example
+./iceflow-with-icepyx
 ```
 
 [Jupyter notebooks](https://docs.jupyter.org/en/latest/) provide executable
