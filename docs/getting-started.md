@@ -2,9 +2,8 @@
 
 ## Jupyter Notebooks
 
-[Jupyter notebooks](https://docs.jupyter.org/en/latest/) provide executable
-examples of how to use `iceflow`. See [Jupyter Notebooks](./notebooks/index.md)
-for more information.
+Executable Jupyter Notebooks provide a great starting point for using `iceflow`.
+See [Jupyter Notebooks](./notebooks/index.md) for more information.
 
 ## API overview
 
