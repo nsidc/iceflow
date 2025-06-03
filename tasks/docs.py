@@ -42,17 +42,13 @@ def watch(_ctx):
     print_and_run(
         (
             f'sphinx-autobuild --pre-build "{_build_apidocs_cmd()}"'
-            f" --watch {PROJECT_DIR}/src"
+            f" --watch {PROJECT_DIR}/src --watch {PROJECT_DIR}/notebooks"
+            f" --watch {PROJECT_DIR}/notebooks"
+            f" --ignore {PROJECT_DIR}/notebooks/.ipynb_checkpoints"
+            f" --ignore {PROJECT_DIR}/notebooks/_sources"
+            f" --ignore {PROJECT_DIR}/notebooks/_static"
+            f" --ignore {PROJECT_DIR}/notebooks/downloaded-data/"
             f" {PROJECT_DIR}/docs {PROJECT_DIR}/docs/_build/html"
         ),
-        pty=True,
-    )
-
-
-@task()
-def render_notebooks_for_docs(_ctx):
-    """Render jupyter notebooks for docs."""
-    print_and_run(
-        (f"{PROJECT_DIR}/notebooks/generate_rendered_notebooks_for_docs.sh"),
         pty=True,
     )

@@ -80,3 +80,26 @@ nitpick_ignore = [
 always_document_param_types = True
 
 nb_execution_mode = "off"
+
+
+def copy_notebook_images(app, _exception):
+    """Copy notebook static images into place post-build."""
+    import shutil
+    from pathlib import Path
+
+    source_dir = Path(app.srcdir) / ".." / "notebooks" / "img"
+    dest_dir = Path(app.outdir) / "notebooks" / "img"
+
+    if dest_dir.exists():
+        shutil.rmtree(dest_dir)
+
+    shutil.copytree(source_dir, dest_dir)
+
+
+def setup(app):
+    """Setup build-finished action to copy images into place.
+
+    Because the images are only referenced in jupyter notebooks, and not source
+    files parsed directly by sphinx, the images will not be copied on their own.
+    """
+    app.connect("build-finished", copy_notebook_images)

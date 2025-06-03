@@ -2,6 +2,10 @@
 docs/_build/
 docs/api/
 
+# Icepyx-related
+.order_restart
+notebooks/.order_restart
+
 # Temporary local data store
 downloaded-data/
 

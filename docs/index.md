@@ -6,8 +6,7 @@
 :caption: content
 
 getting-started.md
-iceflow-example.ipynb
-iceflow-with-icepyx.ipynb
+notebooks/index.md
 contributing.md
 API Docs <api/nsidc>
 LICENSE

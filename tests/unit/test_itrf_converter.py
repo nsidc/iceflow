@@ -37,7 +37,7 @@ def test_transform_itrf():
 
     # Before and after values were extracted from the synthetic dataset in the
     # ITRF corrections notebook put together by Kevin. See:
-    # https://github.com/nsidc/NSIDC-Data-Tutorials/blob/a35203f18841456d258fac3a11dc04f44f839d9d/notebooks/iceflow/corrections.ipynb
+    # ./notebooks/iceflow/corrections.ipynb
     assert result.latitude.to_numpy()[0] == 69.99999974953995
     assert result.longitude.to_numpy()[0] == -50.0000001319163
     # Rounding to 8 decimals in a field assumed to be measured in meters is 10nm accuracy!
