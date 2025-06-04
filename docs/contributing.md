@@ -44,7 +44,8 @@ Available tasks:
 
 ## Jupyter Notebooks
 
-There are Jupyter Notebooks showing `iceflow` functionality under `notebooks/`.
+There are Jupyter Notebooks showing `iceflow` functionality under
+`docs/notebooks/`.
 
 To get started with developing existing or new notebooks, first install the
 notebook-specific dependencies:
@@ -56,7 +57,7 @@ pip install --editable .[notebooks]
 Then:
 
 ```
-cd notebooks/
+cd docs/notebooks/
 jupyter lab
 ```
 
@@ -79,15 +80,6 @@ live-reloading:
 ```
 inv docs.watch
 ```
-
-:::{note}
-
-Most of the content included in the rendered docs come from the `docs/` dir, but
-some is sourced from outside of `docs/`. For example, the Jupyter Notebooks are
-sourced from the project's `notebooks/` directory via symlinks to
-`docs/notebooks`.
-
-:::
 
 The docs are generated and hosted by
 [ReadTheDocs](https://iceflow.readthedocs.io/en/latest/).

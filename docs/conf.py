@@ -87,7 +87,7 @@ def copy_notebook_images(app, _exception):
     import shutil
     from pathlib import Path
 
-    source_dir = Path(app.srcdir) / ".." / "notebooks" / "img"
+    source_dir = Path(app.srcdir) / "notebooks" / "img"
     dest_dir = Path(app.outdir) / "notebooks" / "img"
 
     if dest_dir.exists():

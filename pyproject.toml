@@ -209,4 +209,4 @@ replace = 'version = "v{new_version}"'
 [tool.codespell]
 # Skip all ipynb notebooks. These contain binary data (rendered images from cell
 # outputs) that the checker will flag as errors.
-skip="notebooks/*.ipynb"
+skip="docs/notebooks/*.ipynb"
