@@ -119,3 +119,11 @@ Commit these changes and, once ready, merge them into `main` (through the use of
 a Pull Request on a feature branch). Tag the commit you want to release on
 `main` to initiate a GitHub Action (GHA) that will release the package to
 anaconda.org.
+
+:::{warning}
+
+Jupyter notebooks found in `./notebooks` may need to be re-rendered, depending
+on the changes introduced. It is a good idea to review the notebooks and
+identify any necessary changes that should accompany a PR.
+
+:::
