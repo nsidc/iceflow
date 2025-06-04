@@ -4,16 +4,11 @@
 
 # Iceflow Python Library
 
-<!-- prettier-ignore -->
-> [!WARNING]
-> This repository is under active development. Major changes to the structure of
-> this repository and its code are expected. We are striving to develop code
-> that is well-tested and peer-reviewed, but nothing contained here should be
-> expected to work correctly (or at all!) in this early phase.
-
 `iceflow` is a Python library that provides the ability to search, download, and
-access laser altimetry data from (pre-)Operation Icebridge and ICESat datasets.
-`iceflow` supports the following datasets:
+access laser altimetry data from (pre-)Operation IceBridge and ICESat/GLAS
+datasets. The library also supports International Terrestrial Reference Frame
+(ITRF) transformations to facilitate comparisons across datasets. `iceflow`
+supports the following datasets:
 
 | Dataset                                                  | Temporal Coverage             |
 | -------------------------------------------------------- | ----------------------------- |
@@ -26,8 +21,17 @@ access laser altimetry data from (pre-)Operation Icebridge and ICESat datasets.
 
 ## Level of Support
 
-- This repository is not actively supported by NSIDC but we welcome issue
-  submissions and pull requests in order to foster community contribution.
+This repository is not actively supported by NSIDC but we welcome issue
+submissions and pull requests in order to foster community contribution. We will
+strive to respond to contributions in a timely manner, but make no guarantees.
+
+If you discover any problems or bugs, please submit an
+[Issue](https://github.com/nsidc/iceflow/issues/new).
+
+If you would like to contribute to this repository, you may fork the repository
+and submit a pull request. See our
+[contributing documentation](https://iceflow.readthedocs.io/en/latest/contributing.html)
+for more information about how to contribute to `iceflow`.
 
 See the [LICENSE](./LICENSE) for details on permissions and warranties. Please
 contact nsidc@nsidc.org for more information.

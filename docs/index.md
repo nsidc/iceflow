@@ -8,6 +8,7 @@
 getting-started.md
 iceflow-example.ipynb
 iceflow-with-icepyx.ipynb
+contributing.md
 API Docs <api/nsidc>
 LICENSE
 ```
