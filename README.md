@@ -5,8 +5,10 @@
 # Iceflow Python Library
 
 `iceflow` is a Python library that provides the ability to search, download, and
-access laser altimetry data from (pre-)Operation IceBridge and ICESat/GLAS datasets. The library also supports International Terrestrial Reference Frame (ITRF) transformations to facilitate comparisons across datasets.
-`iceflow` supports the following datasets:
+access laser altimetry data from (pre-)Operation IceBridge and ICESat/GLAS
+datasets. The library also supports International Terrestrial Reference Frame
+(ITRF) transformations to facilitate comparisons across datasets. `iceflow`
+supports the following datasets:
 
 | Dataset                                                  | Temporal Coverage             |
 | -------------------------------------------------------- | ----------------------------- |
