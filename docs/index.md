@@ -6,6 +6,7 @@
 :caption: content
 
 getting-started.md
+altimetry-data-overview.md
 notebooks/index.md
 contributing.md
 API Docs <api/nsidc>

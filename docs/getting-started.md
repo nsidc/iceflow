@@ -1,5 +1,12 @@
 # Getting started with iceflow
 
+## Altimetry Overview
+
+Before working with `iceflow` directly, it may be helpful to understand the
+basics about pre-IceBridge, IceBridge, ICESat/GLAS and ICESat-2 datasets. Learn
+about these `iceflow` supported datasets in
+[Altimetry Data at the NSIDC DAAC: Point Cloud Data Overview](./altimetry-data-overview)
+
 ## Jupyter Notebooks
 
 Executable Jupyter Notebooks provide a great starting point for using `iceflow`.

@@ -5,7 +5,6 @@
 :hidden:
 :caption: content
 
-./0_introduction
 ./corrections
 ./iceflow-example
 ./iceflow-with-icepyx
@@ -38,13 +37,6 @@ Some Python packages/libraries that users may consider investigating include:
   big tabular data sets
 
 ## Iceflow notebooks
-
-- [Altimetry Data at NSIDC](./0_introduction) has an overview about airborne
-  altimetry and related data sets from NASA’s
-  [IceBridge](https://www.nasa.gov/mission_pages/icebridge/index.html) mission,
-  and satellite altimetry data from
-  [ICESat/GLAS](https://icesat.gsfc.nasa.gov/icesat/) and
-  [ICESat-2](https://icesat-2.gsfc.nasa.gov/).
 
 - [NSIDC Iceflow example](./iceflow-example) provides an example of how to
   search for, download, and interact with `ILATM1B v1` data for a small area of
