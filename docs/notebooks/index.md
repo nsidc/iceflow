@@ -53,3 +53,9 @@ Some Python packages/libraries that users may consider investigating include:
   ICESat-2 data. Finally, the notebook provides a simple time-series analysis
   for elevation change over an area of interest across `iceflow` supported
   datasets and ICESat-2.
+
+### Downloading Iceflow notebooks
+
+Users may wish to try executing the Iceflow notebooks themselves. Iceflow
+notebooks can be downloaded
+[from GitHub](https://github.com/nsidc/iceflow/tree/main/docs/notebooks/).
