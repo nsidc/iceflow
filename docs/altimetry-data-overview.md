@@ -88,8 +88,12 @@ detection systems provided by Fibertek. ATLAS measures the travel time of laser
 photons from the satellite to Earth and back; travel times from multiple laser
 pulses are used to determine elevation data.
 
-**Note:** We recommend using the [_icepyx_](https://github.com/icesat2py/icepyx)
-library to access and interact with ICESat-2 data.
+```{note}
+
+We recommend using the [_icepyx_](https://github.com/icesat2py/icepyx)
+library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `icelfow` in the [Using iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
+
+```
 
 <p align="center">
 <img style="align: center;" width="80%" src='./img/iceflow-coverage.jpg'/>
@@ -118,8 +122,12 @@ further mission information and documentation for each data set:
 
 ---
 
-**Note**: If you have questions about the data sets please refer to the user
+```{note}
+
+If you have questions about the data sets please refer to the user
 guides or contact NSIDC user services at nsidc@nsidc.org
+
+```
 
 ## Challenges
 
