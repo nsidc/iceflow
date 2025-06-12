@@ -7,18 +7,19 @@ import earthaccess
 from loguru import logger
 
 from nsidc.iceflow.data.models import (
-    BoundingBox,
+    ALL_DATASETS,
+    BoundingBoxLike,
     Dataset,
-    DatasetSearchParameters,
     IceflowSearchResult,
     IceflowSearchResults,
+    TemporalRange,
 )
 
 
 def _find_iceflow_data_for_dataset(
     *,
     dataset: Dataset,
-    bounding_box: BoundingBox,
+    bounding_box: BoundingBoxLike,
     temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date],
 ) -> IceflowSearchResult:
     earthaccess.login()
@@ -35,12 +36,7 @@ def _find_iceflow_data_for_dataset(
             # non-cloud, we may get duplicate granules as long as the ECS copy
             # remains.
             cloud_hosted=True,
-            bounding_box=(
-                bounding_box.lower_left_lon,
-                bounding_box.lower_left_lat,
-                bounding_box.upper_right_lon,
-                bounding_box.upper_right_lat,
-            ),
+            bounding_box=bounding_box,
             temporal=temporal,
         )
     except IndexError:
@@ -88,14 +84,17 @@ def _download_iceflow_search_result(
 
 def find_iceflow_data(
     *,
-    dataset_search_params: DatasetSearchParameters,
+    bounding_box: BoundingBoxLike,
+    temporal: TemporalRange,
+    datasets: list[Dataset] = ALL_DATASETS,
 ) -> IceflowSearchResults:
+    """Find iceflow-compatible data using spatial and temporal constraints."""
     iceflow_search_results = []
-    for dataset in dataset_search_params.datasets:
+    for dataset in datasets:
         iceflow_search_result = _find_iceflow_data_for_dataset(
             dataset=dataset,
-            bounding_box=dataset_search_params.bounding_box,
-            temporal=dataset_search_params.temporal,
+            bounding_box=bounding_box,
+            temporal=temporal,
         )
         iceflow_search_results.append(iceflow_search_result)
 

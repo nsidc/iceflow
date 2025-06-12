@@ -25,18 +25,13 @@ To find `iceflow`-supported data for an area of interest and timeframe, use
 ```
 import datetime as dt
 
-from nsidc.iceflow import (
-    find_iceflow_data,
-    DatasetSearchParameters,
-    BoundingBox,
-)
+from nsidc.iceflow import find_iceflow_data
 
 
 search_results = find_iceflow_data(
-    dataset_search_params=DatasetSearchParameters(
-        bounding_box=BoundingBox(lower_left_lon=-103.125559, lower_left_lat=-75.180563, upper_right_lon=-102.677327, upper_right_lat=-74.798063),
-        temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 31)),
-    ),
+    # Lower_left_lon, lower_left_lat, upper_right_lon, upper_right_lat
+    bounding_box=(-103.125559, -75.180563, -102.677327, -74.798063),
+    temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 31)),
 )
 ```
 

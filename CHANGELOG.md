@@ -7,6 +7,9 @@
   Generate an Elevation Timeseries" notebook.
 - Filter for cloud-hosted data, avoiding duplicate granule results from
   `fetch.find_iceflow_data`
+- Make "bounding box" construct consistent with `icepyx` and `earthaccess`. This
+  simplifies the api, and means the user no longer needs to import `BoundingBox`
+  to query for data.
 
 # v0.3.0
 
