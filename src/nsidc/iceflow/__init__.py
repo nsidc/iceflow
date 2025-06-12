@@ -22,8 +22,6 @@ from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
     ALL_DATASETS,
     BLATM1BDataset,
-    BoundingBox,
-    DatasetSearchParameters,
     GLAH06Dataset,
     IceflowDataFrame,
     ILATM1BDataset,
@@ -32,16 +30,12 @@ from nsidc.iceflow.data.models import (
 from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.itrf.converter import transform_itrf
 
-# TODO: add bumpversion config to control this version number, and the conda
-# recipe/meta.yaml.
 __version__ = "v1.0.0"
 
 
 __all__ = [
     "ALL_DATASETS",
     "BLATM1BDataset",
-    "BoundingBox",
-    "DatasetSearchParameters",
     "GLAH06Dataset",
     "ILATM1BDataset",
     "ILVIS2Dataset",

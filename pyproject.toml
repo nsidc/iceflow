@@ -48,7 +48,7 @@ Changelog = "https://github.com/NSIDC/iceflow/releases"
 dev = [
   "bump-my-version",
   "invoke",
-  "mypy >=1.15.0",
+  "mypy >=1.16.0",
   "pandas-stubs >=2.2",
   "pre-commit",
   "pytest",

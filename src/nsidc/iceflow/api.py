@@ -11,8 +11,10 @@ from loguru import logger
 from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
     ALL_DATASETS,
-    DatasetSearchParameters,
+    BoundingBoxLike,
+    Dataset,
     IceflowDataFrame,
+    TemporalRange,
 )
 from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.itrf.converter import transform_itrf
@@ -20,7 +22,9 @@ from nsidc.iceflow.itrf.converter import transform_itrf
 
 def fetch_iceflow_df(
     *,
-    dataset_search_params: DatasetSearchParameters,
+    bounding_box: BoundingBoxLike,
+    temporal: TemporalRange,
+    datasets: list[Dataset] = ALL_DATASETS,
     output_dir: Path,
     # TODO: also add option for target epoch!!
     output_itrf: str | None = None,
@@ -38,7 +42,9 @@ def fetch_iceflow_df(
     """
 
     iceflow_search_reuslts = find_iceflow_data(
-        dataset_search_params=dataset_search_params,
+        bounding_box=bounding_box,
+        temporal=temporal,
+        datasets=datasets,
     )
 
     downloaded_files = download_iceflow_results(

@@ -23,43 +23,41 @@ from nsidc.iceflow import (
 )
 from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
+    ALL_DATASETS,
     BLATM1BDataset,
-    BoundingBox,
-    DatasetSearchParameters,
+    BoundingBoxLike,
+    Dataset,
     GLAH06Dataset,
     IceflowDataFrame,
     ILATM1BDataset,
     ILVIS2Dataset,
+    TemporalRange,
 )
 
 
 def test_atm1b_ilatm1b(tmp_path):
     target_itrf = "ITRF2014"
-    common_bounding_box = BoundingBox(
-        lower_left_lon=-103.125559,
-        lower_left_lat=-75.180563,
-        upper_right_lon=-102.677327,
-        upper_right_lat=-74.798063,
+    common_bounding_box = (
+        -103.125559,
+        -75.180563,
+        -102.677327,
+        -74.798063,
     )
 
     # Native ITRF is ITRF2005
     results_ilatm1b_v1_2009 = fetch_iceflow_df(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[ILATM1BDataset(version="1")],
-            bounding_box=common_bounding_box,
-            temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
-        ),
+        datasets=[ILATM1BDataset(version="1")],
+        bounding_box=common_bounding_box,
+        temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
         output_dir=tmp_path,
         output_itrf=target_itrf,
     )
 
     # Native ITRF is ITRF2008
     results_ilatm1b_v2_2014 = fetch_iceflow_df(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[ILATM1BDataset(version="2")],
-            bounding_box=common_bounding_box,
-            temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
-        ),
+        datasets=[ILATM1BDataset(version="2")],
+        bounding_box=common_bounding_box,
+        temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
         output_dir=tmp_path,
         output_itrf=target_itrf,
     )
@@ -72,19 +70,17 @@ def test_atm1b_ilatm1b(tmp_path):
 
 
 def test_atm1b_blatm1b(tmp_path):
-    common_bounding_box = BoundingBox(
-        lower_left_lon=-120.0,
-        lower_left_lat=-75.1,
-        upper_right_lon=-92.0,
-        upper_right_lat=-65.0,
+    common_bounding_box = (
+        -120.0,
+        -75.1,
+        -92.0,
+        -65.0,
     )
 
     results_blamt1b_v2_2014 = fetch_iceflow_df(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[BLATM1BDataset()],
-            bounding_box=common_bounding_box,
-            temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
-        ),
+        datasets=[BLATM1BDataset()],
+        bounding_box=common_bounding_box,
+        temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
         output_dir=tmp_path,
     )
 
@@ -93,32 +89,28 @@ def test_atm1b_blatm1b(tmp_path):
 
 def test_ivlis2(tmp_path):
     results_v1 = fetch_iceflow_df(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[ILVIS2Dataset(version="1")],
-            bounding_box=BoundingBox(
-                lower_left_lon=-120.0,
-                lower_left_lat=-80.0,
-                upper_right_lon=-90.0,
-                upper_right_lat=-65.0,
-            ),
-            temporal=(dt.datetime(2009, 10, 25, 15), dt.datetime(2009, 10, 25, 17)),
+        datasets=[ILVIS2Dataset(version="1")],
+        bounding_box=(
+            -120.0,
+            -80.0,
+            -90.0,
+            -65.0,
         ),
+        temporal=(dt.datetime(2009, 10, 25, 15), dt.datetime(2009, 10, 25, 17)),
         output_dir=tmp_path,
     )
 
     assert (results_v1.ITRF == "ITRF2000").all()
 
     results_v2 = fetch_iceflow_df(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[ILVIS2Dataset(version="2")],
-            bounding_box=BoundingBox(
-                lower_left_lon=-180,
-                lower_left_lat=60.0,
-                upper_right_lon=180,
-                upper_right_lat=90,
-            ),
-            temporal=(dt.datetime(2017, 8, 25, 0), dt.datetime(2017, 8, 25, 14, 30)),
+        datasets=[ILVIS2Dataset(version="2")],
+        bounding_box=(
+            -180,
+            60.0,
+            180,
+            90,
         ),
+        temporal=(dt.datetime(2017, 8, 25, 0), dt.datetime(2017, 8, 25, 14, 30)),
         output_dir=tmp_path,
     )
 
@@ -131,21 +123,19 @@ def test_ivlis2(tmp_path):
 
 
 def test_glah06(tmp_path):
-    common_bounding_box = BoundingBox(
-        lower_left_lon=-180,
-        lower_left_lat=-90,
-        upper_right_lon=180,
-        upper_right_lat=90,
+    common_bounding_box = (
+        -180,
+        -90,
+        180,
+        90,
     )
 
     results = fetch_iceflow_df(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[GLAH06Dataset()],
-            bounding_box=common_bounding_box,
-            temporal=(
-                dt.datetime(2003, 2, 20, 22, 25),
-                dt.datetime(2003, 2, 20, 22, 25, 38),
-            ),
+        datasets=[GLAH06Dataset()],
+        bounding_box=common_bounding_box,
+        temporal=(
+            dt.datetime(2003, 2, 20, 22, 25),
+            dt.datetime(2003, 2, 20, 22, 25, 38),
         ),
         output_dir=tmp_path,
     )
@@ -155,7 +145,9 @@ def test_glah06(tmp_path):
 
 def _create_iceflow_parquet(
     *,
-    dataset_search_params: DatasetSearchParameters,
+    bounding_box: BoundingBoxLike,
+    temporal: TemporalRange,
+    datasets: list[Dataset] = ALL_DATASETS,
     output_dir: Path,
     target_itrf: str,
     overwrite: bool = False,
@@ -175,7 +167,9 @@ def _create_iceflow_parquet(
     `overwrite=True` kwarg).
     """
     iceflow_search_results = find_iceflow_data(
-        dataset_search_params=dataset_search_params,
+        datasets=datasets,
+        temporal=temporal,
+        bounding_box=bounding_box,
     )
 
     download_iceflow_results(
@@ -195,20 +189,18 @@ def _create_iceflow_parquet(
 
 def test_create_iceflow_parquet(tmp_path):
     target_itrf = "ITRF2014"
-    common_bounding_box = BoundingBox(
-        lower_left_lon=-49.149,
-        lower_left_lat=69.186,
-        upper_right_lon=-48.949,
-        upper_right_lat=69.238,
+    common_bounding_box = (
+        -49.149,
+        69.186,
+        -48.949,
+        69.238,
     )
 
     # This should finds 4 results for ILATM1B v1 and 3 results for v2.
     parquet_path = _create_iceflow_parquet(
-        dataset_search_params=DatasetSearchParameters(
-            datasets=[ILATM1BDataset(version="1"), ILATM1BDataset(version="2")],
-            bounding_box=common_bounding_box,
-            temporal=((dt.date(2007, 1, 1), dt.date(2014, 10, 28))),
-        ),
+        datasets=[ILATM1BDataset(version="1"), ILATM1BDataset(version="2")],
+        bounding_box=common_bounding_box,
+        temporal=((dt.date(2007, 1, 1), dt.date(2014, 10, 28))),
         output_dir=tmp_path,
         target_itrf=target_itrf,
     )
