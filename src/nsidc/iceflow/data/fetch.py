@@ -15,7 +15,7 @@ from nsidc.iceflow.data.models import (
 )
 
 
-def _find_iceflow_data(
+def _find_iceflow_data_for_dataset(
     *,
     dataset: Dataset,
     bounding_box: BoundingBox,
@@ -92,7 +92,7 @@ def find_iceflow_data(
 ) -> IceflowSearchResults:
     iceflow_search_results = []
     for dataset in dataset_search_params.datasets:
-        iceflow_search_result = _find_iceflow_data(
+        iceflow_search_result = _find_iceflow_data_for_dataset(
             dataset=dataset,
             bounding_box=dataset_search_params.bounding_box,
             temporal=dataset_search_params.temporal,
