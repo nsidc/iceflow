@@ -32,8 +32,6 @@ from nsidc.iceflow.data.models import (
 from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.itrf.converter import transform_itrf
 
-# TODO: add bumpversion config to control this version number, and the conda
-# recipe/meta.yaml.
 __version__ = "v1.0.0"
 
 
