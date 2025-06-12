@@ -35,6 +35,27 @@ search_results = find_iceflow_data(
 )
 ```
 
+By default, all iceflow-supported datasets are searched. To search for a
+specific subset of iceflow-supported datasets, use the `datasets` kwarg:
+
+```
+from nsidc.iceflow import ILATM1BDataset
+
+
+search_results = find_iceflow_data(
+    datasets=[ILATM1BDataset(version="1")],
+    # Lower_left_lon, lower_left_lat, upper_right_lon, upper_right_lat
+    bounding_box=(-103.125559, -75.180563, -102.677327, -74.798063),
+    temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 31)),
+)
+```
+
+All other keyword arguments to this function (e.g,. `bounding_box`, `temporal`)
+map to [CMR](https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html)
+search parameters, and are passed un-modified to
+[earthaccess.search_data](https://earthaccess.readthedocs.io/en/latest/user-reference/api/api/#earthaccess.api.search_data)
+to perform the search.
+
 ### Downloading data
 
 Once search results have been found, download data with

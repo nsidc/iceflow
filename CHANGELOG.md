@@ -7,9 +7,11 @@
   Generate an Elevation Timeseries" notebook.
 - Filter for cloud-hosted data, avoiding duplicate granule results from
   `fetch.find_iceflow_data`
-- Make "bounding box" construct consistent with `icepyx` and `earthaccess`. This
-  simplifies the api, and means the user no longer needs to import `BoundingBox`
-  to query for data.
+- Pass through search kwargs to `earthaccess` without any type validation. This
+  allows earthaccess to do watever validation it needs to, and then it passes
+  those on to CMR. This provides much greater flexibility over data search and
+  makes the interface more consistent with `icepyx` and `earthaccess`.
+  https://github.com/nsidc/iceflow/issues/51.
 
 # v0.3.0
 

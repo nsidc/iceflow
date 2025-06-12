@@ -248,12 +248,6 @@ ALL_DATASETS: list[Dataset] = [
 TemporalRange = tuple[dt.datetime | dt.date, dt.datetime | dt.date]
 
 
-class DatasetSearchParameters(pydantic.BaseModel):
-    datasets: list[Dataset] = ALL_DATASETS
-    bounding_box: BoundingBoxLike
-    temporal: TemporalRange
-
-
 class IceflowSearchResult(pydantic.BaseModel):
     dataset: Dataset
     granules: list[DataGranule]

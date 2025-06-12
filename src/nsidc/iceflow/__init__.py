@@ -22,7 +22,6 @@ from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
     ALL_DATASETS,
     BLATM1BDataset,
-    DatasetSearchParameters,
     GLAH06Dataset,
     IceflowDataFrame,
     ILATM1BDataset,
@@ -37,7 +36,6 @@ __version__ = "v1.0.0"
 __all__ = [
     "ALL_DATASETS",
     "BLATM1BDataset",
-    "DatasetSearchParameters",
     "GLAH06Dataset",
     "ILATM1BDataset",
     "ILVIS2Dataset",

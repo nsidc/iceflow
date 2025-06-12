@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 
 import earthaccess
@@ -8,25 +7,20 @@ from loguru import logger
 
 from nsidc.iceflow.data.models import (
     ALL_DATASETS,
-    BoundingBoxLike,
     Dataset,
     IceflowSearchResult,
     IceflowSearchResults,
-    TemporalRange,
 )
 
 
 def _find_iceflow_data_for_dataset(
     *,
     dataset: Dataset,
-    bounding_box: BoundingBoxLike,
-    temporal: tuple[dt.datetime | dt.date, dt.datetime | dt.date],
+    **search_kwargs,
 ) -> IceflowSearchResult:
     earthaccess.login()
 
-    ctx_string = (
-        f"{dataset.short_name=} {dataset.version=} with {bounding_box=} {temporal=}"
-    )
+    ctx_string = f"{dataset.short_name=} {dataset.version=} with {search_kwargs=}"
 
     try:
         granules_list = earthaccess.search_data(
@@ -36,8 +30,7 @@ def _find_iceflow_data_for_dataset(
             # non-cloud, we may get duplicate granules as long as the ECS copy
             # remains.
             cloud_hosted=True,
-            bounding_box=bounding_box,
-            temporal=temporal,
+            **search_kwargs,
         )
     except IndexError:
         # There's no data matching the given parameters.
@@ -84,17 +77,20 @@ def _download_iceflow_search_result(
 
 def find_iceflow_data(
     *,
-    bounding_box: BoundingBoxLike,
-    temporal: TemporalRange,
     datasets: list[Dataset] = ALL_DATASETS,
+    **search_kwargs,
 ) -> IceflowSearchResults:
-    """Find iceflow-compatible data using spatial and temporal constraints."""
+    """Find iceflow-compatible data using search kwargs.
+
+    `search_kwargs` are passed to `earthaccess.search_data`, allowing for
+    CMR-supported filters (see
+    https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html)
+    """
     iceflow_search_results = []
     for dataset in datasets:
         iceflow_search_result = _find_iceflow_data_for_dataset(
             dataset=dataset,
-            bounding_box=bounding_box,
-            temporal=temporal,
+            **search_kwargs,
         )
         iceflow_search_results.append(iceflow_search_result)
 
