@@ -10,13 +10,13 @@ from loguru import logger
 
 from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
-    ALL_DATASETS,
     BoundingBoxLike,
     Dataset,
     IceflowDataFrame,
     TemporalRange,
 )
 from nsidc.iceflow.data.read import read_iceflow_datafiles
+from nsidc.iceflow.data.supported_datasets import ALL_SUPPORTED_DATASETS
 from nsidc.iceflow.itrf.converter import transform_itrf
 
 
@@ -24,7 +24,7 @@ def fetch_iceflow_df(
     *,
     bounding_box: BoundingBoxLike,
     temporal: TemporalRange,
-    datasets: list[Dataset] = ALL_DATASETS,
+    datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
     output_dir: Path,
     # TODO: also add option for target epoch!!
     output_itrf: str | None = None,
@@ -97,7 +97,7 @@ def make_iceflow_parquet(
 
     all_subdirs = [
         data_dir / ds.subdir_name
-        for ds in ALL_DATASETS
+        for ds in ALL_SUPPORTED_DATASETS
         if (data_dir / ds.subdir_name).is_dir()
     ]
     for subdir in all_subdirs:

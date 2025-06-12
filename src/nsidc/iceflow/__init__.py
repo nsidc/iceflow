@@ -20,22 +20,26 @@ from __future__ import annotations
 from nsidc.iceflow.api import make_iceflow_parquet
 from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
 from nsidc.iceflow.data.models import (
-    ALL_DATASETS,
+    Dataset,
+    IceflowDataFrame,
+)
+from nsidc.iceflow.data.read import read_iceflow_datafiles
+from nsidc.iceflow.data.supported_datasets import (
+    ALL_SUPPORTED_DATASETS,
     BLATM1BDataset,
     GLAH06Dataset,
-    IceflowDataFrame,
     ILATM1BDataset,
     ILVIS2Dataset,
 )
-from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.itrf.converter import transform_itrf
 
 __version__ = "v1.0.0"
 
 
 __all__ = [
-    "ALL_DATASETS",
+    "ALL_SUPPORTED_DATASETS",
     "BLATM1BDataset",
+    "Dataset",
     "GLAH06Dataset",
     "ILATM1BDataset",
     "ILVIS2Dataset",

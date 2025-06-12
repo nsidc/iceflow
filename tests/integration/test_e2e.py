@@ -23,15 +23,17 @@ from nsidc.iceflow import (
 )
 from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
-    ALL_DATASETS,
-    BLATM1BDataset,
     BoundingBoxLike,
     Dataset,
-    GLAH06Dataset,
     IceflowDataFrame,
+    TemporalRange,
+)
+from nsidc.iceflow.data.supported_datasets import (
+    ALL_SUPPORTED_DATASETS,
+    BLATM1BDataset,
+    GLAH06Dataset,
     ILATM1BDataset,
     ILVIS2Dataset,
-    TemporalRange,
 )
 
 
@@ -147,7 +149,7 @@ def _create_iceflow_parquet(
     *,
     bounding_box: BoundingBoxLike,
     temporal: TemporalRange,
-    datasets: list[Dataset] = ALL_DATASETS,
+    datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
     output_dir: Path,
     target_itrf: str,
     overwrite: bool = False,

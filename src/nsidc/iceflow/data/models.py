@@ -205,44 +205,10 @@ class ATM1BDataset(Dataset):
     short_name: ATM1BShortName
 
 
-class ILATM1BDataset(ATM1BDataset):
-    short_name: ATM1BShortName = "ILATM1B"
-    version: Literal["1", "2"]
-
-
-class BLATM1BDataset(ATM1BDataset):
-    short_name: ATM1BShortName = "BLATM1B"
-    # There is only 1 version of BLATM1B
-    version: Literal["1"] = "1"
-
-
-class ILVIS2Dataset(Dataset):
-    short_name: DatasetShortName = "ILVIS2"
-    version: Literal["1", "2"]
-
-
-class GLAH06Dataset(Dataset):
-    short_name: DatasetShortName = "GLAH06"
-    # Note: some dataset versions are padded with zeros like GLAH06. NSIDC
-    # documentation refers to "version 34", but CMR only recognizes "034".  As a
-    # rule-of-thumb, ICESat-2, SMAP, and GLAH/GLA datasets have zero padding.
-    version: Literal["034"] = "034"
-
-
 # This mirrors the bounding box construct in `earthaccess` and `icepyx`: a
 # list/float of len 4:
 # (lower_left_lon, lower_left_lat, upper_right_lon, upper_right_lat)
 BoundingBoxLike = list[float] | tuple[float, float, float, float]
-
-
-ALL_DATASETS: list[Dataset] = [
-    ILATM1BDataset(version="1"),
-    ILATM1BDataset(version="2"),
-    BLATM1BDataset(version="1"),
-    ILVIS2Dataset(version="1"),
-    ILVIS2Dataset(version="2"),
-    GLAH06Dataset(),
-]
 
 
 TemporalRange = tuple[dt.datetime | dt.date, dt.datetime | dt.date]
