@@ -6,8 +6,8 @@
 :caption: content
 
 getting-started.md
-iceflow-example.ipynb
-iceflow-with-icepyx.ipynb
+altimetry-data-overview.md
+notebooks/index.md
 contributing.md
 API Docs <api/nsidc>
 LICENSE

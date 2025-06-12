@@ -1,26 +1,16 @@
 # Getting started with iceflow
 
+## Altimetry Overview
+
+Before working with `iceflow` directly, it may be helpful to understand the
+basics about pre-IceBridge, IceBridge, ICESat/GLAS and ICESat-2 datasets. Learn
+about these `iceflow` supported datasets in
+[Altimetry Data at the NSIDC DAAC: Point Cloud Data Overview](./altimetry-data-overview)
+
 ## Jupyter Notebooks
 
-[Jupyter notebooks](https://docs.jupyter.org/en/latest/) provide executable
-examples of how to use `iceflow`:
-
-- [iceflow-example.ipynb](./iceflow-example.ipynb) provides an example of how to
-  search for, download, and interact with `ILATM1B v1` data for a small area of
-  interest. This notebook also illustrates how to perform
-  [ITRF](https://itrf.ign.fr/) transformations to facilitate comparisons across
-  datasets. To learn more about ITRF transformations, see the
-  [corrections.ipynb](https://github.com/nsidc/NSIDC-Data-Tutorials/blob/main/notebooks/iceflow/corrections.ipynb)
-  notebook in the
-  [NSIDC-Data-Tutorials GitHub repository](https://github.com/nsidc/NSIDC-Data-Tutorials).
-
-- [iceflow-with-icepyx.ipynb](./iceflow-with-icepyx.ipynb) shows how to search
-  for, download, and interact with a large amount of data across many datasets
-  supported by `iceflow`. It also illustrates how to utilize
-  [icepyx](https://icepyx.readthedocs.io/en/latest/) to find and access ICESat-2
-  data. Finally, the notebook provides a simple time-series analysis for
-  elevation change over an area of interest across `iceflow` supported datasets
-  and ICESat-2.
+Executable Jupyter Notebooks provide a great starting point for using `iceflow`.
+See [Jupyter Notebooks](./notebooks/index.md) for more information.
 
 ## API overview
 

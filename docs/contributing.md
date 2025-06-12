@@ -44,7 +44,8 @@ Available tasks:
 
 ## Jupyter Notebooks
 
-There are Jupyter Notebooks showing `iceflow` functionality under `notebooks/`.
+There are Jupyter Notebooks showing `iceflow` functionality under
+`docs/notebooks/`.
 
 To get started with developing existing or new notebooks, first install the
 notebook-specific dependencies:
@@ -56,15 +57,13 @@ pip install --editable .[notebooks]
 Then:
 
 ```
-cd notebooks/
+cd docs/notebooks/
 jupyter lab
 ```
 
 Develop notebooks and confirm that they work as expected. Before committing
-changes, clear all outputs.
-
-See below for information about adding rendered versions of notebooks to
-ReadTheDocs.
+changes, ensure all cells are evaluated so that outputs are populated. These
+notebooks are included in the docs and will be displayed on ReadTheDocs.
 
 ## Documentation
 
@@ -90,15 +89,6 @@ Please review this carefully and ensure that any changes are accurately
 reflected. On a merge to main, changes to the documentation will be reflected on
 the main, public-facing documentation site.
 
-> [!NOTE] Most of the documentation is designed to be generated automatically.
-> E.g., changes to the API and markdown documents will be automatically
-> refelcted in the documentation. The one exception are the jupyter notebooks
-> (e.g., `iceflow-example.ipynb`), which are static and must be re-generated
-> manually. Use the `invoke docs.render-notebooks-for-docs` task to re-generate
-> these files, and then commit any changes to the repository. See the
-> `notebooks/generate_rendered_notebooks_for_docs.sh` for how to add new
-> rendered notebooks to the docs.
-
 ## Releasing
 
 To release a new version of the software, first update the CHANGELOG.md to
@@ -111,11 +101,21 @@ $ bump-my-version bump {major|minor|patch}
 
 This will update files containing the software version number.
 
-> [!WARNING]
->
-> Please do not attempt to update version numbers by hand!
+:::{warning}
+
+Please do not attempt to update version numbers by hand!
+
+:::
 
 Commit these changes and, once ready, merge them into `main` (through the use of
 a Pull Request on a feature branch). Tag the commit you want to release on
 `main` to initiate a GitHub Action (GHA) that will release the package to
 anaconda.org.
+
+:::{warning}
+
+Jupyter notebooks found in `./notebooks` may need to be re-rendered, depending
+on the changes introduced. It is a good idea to review the notebooks and
+identify any necessary changes that should accompany a PR.
+
+:::
