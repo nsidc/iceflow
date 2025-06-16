@@ -12,6 +12,9 @@
   those on to CMR. This provides much greater flexibility over data search and
   makes the interface more consistent with `icepyx` and `earthaccess`.
   https://github.com/nsidc/iceflow/issues/51.
+- Remove restrictive `fetch_iceflow_df` function from public API. Users should
+  utilize the search, download, and read functions described in
+  `doc/getting-started.md` instead.
 
 # v0.3.0
 

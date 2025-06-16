@@ -8,59 +8,9 @@ from pathlib import Path
 import dask.dataframe as dd
 from loguru import logger
 
-from nsidc.iceflow.data.fetch import download_iceflow_results, find_iceflow_data
-from nsidc.iceflow.data.models import (
-    BoundingBoxLike,
-    Dataset,
-    IceflowDataFrame,
-    TemporalRange,
-)
 from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.data.supported_datasets import ALL_SUPPORTED_DATASETS
 from nsidc.iceflow.itrf.converter import transform_itrf
-
-
-def fetch_iceflow_df(
-    *,
-    bounding_box: BoundingBoxLike,
-    temporal: TemporalRange,
-    datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
-    output_dir: Path,
-    # TODO: also add option for target epoch!!
-    output_itrf: str | None = None,
-) -> IceflowDataFrame:
-    """Search for data matching parameters and return an IceflowDataframe.
-
-    Optionally transform data to the given ITRF for consistency.
-
-    Note: a potentially large amount of data may be returned, especially if the
-    user requests a large spatial/temporal area across multiple datasets. The
-    result may not even fit in memory!
-
-    Consider using `make_iceflow_parquet` to store downloaded data in parquet
-    format.
-    """
-
-    iceflow_search_reuslts = find_iceflow_data(
-        bounding_box=bounding_box,
-        temporal=temporal,
-        datasets=datasets,
-    )
-
-    downloaded_files = download_iceflow_results(
-        iceflow_search_results=iceflow_search_reuslts,
-        output_dir=output_dir,
-    )
-
-    iceflow_df = read_iceflow_datafiles(downloaded_files)
-
-    if output_itrf is not None:
-        iceflow_df = transform_itrf(
-            data=iceflow_df,
-            target_itrf=output_itrf,
-        )
-
-    return iceflow_df
 
 
 def make_iceflow_parquet(

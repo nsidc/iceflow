@@ -21,13 +21,13 @@ from nsidc.iceflow import (
     find_iceflow_data,
     make_iceflow_parquet,
 )
-from nsidc.iceflow.api import fetch_iceflow_df
 from nsidc.iceflow.data.models import (
     BoundingBoxLike,
     Dataset,
     IceflowDataFrame,
     TemporalRange,
 )
+from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.data.supported_datasets import (
     ALL_SUPPORTED_DATASETS,
     BLATM1BDataset,
@@ -35,6 +35,50 @@ from nsidc.iceflow.data.supported_datasets import (
     ILATM1BDataset,
     ILVIS2Dataset,
 )
+from nsidc.iceflow.itrf.converter import transform_itrf
+
+
+def _fetch_iceflow_df(
+    *,
+    bounding_box: BoundingBoxLike,
+    temporal: TemporalRange,
+    datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
+    output_dir: Path,
+    # TODO: also add option for target epoch!!
+    output_itrf: str | None = None,
+):
+    """Search for data matching parameters and return an IceflowDataframe.
+
+    Optionally transform data to the given ITRF for consistency.
+
+    Note: a potentially large amount of data may be returned, especially if the
+    user requests a large spatial/temporal area across multiple datasets. The
+    result may not even fit in memory!
+
+    Consider using `make_iceflow_parquet` to store downloaded data in parquet
+    format.
+    """
+
+    iceflow_search_reuslts = find_iceflow_data(
+        bounding_box=bounding_box,
+        temporal=temporal,
+        datasets=datasets,
+    )
+
+    downloaded_files = download_iceflow_results(
+        iceflow_search_results=iceflow_search_reuslts,
+        output_dir=output_dir,
+    )
+
+    iceflow_df = read_iceflow_datafiles(downloaded_files)
+
+    if output_itrf is not None:
+        iceflow_df = transform_itrf(
+            data=iceflow_df,
+            target_itrf=output_itrf,
+        )
+
+    return iceflow_df
 
 
 def test_atm1b_ilatm1b(tmp_path):
@@ -47,7 +91,7 @@ def test_atm1b_ilatm1b(tmp_path):
     )
 
     # Native ITRF is ITRF2005
-    results_ilatm1b_v1_2009 = fetch_iceflow_df(
+    results_ilatm1b_v1_2009 = _fetch_iceflow_df(
         datasets=[ILATM1BDataset(version="1")],
         bounding_box=common_bounding_box,
         temporal=(dt.date(2009, 11, 1), dt.date(2009, 12, 1)),
@@ -56,7 +100,7 @@ def test_atm1b_ilatm1b(tmp_path):
     )
 
     # Native ITRF is ITRF2008
-    results_ilatm1b_v2_2014 = fetch_iceflow_df(
+    results_ilatm1b_v2_2014 = _fetch_iceflow_df(
         datasets=[ILATM1BDataset(version="2")],
         bounding_box=common_bounding_box,
         temporal=(dt.date(2014, 11, 1), dt.date(2014, 12, 1)),
@@ -79,7 +123,7 @@ def test_atm1b_blatm1b(tmp_path):
         -65.0,
     )
 
-    results_blamt1b_v2_2014 = fetch_iceflow_df(
+    results_blamt1b_v2_2014 = _fetch_iceflow_df(
         datasets=[BLATM1BDataset()],
         bounding_box=common_bounding_box,
         temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
@@ -90,7 +134,7 @@ def test_atm1b_blatm1b(tmp_path):
 
 
 def test_ivlis2(tmp_path):
-    results_v1 = fetch_iceflow_df(
+    results_v1 = _fetch_iceflow_df(
         datasets=[ILVIS2Dataset(version="1")],
         bounding_box=(
             -120.0,
@@ -104,7 +148,7 @@ def test_ivlis2(tmp_path):
 
     assert (results_v1.ITRF == "ITRF2000").all()
 
-    results_v2 = fetch_iceflow_df(
+    results_v2 = _fetch_iceflow_df(
         datasets=[ILVIS2Dataset(version="2")],
         bounding_box=(
             -180,
@@ -132,7 +176,7 @@ def test_glah06(tmp_path):
         90,
     )
 
-    results = fetch_iceflow_df(
+    results = _fetch_iceflow_df(
         datasets=[GLAH06Dataset()],
         bounding_box=common_bounding_box,
         temporal=(
