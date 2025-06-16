@@ -4,7 +4,7 @@ import pandas as pd
 import pandera as pa
 import pytest
 
-from nsidc.iceflow.data.models import BoundingBox, IceflowDataFrame
+from nsidc.iceflow.data.models import IceflowDataFrame
 
 _mock_bad_df = pd.DataFrame(
     {
@@ -45,55 +45,3 @@ def _pa_check_out(df: pd.DataFrame) -> IceflowDataFrame:
 def test_pa_check_out():
     with pytest.raises(pa.errors.SchemaError):
         _pa_check_out(_mock_bad_df)
-
-
-def test_bounding_box():
-    bbox_with_kwargs = BoundingBox(
-        lower_left_lon=-103.125559,
-        lower_left_lat=-75.180563,
-        upper_right_lon=-102.677327,
-        upper_right_lat=-74.798063,
-    )
-
-    bbox_with_args = BoundingBox(
-        -103.125559,
-        -75.180563,
-        -102.677327,
-        -74.798063,
-    )
-
-    bbox_with_list = BoundingBox(
-        [
-            -103.125559,
-            -75.180563,
-            -102.677327,
-            -74.798063,
-        ]
-    )
-
-    assert bbox_with_kwargs == bbox_with_args
-    assert bbox_with_kwargs == bbox_with_list
-
-    bbox = bbox_with_kwargs
-
-    # Access via named values
-    assert bbox.lower_left_lon == -103.125559
-    assert bbox.lower_left_lat == -75.180563
-    assert bbox.upper_right_lon == -102.677327
-    assert bbox.upper_right_lat == -74.798063
-
-    # Access as a list/tuple
-    assert list(bbox) == [-103.125559, -75.180563, -102.677327, -74.798063]
-    assert tuple(bbox) == (-103.125559, -75.180563, -102.677327, -74.798063)
-
-    # Access via index
-    assert bbox[0] == -103.125559
-    assert bbox[1] == -75.180563
-    assert bbox[2] == -102.677327
-    assert bbox[3] == -74.798063
-
-    # Access via name
-    assert bbox["lower_left_lon"] == -103.125559
-    assert bbox["lower_left_lat"] == -75.180563
-    assert bbox["upper_right_lon"] == -102.677327
-    assert bbox["upper_right_lat"] == -74.798063
