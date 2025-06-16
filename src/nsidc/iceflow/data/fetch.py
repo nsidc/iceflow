@@ -3,14 +3,15 @@ from __future__ import annotations
 from pathlib import Path
 
 import earthaccess
+import pydantic
 from loguru import logger
 
 from nsidc.iceflow.data.models import (
-    ALL_DATASETS,
     Dataset,
     IceflowSearchResult,
     IceflowSearchResults,
 )
+from nsidc.iceflow.data.supported_datasets import ALL_SUPPORTED_DATASETS
 
 
 def _find_iceflow_data_for_dataset(
@@ -75,9 +76,10 @@ def _download_iceflow_search_result(
     return downloaded_filepaths
 
 
+@pydantic.validate_call()
 def find_iceflow_data(
     *,
-    datasets: list[Dataset] = ALL_DATASETS,
+    datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
     **search_kwargs,
 ) -> IceflowSearchResults:
     """Find iceflow-compatible data using search kwargs.
