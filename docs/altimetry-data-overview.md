@@ -185,6 +185,9 @@ ICESat-2.
 - [OpenAltimetry](https://openaltimetry.earthdatacloud.nasa.gov/data/): Advanced
   discovery, processing, and visualization services for ICESat and ICESat-2
   altimeter data
+- [icepyx](https://icepyx.readthedocs.io/en/latest/): icepyx is both a software
+  library and a community composed of ICESat-2 data users, developers, and the
+  scientific community.
 - [ITS_LIVE](https://its-live.jpl.nasa.gov/): A NASA MEaSUREs project to provide
   automated, low latency, global glacier flow and elevation change data sets.
 
