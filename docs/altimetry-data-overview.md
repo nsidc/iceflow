@@ -91,7 +91,7 @@ pulses are used to determine elevation data.
 ```{note}
 
 We recommend using the [_icepyx_](https://github.com/icesat2py/icepyx)
-library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `icelfow` in the [Using iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
+library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `iceflow` in the [Using iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
 
 ```
 
