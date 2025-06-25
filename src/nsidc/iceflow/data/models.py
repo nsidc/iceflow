@@ -38,22 +38,41 @@ class ATM1BSchema(CommonDataColumnsSchema):
     pulse_width: Series[float] = pa.Field(nullable=True, coerce=True)
 
 
-# Note/TODO: the ILVIS2 data contain multiple sets of lat/lon/elev. The common
+# Note: the ILVIS2 data contain multiple sets of lat/lon/elev. The common
 # schema assumes one set of lat/lon/elev which is used for the ITRF
 # transformation code.
 class ILVIS2Schema(CommonDataColumnsSchema):
+    """ILVIS2 Data Schema.
+
+    Note that ILVIS2 data contain multiple sets of lat/lon/elev.
+
+    * GLAT/GLON/GZ represent the center of the lowest mode in the waveform.
+    * HLAT/HLON/HZ represent the center of the highest detected mode within the
+      waveform. Both of these sets of lat/lon/elev are available across v1 and
+      v2 ILIVS data.
+
+    ILVIS V1 data:
+    * CLAT/CLON/ZC represent the centroid of the corresponding LVIS Level-1B waveform.
+
+    ILVIS V2 data:
+    * TLAT/TLON/ZT, which represent the highest detected signal
+    """
+
     # Common columns
     LFID: Series[float] = pa.Field(nullable=True, coerce=True)
     SHOTNUMBER: Series[float] = pa.Field(nullable=True, coerce=True)
     TIME: Series[float] = pa.Field(nullable=True, coerce=True)
+    # ZG/GLAT/GLON: the center of the lowest detected mode within the waveform
     ZG: Series[float] = pa.Field(nullable=True, coerce=True)
     GLAT: Series[float] = pa.Field(nullable=True, coerce=True)
     GLON: Series[float] = pa.Field(nullable=True, coerce=True)
+    # HLAT/HLON/ZH: the center of the highest detected mode within the waveform
     HLAT: Series[float] = pa.Field(nullable=True, coerce=True)
     HLON: Series[float] = pa.Field(nullable=True, coerce=True)
     ZH: Series[float] = pa.Field(nullable=True, coerce=True)
 
     # V104-specific
+    # CLAT/CLON/ZC: Centroid of the corresponding LVIS Level-1B waveform
     CLAT: Series[float] = pa.Field(nullable=True, coerce=True)
     CLON: Series[float] = pa.Field(nullable=True, coerce=True)
     ZC: Series[float] = pa.Field(nullable=True, coerce=True)
@@ -66,6 +85,7 @@ class ILVIS2Schema(CommonDataColumnsSchema):
     COMPLEXITY: Series[float] = pa.Field(nullable=True, coerce=True)
     INCIDENT_ANGLE: Series[float] = pa.Field(nullable=True, coerce=True)
     RANGE: Series[float] = pa.Field(nullable=True, coerce=True)
+    # RH%%%: Height (relative to ZG) at which % of the waveform energy occurs
     RH10: Series[float] = pa.Field(nullable=True, coerce=True)
     RH15: Series[float] = pa.Field(nullable=True, coerce=True)
     RH20: Series[float] = pa.Field(nullable=True, coerce=True)
@@ -89,6 +109,7 @@ class ILVIS2Schema(CommonDataColumnsSchema):
     RH98: Series[float] = pa.Field(nullable=True, coerce=True)
     RH99: Series[float] = pa.Field(nullable=True, coerce=True)
     RH100: Series[float] = pa.Field(nullable=True, coerce=True)
+    # Highest detected signal
     TLAT: Series[float] = pa.Field(nullable=True, coerce=True)
     TLON: Series[float] = pa.Field(nullable=True, coerce=True)
     ZT: Series[float] = pa.Field(nullable=True, coerce=True)

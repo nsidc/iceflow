@@ -203,15 +203,8 @@ def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
     data = _ilvis2_data(filepath, file_date, the_fields)
     data["ITRF"] = itrf_str
 
-    # TODO: this data does not have a single set of latitude, longitude, and
-    # elevation fields. Instead, it has e.g., "CLON" and "GLON" and "HLON". In
-    # the original `valkyrie` service code, it looks like "GLON", "GLAT", and
-    # "ZG" cols were used as for the points stored in the valkyrie database and
-    # transformed by the ITRF transformation service. Ideally, we support
-    # consistent transformation of the ITRF across all lat/lon/elev
-    # fields. E.g., a user may be more interested in looking at the "CLON",
-    # "CLAT", and "ZC" fields instead.
-    # For now, we will replicate the behavior of `valkyrie`:
+    # GLAT/GLON/GZ represent the center of the lowest mode in the waveform.
+    # This replicates `valkyrie`'s behavior.
     data["latitude"] = data["GLAT"]
     data["longitude"] = data["GLON"]
     data["elevation"] = data["ZG"]
