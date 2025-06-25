@@ -17,6 +17,7 @@ class CommonDataColumnsSchema(pa.DataFrameModel):
     latitude: Series[float] = pa.Field(coerce=True)
     longitude: Series[float] = pa.Field(coerce=True)
     elevation: Series[float] = pa.Field(coerce=True)
+    dataset: str
 
 
 class ATM1BSchema(CommonDataColumnsSchema):

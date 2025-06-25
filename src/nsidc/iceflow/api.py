@@ -61,8 +61,6 @@ def make_iceflow_parquet(
         )
 
         # Add a string col w/ dataset name and version.
-        short_name, version = subdir.name.split("_")
-        iceflow_df["dataset"] = [f"{short_name}v{version}"] * len(iceflow_df.latitude)
         common_columns = ["latitude", "longitude", "elevation", "dataset"]
         common_dask_df = dd.from_pandas(iceflow_df[common_columns])
         if parquet_subdir.exists():

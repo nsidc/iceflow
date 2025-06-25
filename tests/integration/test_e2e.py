@@ -99,6 +99,8 @@ def test_atm1b_ilatm1b(tmp_path):
         output_itrf=target_itrf,
     )
 
+    assert (results_ilatm1b_v1_2009.dataset == "ILATM1Bv1").all()
+
     # Native ITRF is ITRF2008
     results_ilatm1b_v2_2014 = _fetch_iceflow_df(
         datasets=[ILATM1BDataset(version="2")],
@@ -107,6 +109,8 @@ def test_atm1b_ilatm1b(tmp_path):
         output_dir=tmp_path,
         output_itrf=target_itrf,
     )
+
+    assert (results_ilatm1b_v2_2014.dataset == "ILATM1Bv2").all()
 
     complete_df = IceflowDataFrame(
         pd.concat([results_ilatm1b_v1_2009, results_ilatm1b_v2_2014])
@@ -123,14 +127,16 @@ def test_atm1b_blatm1b(tmp_path):
         -65.0,
     )
 
-    results_blamt1b_v2_2014 = _fetch_iceflow_df(
+    results_blamt1b_v1_2014 = _fetch_iceflow_df(
         datasets=[BLATM1BDataset()],
         bounding_box=common_bounding_box,
         temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
         output_dir=tmp_path,
     )
 
-    assert (results_blamt1b_v2_2014.ITRF == "ITRF2000").all()
+    assert (results_blamt1b_v1_2014.dataset == "BLATM1Bv1").all()
+
+    assert (results_blamt1b_v1_2014.ITRF == "ITRF2000").all()
 
 
 def test_ivlis2(tmp_path):
@@ -146,6 +152,8 @@ def test_ivlis2(tmp_path):
         output_dir=tmp_path,
     )
 
+    assert (results_v1.dataset == "ILVIS2v1").all()
+
     assert (results_v1.ITRF == "ITRF2000").all()
 
     results_v2 = _fetch_iceflow_df(
@@ -159,6 +167,8 @@ def test_ivlis2(tmp_path):
         temporal=(dt.datetime(2017, 8, 25, 0), dt.datetime(2017, 8, 25, 14, 30)),
         output_dir=tmp_path,
     )
+
+    assert (results_v2.dataset == "ILVIS2v2").all()
 
     assert (results_v2.ITRF == "ITRF2008").all()
 
@@ -186,6 +196,7 @@ def test_glah06(tmp_path):
         output_dir=tmp_path,
     )
 
+    assert (results.dataset == "GLAH06v034").all()
     assert (results.ITRF == "ITRF2008").all()
 
 

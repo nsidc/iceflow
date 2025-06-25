@@ -23,6 +23,7 @@ def test_transform_itrf():
             "longitude": [-50, -50],
             "elevation": [1, 1],
             "ITRF": ["ITRF93", "ITRF93"],
+            "dataset": ["foov1", "foov2"],
         },
     )
 
@@ -94,6 +95,7 @@ def test_transform_itrf_ectt():
             "latitude": [lat, lat],
             "elevation": [elev, elev],
             "ITRF": ["ITRF93", "ITRF93"],
+            "dataset": ["foov1", "foov2"],
         },
     )
 

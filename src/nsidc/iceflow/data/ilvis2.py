@@ -191,12 +191,14 @@ def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
         # The user guide indicates ILVIS2 v1 data uses ITRF2000 as a reference frame:
         # https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v001-userguide.pdf
         itrf_str = "ITRF2000"
+        dataset = "ILVIS2v1"
     else:
         # This corresponds to ILVIS v2
         the_fields = ILVIS2_V202b_FIELDS
         # The user guide indicates ILVIS2 v1 data uses ITRF2008 as a reference frame:
         # https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v002-userguide.pdf
         itrf_str = "ITRF2008"
+        dataset = "ILVIS2v2"
 
     file_date = _file_date(filename)
 
@@ -208,6 +210,7 @@ def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
     data["latitude"] = data["GLAT"]
     data["longitude"] = data["GLON"]
     data["elevation"] = data["ZG"]
+    data["dataset"] = dataset
 
     data = data.set_index("utc_datetime")
 

@@ -253,6 +253,7 @@ def glah06_data(filepath: Path) -> GLAH06DataFrame:
     df["latitude"] = df["d_lat"]
     df["longitude"] = df["d_lon"]
     df["elevation"] = df["d_elev"]
+    df["dataset"] = "GLAH06v034"
 
     # We index the data by utc datetime.
     df = df.set_index("utc_datetime")
