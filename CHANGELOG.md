@@ -11,6 +11,8 @@
   lat/lon/elev fields.
 - Update data model for `IceflowDataFrame` to include `dataset`, which gives the
   dataset short name and version as a string (e.g., ILVIS v2 is "ILVISv2").
+- Add `total_size_mb` property to `IceflowSearchResult` and log size when
+  downloading.
 
 # v1.0.0
 

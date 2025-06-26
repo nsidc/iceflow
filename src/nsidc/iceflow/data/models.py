@@ -247,5 +247,10 @@ class IceflowSearchResult(pydantic.BaseModel):
     # this that type
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
+    @property
+    def total_size_mb(self):
+        granule_sizes_mb = [granule.size() for granule in self.granules]
+        return sum(granule_sizes_mb)
+
 
 IceflowSearchResults = list[IceflowSearchResult]

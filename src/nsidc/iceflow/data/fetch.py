@@ -61,6 +61,7 @@ def _download_iceflow_search_result(
 
     logger.info(
         f"Downloading {len(iceflow_search_result.granules)} granules"
+        f" (approx. {iceflow_search_result.total_size_mb} MB)"
         f" to {output_subdir}."
     )
 
