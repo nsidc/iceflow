@@ -117,7 +117,8 @@ further mission information and documentation for each data set:
 | [BLATM L1B](https://nsidc.org/data/BLATM1B)               | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 23 Jun. 1993 - 30 Oct. 2008                    | Pre-IceBridge | ATM                                                  |
 | [ILATM L1B V1](https://nsidc.org/data/ILATM1B/versions/1) | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 31 Mar. 2009 - 8 Nov. 2012 <br> (updated 2013) | IceBridge     | ATM                                                  |
 | [ILATM L1B V2](https://nsidc.org/data/ILATM1B/versions/2) | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 20 Mar. 2013 - 16 May 2019 <br> (updated 2020) | IceBridge     | ATM                                                  |
-| [ILVIS2](https://nsidc.org/data/ILVIS2)                   | North: N:90, S: 60, E:180, W:-180                                          | 25 Aug. 2017 - 20 Sept. 2017                   | IceBridge     | ALTIMETERS, LASERS, LVIS                             |
+| [ILVIS2 v1](https://nsidc.org/data/ilvis2/versions/1)     | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 14 Apr. 2009 - 31 Oct. 2015                    | IceBridge     | ALTIMETERS, LASERS, LVIS                             |
+| [ILVIS2 v2](https://nsidc.org/data/ilvis2/versions/2)     | North: N:90, S: 60, E:180, W:-180                                          | 25 Aug. 2017 - 20 Sept. 2017                   | IceBridge     | ALTIMETERS, LASERS, LVIS                             |
 | [GLAH06](https://nsidc.org/data/GLAH06/)                  | Global: N:86, S: -86, E:180, W:-180                                        | 20 Feb. 2003 - 11 Oct. 2009                    | ICESat/GLAS   | ALTIMETERS, CD, GLAS, GPS, <br> GPS Receiver, LA, PC |
 
 ---
