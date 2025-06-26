@@ -12,11 +12,6 @@ import pandera as pa
 
 from nsidc.iceflow.data.models import ILVIS2DataFrame
 
-# TODO: consider coord set names and think about if we should just expose the
-# two sets that are common across both v1 and v2. It would be nice to expose the
-# flexibility for both, but when read_datafiles is used across multiple datasets
-# this could cause a problem. E.g., users might try to use one that's only
-# available in v1, even though v2 is also specified.
 ILVIS2_COORDINATE_SETS = Literal["low_mode", "high_mode", "centroid", "highest_signal"]
 ILVIS2_COORDINATE_SET_MAPPING: dict[ILVIS2_COORDINATE_SETS, dict[str, str]] = {
     # The center of the lowest detected mode within the waveform. Available in
