@@ -53,7 +53,7 @@ class ILVIS2Schema(CommonDataColumnsSchema):
     * GLAT/GLON/GZ represent the center of the lowest mode in the waveform.
     * HLAT/HLON/HZ represent the center of the highest detected mode within the
       waveform. Both of these sets of lat/lon/elev are available across v1 and
-      v2 ILIVS data.
+      v2 ILVIS2 data.
 
     ILVIS V1 data:
     * CLAT/CLON/ZC represent the centroid of the corresponding LVIS Level-1B waveform.
