@@ -1,5 +1,12 @@
 # v1.1.0
 
+- Support selecting alternative lat/lon/elev triplet as primary lat/lon/elev
+  fields for ILVIS2 data. By default, the `low_mode` coordinates are used, which
+  represent the center of the lowest detected mode within the waveform. This
+  replicates the behavior of the valkyrie service this code is based on. Users
+  may now choose between the following coordinate sets: `low_mode` (the
+  default), `high_mode`, `centroid` (ILVIS2 v1 only), and `highest_signal`
+  (ILVIS2 v2 only).
 - Update documentation around ILVIS2 datasets and their multiple tuplets of
   lat/lon/elev fields.
 - Update data model for `IceflowDataFrame` to include `dataset`, which gives the

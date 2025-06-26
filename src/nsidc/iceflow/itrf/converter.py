@@ -125,15 +125,16 @@ def transform_itrf(
     https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
 
     Note that ILVIS2 data contain more than one set of
-    latitude/longitude/elevation variables (e.g., HLAT, HLON, ZH). By default,
-    GLAT/GLON/ZG are used for the latitude/longitude/elevation variables. To
-    transform an alternative set of coordinates:
-
+    latitude/longitude/elevation variables (e.g., HLAT/HLON/ZH,
+    CLAT/CLON/ZC). This function only transforms the primary
+    latitude/longitude/elevation fields in the provided dataframe. Use the
+    `ilvis2_coordinate_set` kwarg on `read_iceflow_datafile(s)` to select an
+    different primary set of latitude/longitude/elevation fields. Alternatively,
+    manually set the fields:
     ```
-    data["latitude"] = data["HLAT"]
-    data["longitude"] = data["HLON"]
-    data["elevation"] = data["HG"]
-    transform_itrf(data=data, ...)
+    # TLAT/TLON/TZ are only available in ILVIS2v2 data:
+    sel_ilvis2v2 = data.dataset == "ILVIS2v2"
+    data.loc[sel_ilvis2v2, ["latitude", "longitude", "elevation"]] = data.loc[sel_ilvis2v2, ["TLAT", "TLON", "ZT"]]
     ```
     """
     if not check_itrf(target_itrf):

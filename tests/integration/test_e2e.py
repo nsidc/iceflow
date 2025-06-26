@@ -21,6 +21,10 @@ from nsidc.iceflow import (
     find_iceflow_data,
     make_iceflow_parquet,
 )
+from nsidc.iceflow.data.ilvis2 import (
+    ILVIS2_COORDINATE_SETS,
+    ILVIS2_DEFAULT_COORDINATE_SET,
+)
 from nsidc.iceflow.data.models import (
     BoundingBoxLike,
     Dataset,
@@ -44,8 +48,8 @@ def _fetch_iceflow_df(
     temporal: TemporalRange,
     datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
     output_dir: Path,
-    # TODO: also add option for target epoch!!
     output_itrf: str | None = None,
+    ilvis2_coordinate_set: ILVIS2_COORDINATE_SETS = ILVIS2_DEFAULT_COORDINATE_SET,
 ):
     """Search for data matching parameters and return an IceflowDataframe.
 
@@ -70,7 +74,9 @@ def _fetch_iceflow_df(
         output_dir=output_dir,
     )
 
-    iceflow_df = read_iceflow_datafiles(downloaded_files)
+    iceflow_df = read_iceflow_datafiles(
+        downloaded_files, ilvis2_coordinate_set=ilvis2_coordinate_set
+    )
 
     if output_itrf is not None:
         iceflow_df = transform_itrf(
@@ -176,6 +182,28 @@ def test_ivlis2(tmp_path):
     complete_df = IceflowDataFrame(pd.concat([results_v1, results_v2]))
 
     assert complete_df is not None
+
+    # Confirm that we get the alt. set of ilvis2 coordinates when specified.
+    results_v2_alt_coords = _fetch_iceflow_df(
+        datasets=[ILVIS2Dataset(version="2")],
+        bounding_box=(
+            -180,
+            60.0,
+            180,
+            90,
+        ),
+        temporal=(dt.datetime(2017, 8, 25, 0), dt.datetime(2017, 8, 25, 14, 30)),
+        output_dir=tmp_path,
+        ilvis2_coordinate_set="highest_signal",
+    )
+    assert (results_v2_alt_coords.latitude == results_v2_alt_coords.TLAT).all()
+    assert (results_v2_alt_coords.longitude == results_v2_alt_coords.TLON).all()
+    assert (results_v2_alt_coords.elevation == results_v2_alt_coords.ZT).all()
+
+    # Results v1 should use the default ("low_mode")
+    assert (results_v2.latitude == results_v2.GLAT).all()
+    assert (results_v2.longitude == results_v2.GLON).all()
+    assert (results_v2.elevation == results_v2.ZG).all()
 
 
 def test_glah06(tmp_path):
