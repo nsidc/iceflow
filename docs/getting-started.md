@@ -101,14 +101,15 @@ from nsidc.iceflow import make_iceflow_parquet
 parquet_path = make_iceflow_parquet(
     data_dir=Path("/path/to/data/dir/"),
     target_itrf="ITRF2014",
+    ilvis2_coordinate_set="low_mode",
 )
 df = dd.read_parquet(parquet_path)
 ```
 
 Note that `make_iceflow_parquet` creates a parquet datastore for the data in the
 provided `data_dir` with the data transformed into a common
-[ITRF](https://itrf.ign.fr/) to facilitate analysis. Only datetime, lat, lon,
-and elevation fields are preserved in the parquet datastore.
+[ITRF](https://itrf.ign.fr/) to facilitate analysis. Only datetime, latitude,
+longitude, elevation, and dataset fields are preserved in the parquet datastore.
 
 To access and analyze the full data record in the source files, use
 [`read_iceflow_datafiles`](nsidc.iceflow.read_iceflow_datafiles):
@@ -117,7 +118,10 @@ To access and analyze the full data record in the source files, use
 from nsidc.iceflow import read_iceflow_datafiles
 
 # Read all of the data in the source files - not just lat/lon/elev.
-df = read_iceflow_datafiles(downloaded_files)
+df = read_iceflow_datafiles(
+    downloaded_files,
+    ilvis2_coordinate_set="low_mode",
+)
 
 # Optional: transform lat/lon/elev to common ITRF:
 from nsidc.iceflow import transform_itrf
@@ -130,3 +134,12 @@ df = transform_itrf(
 Note that `read_iceflow_datafiles` reads all of the data from the given
 filepaths. This could be a large amount of data, and could cause your program to
 crash if physical memory limits are exceeded.
+
+#### Special considerations for ILVIS2 data
+
+Users of ILVIS2 data should be aware that ILVIS2 data contains multiple sets of
+lat/lon/elev that may be of interest. By default, the `low_mode` set is used as
+the primary set of latitude/longitude/elevation used by `iceflow`.
+
+See [ILVIS2 data](./altimetry-data-overview.md#ilvis2-data) for more
+information.

@@ -130,6 +130,36 @@ guides or contact NSIDC user services at nsidc@nsidc.org
 
 ```
 
+### ILVIS2 data
+
+ILVIS2 contain multiple sets of latitude/longitude/elevation values.
+
+- `GLAT`/`GLON`/`GZ` represent the center of the lowest mode in the waveform.
+- `HLAT`/`HLON`/`HZ` represent the center of the highest detected mode within
+  the waveform. Both of these sets of lat/lon/elev are available across v1 and
+  v2 ILIVS data.
+
+ILVIS V1 data:
+
+- `CLAT`/`CLON`/`ZC` represent the centroid of the corresponding LVIS Level-1B
+  waveform.
+
+ILVIS V2 data:
+
+- `TLAT`/`TLON`/`ZT`, which represent the highest detected signal.
+
+By default, `iceflow` will use `GLAT`/`GLON`/`GZ` as the primary
+latitude/longitude/elevation fields in `IceflowDataFrame`s. Use the
+`ilvis2_coordinate_set` kwarg on `read_iceflow_datafile(s)` or
+`make_iceflow_parquet` to select an different primary set of
+latitude/longitude/elevation fields. Alternatively, manually set the fields:
+
+```
+# TLAT/TLON/TZ are only available in ILVIS2v2 data:
+sel_ilvis2v2 = data.dataset == "ILVIS2v2"
+data.loc[sel_ilvis2v2, ["latitude", "longitude", "elevation"]] = data.loc[sel_ilvis2v2, ["TLAT", "TLON", "ZT"]]
+```
+
 ## Challenges
 
 The wealth of data from these missions presents an opportunity to study the
