@@ -4,12 +4,46 @@ import datetime as dt
 import re
 from collections import namedtuple
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pandas as pd
 import pandera as pa
 
 from nsidc.iceflow.data.models import ILVIS2DataFrame
+
+ILVIS2_COORDINATE_SETS = Literal["low_mode", "high_mode", "centroid", "highest_signal"]
+ILVIS2_COORDINATE_SET_MAPPING: dict[ILVIS2_COORDINATE_SETS, dict[str, str]] = {
+    # The center of the lowest detected mode within the waveform. Available in
+    # both v1 and v2.
+    "low_mode": {
+        "latitude": "GLAT",
+        "longitude": "GLON",
+        "elevation": "ZG",
+    },
+    # The center of the highest detected mode within the waveform. Available in
+    # both v1 and v2.
+    "high_mode": {
+        "latitude": "HLAT",
+        "longitude": "HLON",
+        "elevation": "ZH",
+    },
+    # Centroid of the corresponding LVIS Level-1B waveform. v1 only.
+    "centroid": {
+        "latitude": "CLAT",
+        "longitude": "CLON",
+        "elevation": "ZC",
+    },
+    # Highest detected signal. v2 only.
+    "highest_signal": {
+        "latitude": "TLAT",
+        "longitude": "TLON",
+        "elevation": "ZT",
+    },
+}
+# In the valkyrie service that this code is based on, only the low_mode was
+# exposed to users. This default replicates that behavior.
+ILVIS2_DEFAULT_COORDINATE_SET: ILVIS2_COORDINATE_SETS = "low_mode"
 
 Field = namedtuple("Field", ["name", "type", "scale_factor"])
 
@@ -160,7 +194,10 @@ def _ilvis2_data(filepath: Path, file_date: dt.date, fields) -> pd.DataFrame:
 
 
 @pa.check_types()
-def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
+def ilvis2_data(
+    filepath: Path,
+    coordinate_set: ILVIS2_COORDINATE_SETS = ILVIS2_DEFAULT_COORDINATE_SET,
+) -> ILVIS2DataFrame:
     """Return the ilvis2 data given a filepath.
 
     Parameters
@@ -187,34 +224,39 @@ def ilvis2_data(filepath: Path) -> ILVIS2DataFrame:
 
     if year < 2017:
         # This corresponds to ILVIS v1
+        dataset = "ILVIS2v1"
         the_fields = ILVIS2_V104_FIELDS
         # The user guide indicates ILVIS2 v1 data uses ITRF2000 as a reference frame:
         # https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v001-userguide.pdf
         itrf_str = "ITRF2000"
+        # Ensure that the highest_signal coordinate set has not been selected.
+        if coordinate_set == "highest_signal":
+            raise ValueError(
+                "ILVIS coordinate set 'highest_signal' is only available in v2 data."
+            )
     else:
         # This corresponds to ILVIS v2
+        dataset = "ILVIS2v2"
         the_fields = ILVIS2_V202b_FIELDS
         # The user guide indicates ILVIS2 v1 data uses ITRF2008 as a reference frame:
         # https://nsidc.org/sites/default/files/documents/user-guide/ilvis2-v002-userguide.pdf
         itrf_str = "ITRF2008"
+        # Ensure that the centroid coordinate set has not been selected.
+        if coordinate_set == "centroid":
+            raise ValueError(
+                "ILVIS coordinate set 'centroid' is only available in v1 data."
+            )
 
     file_date = _file_date(filename)
 
     data = _ilvis2_data(filepath, file_date, the_fields)
     data["ITRF"] = itrf_str
+    data["dataset"] = dataset
 
-    # TODO: this data does not have a single set of latitude, longitude, and
-    # elevation fields. Instead, it has e.g., "CLON" and "GLON" and "HLON". In
-    # the original `valkyrie` service code, it looks like "GLON", "GLAT", and
-    # "ZG" cols were used as for the points stored in the valkyrie database and
-    # transformed by the ITRF transformation service. Ideally, we support
-    # consistent transformation of the ITRF across all lat/lon/elev
-    # fields. E.g., a user may be more interested in looking at the "CLON",
-    # "CLAT", and "ZC" fields instead.
-    # For now, we will replicate the behavior of `valkyrie`:
-    data["latitude"] = data["GLAT"]
-    data["longitude"] = data["GLON"]
-    data["elevation"] = data["ZG"]
+    coordinate_fields = ILVIS2_COORDINATE_SET_MAPPING[coordinate_set]
+    data["latitude"] = data[coordinate_fields["latitude"]]
+    data["longitude"] = data[coordinate_fields["longitude"]]
+    data["elevation"] = data[coordinate_fields["elevation"]]
 
     data = data.set_index("utc_datetime")
 

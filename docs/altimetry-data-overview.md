@@ -91,7 +91,7 @@ pulses are used to determine elevation data.
 ```{note}
 
 We recommend using the [_icepyx_](https://github.com/icesat2py/icepyx)
-library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `icelfow` in the [Using iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
+library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `iceflow` in the [Using iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
 
 ```
 
@@ -117,7 +117,8 @@ further mission information and documentation for each data set:
 | [BLATM L1B](https://nsidc.org/data/BLATM1B)               | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 23 Jun. 1993 - 30 Oct. 2008                    | Pre-IceBridge | ATM                                                  |
 | [ILATM L1B V1](https://nsidc.org/data/ILATM1B/versions/1) | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 31 Mar. 2009 - 8 Nov. 2012 <br> (updated 2013) | IceBridge     | ATM                                                  |
 | [ILATM L1B V2](https://nsidc.org/data/ILATM1B/versions/2) | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 20 Mar. 2013 - 16 May 2019 <br> (updated 2020) | IceBridge     | ATM                                                  |
-| [ILVIS2](https://nsidc.org/data/ILVIS2)                   | North: N:90, S: 60, E:180, W:-180                                          | 25 Aug. 2017 - 20 Sept. 2017                   | IceBridge     | ALTIMETERS, LASERS, LVIS                             |
+| [ILVIS2 v1](https://nsidc.org/data/ilvis2/versions/1)     | South: N:-53, S: -90, E:180, W:-180 <br> North: N:90, S: 60, E:180, W:-180 | 14 Apr. 2009 - 31 Oct. 2015                    | IceBridge     | ALTIMETERS, LASERS, LVIS                             |
+| [ILVIS2 v2](https://nsidc.org/data/ilvis2/versions/2)     | North: N:90, S: 60, E:180, W:-180                                          | 25 Aug. 2017 - 20 Sept. 2017                   | IceBridge     | ALTIMETERS, LASERS, LVIS                             |
 | [GLAH06](https://nsidc.org/data/GLAH06/)                  | Global: N:86, S: -86, E:180, W:-180                                        | 20 Feb. 2003 - 11 Oct. 2009                    | ICESat/GLAS   | ALTIMETERS, CD, GLAS, GPS, <br> GPS Receiver, LA, PC |
 
 ---
@@ -127,6 +128,36 @@ further mission information and documentation for each data set:
 If you have questions about the data sets please refer to the user
 guides or contact NSIDC user services at nsidc@nsidc.org
 
+```
+
+### ILVIS2 data
+
+ILVIS2 contain multiple sets of latitude/longitude/elevation values.
+
+- `GLAT`/`GLON`/`GZ` represent the center of the lowest mode in the waveform.
+- `HLAT`/`HLON`/`HZ` represent the center of the highest detected mode within
+  the waveform. Both of these sets of lat/lon/elev are available across v1 and
+  v2 ILIVS data.
+
+ILVIS V1 data:
+
+- `CLAT`/`CLON`/`ZC` represent the centroid of the corresponding LVIS Level-1B
+  waveform.
+
+ILVIS V2 data:
+
+- `TLAT`/`TLON`/`ZT`, which represent the highest detected signal.
+
+By default, `iceflow` will use `GLAT`/`GLON`/`GZ` as the primary
+latitude/longitude/elevation fields in `IceflowDataFrame`s. Use the
+`ilvis2_coordinate_set` kwarg on `read_iceflow_datafile(s)` or
+`make_iceflow_parquet` to select an different primary set of
+latitude/longitude/elevation fields. Alternatively, manually set the fields:
+
+```
+# TLAT/TLON/TZ are only available in ILVIS2v2 data:
+sel_ilvis2v2 = data.dataset == "ILVIS2v2"
+data.loc[sel_ilvis2v2, ["latitude", "longitude", "elevation"]] = data.loc[sel_ilvis2v2, ["TLAT", "TLON", "ZT"]]
 ```
 
 ## Challenges
@@ -185,6 +216,9 @@ ICESat-2.
 - [OpenAltimetry](https://openaltimetry.earthdatacloud.nasa.gov/data/): Advanced
   discovery, processing, and visualization services for ICESat and ICESat-2
   altimeter data
+- [icepyx](https://icepyx.readthedocs.io/en/latest/): icepyx is both a software
+  library and a community composed of ICESat-2 data users, developers, and the
+  scientific community.
 - [ITS_LIVE](https://its-live.jpl.nasa.gov/): A NASA MEaSUREs project to provide
   automated, low latency, global glacier flow and elevation change data sets.
 

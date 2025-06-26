@@ -105,7 +105,8 @@ def transform_itrf(
     # and the mean of that chunk is used to determine the plate name.
     plate: str | None = None,
 ) -> IceflowDataFrame:
-    """Transform the data's lon/lat/elev from the source ITRF to the target ITRF.
+    """Transform the data's latitude/longitude/elevation variables from the
+    source ITRF to the target ITRF.
 
     If a `target_epoch` is given, coordinate propagation is performed via a
     plate motion model (PMM) defined for the target_itrf. The target epoch
@@ -122,6 +123,19 @@ def transform_itrf(
     https://proj.org/en/9.3/resource_files.html#init-files). For example,
     ITRF2014 parameters are defined here:
     https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
+
+    Note that ILVIS2 data contain more than one set of
+    latitude/longitude/elevation variables (e.g., HLAT/HLON/ZH,
+    CLAT/CLON/ZC). This function only transforms the primary
+    latitude/longitude/elevation fields in the provided dataframe. Use the
+    `ilvis2_coordinate_set` kwarg on `read_iceflow_datafile(s)` to select an
+    different primary set of latitude/longitude/elevation fields. Alternatively,
+    manually set the fields:
+    ```
+    # TLAT/TLON/TZ are only available in ILVIS2v2 data:
+    sel_ilvis2v2 = data.dataset == "ILVIS2v2"
+    data.loc[sel_ilvis2v2, ["latitude", "longitude", "elevation"]] = data.loc[sel_ilvis2v2, ["TLAT", "TLON", "ZT"]]
+    ```
     """
     if not check_itrf(target_itrf):
         err_msg = (

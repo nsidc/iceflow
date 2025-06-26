@@ -440,15 +440,19 @@ def atm1b_data(filepath: Path) -> ATM1BDataFrame:
     if year >= 2013:
         file_date = _ilatm1b_date(filename)
         data = _ilatm1bv2_data(filepath, file_date)
+        dataset = "ILATM1Bv2"
     elif year >= 2009:
         file_date = _ilatm1b_date(filename)
         data = _atm1b_qfit_data(filepath, file_date)
+        dataset = "ILATM1Bv1"
     else:
         file_date = _blatm1bv1_date(filename)
         data = _atm1b_qfit_data(filepath, file_date)
+        dataset = "BLATM1Bv1"
 
     itrf = extract_itrf(filepath)
     data["ITRF"] = itrf
+    data["dataset"] = dataset
 
     data = data.set_index("utc_datetime")
 

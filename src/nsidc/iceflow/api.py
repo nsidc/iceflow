@@ -8,6 +8,7 @@ from pathlib import Path
 import dask.dataframe as dd
 from loguru import logger
 
+from nsidc.iceflow.data.ilvis2 import ILVIS2_DEFAULT_COORDINATE_SET
 from nsidc.iceflow.data.read import read_iceflow_datafiles
 from nsidc.iceflow.data.supported_datasets import ALL_SUPPORTED_DATASETS
 from nsidc.iceflow.itrf.converter import transform_itrf
@@ -19,6 +20,7 @@ def make_iceflow_parquet(
     target_itrf: str,
     overwrite: bool = False,
     target_epoch: str | None = None,
+    ilvis2_coordinate_set=ILVIS2_DEFAULT_COORDINATE_SET,
 ) -> Path:
     """Create a parquet dataset containing the lat/lon/elev data in `data_dir`.
 
@@ -52,7 +54,10 @@ def make_iceflow_parquet(
     ]
     for subdir in all_subdirs:
         iceflow_filepaths = [path for path in subdir.iterdir() if path.is_file()]
-        iceflow_df = read_iceflow_datafiles(iceflow_filepaths)
+        iceflow_df = read_iceflow_datafiles(
+            iceflow_filepaths,
+            ilvis2_coordinate_set=ilvis2_coordinate_set,
+        )
 
         iceflow_df = transform_itrf(
             data=iceflow_df,
@@ -61,8 +66,6 @@ def make_iceflow_parquet(
         )
 
         # Add a string col w/ dataset name and version.
-        short_name, version = subdir.name.split("_")
-        iceflow_df["dataset"] = [f"{short_name}v{version}"] * len(iceflow_df.latitude)
         common_columns = ["latitude", "longitude", "elevation", "dataset"]
         common_dask_df = dd.from_pandas(iceflow_df[common_columns])
         if parquet_subdir.exists():

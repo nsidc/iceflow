@@ -21,6 +21,10 @@ from nsidc.iceflow import (
     find_iceflow_data,
     make_iceflow_parquet,
 )
+from nsidc.iceflow.data.ilvis2 import (
+    ILVIS2_COORDINATE_SETS,
+    ILVIS2_DEFAULT_COORDINATE_SET,
+)
 from nsidc.iceflow.data.models import (
     BoundingBoxLike,
     Dataset,
@@ -44,8 +48,8 @@ def _fetch_iceflow_df(
     temporal: TemporalRange,
     datasets: list[Dataset] = ALL_SUPPORTED_DATASETS,
     output_dir: Path,
-    # TODO: also add option for target epoch!!
     output_itrf: str | None = None,
+    ilvis2_coordinate_set: ILVIS2_COORDINATE_SETS = ILVIS2_DEFAULT_COORDINATE_SET,
 ):
     """Search for data matching parameters and return an IceflowDataframe.
 
@@ -70,7 +74,9 @@ def _fetch_iceflow_df(
         output_dir=output_dir,
     )
 
-    iceflow_df = read_iceflow_datafiles(downloaded_files)
+    iceflow_df = read_iceflow_datafiles(
+        downloaded_files, ilvis2_coordinate_set=ilvis2_coordinate_set
+    )
 
     if output_itrf is not None:
         iceflow_df = transform_itrf(
@@ -99,6 +105,8 @@ def test_atm1b_ilatm1b(tmp_path):
         output_itrf=target_itrf,
     )
 
+    assert (results_ilatm1b_v1_2009.dataset == "ILATM1Bv1").all()
+
     # Native ITRF is ITRF2008
     results_ilatm1b_v2_2014 = _fetch_iceflow_df(
         datasets=[ILATM1BDataset(version="2")],
@@ -107,6 +115,8 @@ def test_atm1b_ilatm1b(tmp_path):
         output_dir=tmp_path,
         output_itrf=target_itrf,
     )
+
+    assert (results_ilatm1b_v2_2014.dataset == "ILATM1Bv2").all()
 
     complete_df = IceflowDataFrame(
         pd.concat([results_ilatm1b_v1_2009, results_ilatm1b_v2_2014])
@@ -123,14 +133,16 @@ def test_atm1b_blatm1b(tmp_path):
         -65.0,
     )
 
-    results_blamt1b_v2_2014 = _fetch_iceflow_df(
+    results_blamt1b_v1_2014 = _fetch_iceflow_df(
         datasets=[BLATM1BDataset()],
         bounding_box=common_bounding_box,
         temporal=(dt.date(2002, 11, 27), dt.date(2002, 11, 28)),
         output_dir=tmp_path,
     )
 
-    assert (results_blamt1b_v2_2014.ITRF == "ITRF2000").all()
+    assert (results_blamt1b_v1_2014.dataset == "BLATM1Bv1").all()
+
+    assert (results_blamt1b_v1_2014.ITRF == "ITRF2000").all()
 
 
 def test_ivlis2(tmp_path):
@@ -146,6 +158,8 @@ def test_ivlis2(tmp_path):
         output_dir=tmp_path,
     )
 
+    assert (results_v1.dataset == "ILVIS2v1").all()
+
     assert (results_v1.ITRF == "ITRF2000").all()
 
     results_v2 = _fetch_iceflow_df(
@@ -160,12 +174,36 @@ def test_ivlis2(tmp_path):
         output_dir=tmp_path,
     )
 
+    assert (results_v2.dataset == "ILVIS2v2").all()
+
     assert (results_v2.ITRF == "ITRF2008").all()
 
     # test that v1 and 2 can be concatenated
     complete_df = IceflowDataFrame(pd.concat([results_v1, results_v2]))
 
     assert complete_df is not None
+
+    # Confirm that we get the alt. set of ilvis2 coordinates when specified.
+    results_v2_alt_coords = _fetch_iceflow_df(
+        datasets=[ILVIS2Dataset(version="2")],
+        bounding_box=(
+            -180,
+            60.0,
+            180,
+            90,
+        ),
+        temporal=(dt.datetime(2017, 8, 25, 0), dt.datetime(2017, 8, 25, 14, 30)),
+        output_dir=tmp_path,
+        ilvis2_coordinate_set="highest_signal",
+    )
+    assert (results_v2_alt_coords.latitude == results_v2_alt_coords.TLAT).all()
+    assert (results_v2_alt_coords.longitude == results_v2_alt_coords.TLON).all()
+    assert (results_v2_alt_coords.elevation == results_v2_alt_coords.ZT).all()
+
+    # Results v1 should use the default ("low_mode")
+    assert (results_v2.latitude == results_v2.GLAT).all()
+    assert (results_v2.longitude == results_v2.GLON).all()
+    assert (results_v2.elevation == results_v2.ZG).all()
 
 
 def test_glah06(tmp_path):
@@ -186,6 +224,7 @@ def test_glah06(tmp_path):
         output_dir=tmp_path,
     )
 
+    assert (results.dataset == "GLAH06v034").all()
     assert (results.ITRF == "ITRF2008").all()
 
 
