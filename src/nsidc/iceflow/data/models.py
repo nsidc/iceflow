@@ -17,7 +17,10 @@ class CommonDataColumnsSchema(pa.DataFrameModel):
     latitude: Series[float] = pa.Field(coerce=True)
     longitude: Series[float] = pa.Field(coerce=True)
     elevation: Series[float] = pa.Field(coerce=True)
-    dataset: str
+    # In practice, "dataset" is always available to provide provenance on where
+    # each point comes from, but we mark it as optional here because it is not
+    # strictly necessary for e.g., ITRF transformations.
+    dataset: str | None
 
 
 class ATM1BSchema(CommonDataColumnsSchema):
