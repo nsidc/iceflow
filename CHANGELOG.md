@@ -10,7 +10,7 @@
 - Update documentation around ILVIS2 datasets and their multiple tuplets of
   lat/lon/elev fields.
 - Update data model for `IceflowDataFrame` to include `dataset`, which gives the
-  dataset short name and version as a string (e.g,. ILVIS v2 is "ILVISv2").
+  dataset short name and version as a string (e.g., ILVIS v2 is "ILVISv2").
 
 # v1.0.0
 
