@@ -327,7 +327,7 @@ def _infer_qfit_itrf(filepath: Path) -> str:
     From which we extract an ITRF of `ITRF2005` from the `_itrf05_` bit.
 
     According to Michael Studinger (see
-    https://github.com/nsidc/iceflow/issues/35#issuecomment-2408619586), This
+    https://github.com/nsidc/nsidc-iceflow/issues/35#issuecomment-2408619586), This
     string represents the "GPS trajectory that was used to reference the lidar
     data and that has the ITRF epoch in its file name."
     """

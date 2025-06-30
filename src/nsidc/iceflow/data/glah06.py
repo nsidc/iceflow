@@ -247,7 +247,7 @@ def glah06_data(filepath: Path) -> GLAH06DataFrame:
 
     # Add the ITRF
     df["ITRF"] = GLAH06_ITRF
-    # To be consistent with the other `iceflow` datasets, copy the primary
+    # To be consistent with the other `nsidc-iceflow` datasets, copy the primary
     # lat/lon/elev fields to the standard "latitude", "longitude", "elevation"
     # field names.
     df["latitude"] = df["d_lat"]

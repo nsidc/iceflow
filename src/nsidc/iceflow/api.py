@@ -1,4 +1,4 @@
-"""Module with functions defining the user-facing API for iceflow."""
+"""Module with functions defining the user-facing API for nsidc-iceflow."""
 
 from __future__ import annotations
 

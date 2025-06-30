@@ -69,7 +69,7 @@ def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
     """
     # The `+inv` reverses the transformation. So `+init=ITRF2014:ITRF2008`
     # performs a helmert transform from ITRF2008 to ITRF2014.  This is the most
-    # common case for `iceflow`, because we tend to be targeting pre-icesat2
+    # common case for `nsidc-iceflow`, because we tend to be targeting pre-icesat2
     # data for transformation to ITRF2014 (icesat2), so try this first.
     inv_itrf_transformation_step = f"+step +inv +init={target_itrf}:{source_itrf}"
     if _check_valid_proj_step(inv_itrf_transformation_step):

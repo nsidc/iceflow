@@ -44,7 +44,7 @@ Available tasks:
 
 ## Jupyter Notebooks
 
-There are Jupyter Notebooks showing `iceflow` functionality under
+There are Jupyter Notebooks showing `nsidc-iceflow` functionality under
 `docs/notebooks/`.
 
 To get started with developing existing or new notebooks, first install the

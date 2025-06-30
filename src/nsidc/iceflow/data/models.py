@@ -131,7 +131,7 @@ class GLAH06Schema(CommonDataColumnsSchema):
     # group. There is also a "Data_1HZ" group, which contains similar variables,
     # but does not include the elevation data and appears to be a downsampled
     # version of the "Data_40HZ" group. See
-    # https://github.com/nsidc/iceflow/issues/43.
+    # https://github.com/nsidc/nsidc-iceflow/issues/43.
     i_rec_ndx: Series[int] = pa.Field(coerce=True)
     i_shot_count: Series[int] = pa.Field(coerce=True)
     d_lat: Series[float]

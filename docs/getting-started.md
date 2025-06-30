@@ -1,26 +1,27 @@
-# Getting started with iceflow
+# Getting started with `nsidc-iceflow`
 
 ## Altimetry Overview
 
-Before working with `iceflow` directly, it may be helpful to understand the
-basics about pre-IceBridge, IceBridge, ICESat/GLAS and ICESat-2 datasets. Learn
-about these `iceflow` supported datasets in
+Before working with `nsidc-iceflow` directly, it may be helpful to understand
+the basics about pre-IceBridge, IceBridge, ICESat/GLAS and ICESat-2 datasets.
+Learn about these `nsidc-iceflow` supported datasets in
 [Altimetry Data at the NSIDC DAAC: Point Cloud Data Overview](./altimetry-data-overview)
 
 ## Jupyter Notebooks
 
-Executable Jupyter Notebooks provide a great starting point for using `iceflow`.
-See [Jupyter Notebooks](./notebooks/index.md) for more information.
+Executable Jupyter Notebooks provide a great starting point for using
+`nsidc-iceflow`. See [Jupyter Notebooks](./notebooks/index.md) for more
+information.
 
 ## API overview
 
-`iceflow` provides a simple API for finding, downloading, and accessing
+`nsidc-iceflow` provides a simple API for finding, downloading, and accessing
 iceflow-supported datasets.
 
 ### Finding data
 
-To find `iceflow`-supported data for an area of interest and timeframe, use
-[`find_iceflow_data`](nsidc.iceflow.find_iceflow_data):
+To find `nsidc-iceflow`-supported data for an area of interest and timeframe,
+use [`find_iceflow_data`](nsidc.iceflow.find_iceflow_data):
 
 ```
 import datetime as dt
@@ -54,7 +55,7 @@ search_results = find_iceflow_data(
 
 ```
 
-`iceflow` currently supports the following datasets:
+`nsidc-iceflow` currently supports the following datasets:
 
 | Dataset                                                  | Temporal Coverage             |
 | -------------------------------------------------------- | ----------------------------- |
@@ -139,7 +140,7 @@ crash if physical memory limits are exceeded.
 
 Users of ILVIS2 data should be aware that ILVIS2 data contains multiple sets of
 lat/lon/elev that may be of interest. By default, the `low_mode` set is used as
-the primary set of latitude/longitude/elevation used by `iceflow`.
+the primary set of latitude/longitude/elevation used by `nsidc-iceflow`.
 
 See [ILVIS2 data](./altimetry-data-overview.md#ilvis2-data) for more
 information.

@@ -1,4 +1,4 @@
-# iceflow
+# `nsidc-iceflow`
 
 ```{toctree}
 :maxdepth: 2
