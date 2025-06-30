@@ -91,7 +91,7 @@ pulses are used to determine elevation data.
 ```{note}
 
 We recommend using the [_icepyx_](https://github.com/icesat2py/icepyx)
-library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `iceflow` in the [Using iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
+library to access and interact with ICESat-2 data. Learn more about using `icepyx` with `nsidc-iceflow` in the [Using nsidc-iceflow with icepyx to Generate an Elevation Timeseries](notebooks/iceflow-with-icepyx) Jupyter notebook.
 
 ```
 
@@ -148,7 +148,7 @@ ILVIS V2 data:
 
 - `TLAT`/`TLON`/`ZT`, which represent the highest detected signal.
 
-By default, `iceflow` will use `GLAT`/`GLON`/`GZ` as the primary
+By default, `nsidc-iceflow` will use `GLAT`/`GLON`/`GZ` as the primary
 latitude/longitude/elevation fields in `IceflowDataFrame`s. Use the
 `ilvis2_coordinate_set` kwarg on `read_iceflow_datafile(s)` or
 `make_iceflow_parquet` to select an different primary set of
@@ -182,14 +182,14 @@ these missions presents several challenges:
   and longitude is the same. These changes in geolocation need to be reconciled
   to allow meaningful comparisons within the long-term data record.
 
-The `iceflow` Python library addresses these concerns by providing the ability
-to search, download, and access laser altimetry data from (pre-)Operation
-IceBridge and ICESat/GLAS datasets. The library also supports International
-Terrestrial Reference Frame (ITRF) transformations to facilitate comparisons
-across datasets.
+The `nsidc-iceflow` Python library addresses these concerns by providing the
+ability to search, download, and access laser altimetry data from
+(pre-)Operation IceBridge and ICESat/GLAS datasets. The library also supports
+International Terrestrial Reference Frame (ITRF) transformations to facilitate
+comparisons across datasets.
 
 Companion Jupyter notebooks give additional information and contain example code
-about `iceflow`.
+about `nsidc-iceflow`.
 
 [NSIDC Iceflow example](./notebooks/iceflow-example) provides an example of how
 to search for, download, and interact with `ILATM1B v1` data for a small area of
@@ -199,13 +199,13 @@ datasets. To learn more about ITRF transformations, see the
 [Applying Coordinate Transformations to Facilitate Data Comparison](./notebooks/corrections)
 notebook.
 
-[Using iceflow with icepyx to Generate an Elevation Timeseries](./notebooks/iceflow-with-icepyx)
+[Using nsidc-iceflow with icepyx to Generate an Elevation Timeseries](./notebooks/iceflow-with-icepyx)
 shows how to search for, download, and interact with a large amount of data
-across many datasets supported by `iceflow`. It also illustrates how to utilize
-[icepyx](https://icepyx.readthedocs.io/en/latest/) to find and access ICESat-2
-data. Finally, the notebook provides a simple time-series analysis for elevation
-change over an area of interest across `iceflow` supported datasets and
-ICESat-2.
+across many datasets supported by `nsidc-iceflow`. It also illustrates how to
+utilize [icepyx](https://icepyx.readthedocs.io/en/latest/) to find and access
+ICESat-2 data. Finally, the notebook provides a simple time-series analysis for
+elevation change over an area of interest across `nsidc-iceflow` supported
+datasets and ICESat-2.
 
 ## References
 
@@ -227,4 +227,4 @@ ICESat-2.
 With the knowledge gained from reading this page, users should be prepared for
 the [NSIDC Iceflow example](./notebooks/iceflow-example) notebook, which
 provides an example of how to search for, download, and interact with
-`ILATM1B v1` data for a small area of interest with the `iceflow` library.
+`ILATM1B v1` data for a small area of interest with the `nsidc-iceflow` library.

@@ -39,10 +39,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/NSIDC/iceflow"
-"Bug Tracker" = "https://github.com/NSIDC/iceflow/issues"
-Discussions = "https://github.com/NSIDC/iceflow/discussions"
-Changelog = "https://github.com/NSIDC/iceflow/releases"
+Homepage = "https://github.com/NSIDC/nsidc-iceflow"
+"Bug Tracker" = "https://github.com/NSIDC/nsidc-iceflow/issues"
+Discussions = "https://github.com/NSIDC/nsidc-iceflow/discussions"
+Changelog = "https://github.com/NSIDC/nsidc-iceflow/releases"
 
 [project.optional-dependencies]
 dev = [
@@ -196,7 +196,7 @@ commit = false
 tag = false
 
 [[tool.bumpversion.files]]
-filename = "src/nsidc/iceflow/__init__.py"
+filename = "src/nsidc/nsidc-iceflow/__init__.py"
 search   = '__version__ = "v{current_version}"'
 replace  = '__version__ = "v{new_version}"'
 

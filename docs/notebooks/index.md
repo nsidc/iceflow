@@ -11,13 +11,13 @@
 ```
 
 [Jupyter notebooks](https://docs.jupyter.org/en/latest/) provide executable
-examples of how to use `iceflow`.
+examples of how to use `nsidc-iceflow`.
 
 ## Prerequisites
 
-The `iceflow` notebooks are best approached with some familiarity with Python
-and its geoscience stack. If you feel like learning more about geoscience and
-Python, you can find great tutorials by CU Boulder's Earth Lab here:
+The `nsidc-iceflow` notebooks are best approached with some familiarity with
+Python and its geoscience stack. If you feel like learning more about geoscience
+and Python, you can find great tutorials by CU Boulder's Earth Lab here:
 [Data Exploration and Analysis Lessons](https://www.earthdatascience.org/tags/data-exploration-and-analysis/)
 or by the Data Carpentry project:
 [Introduction to Geospatial Concepts](https://datacarpentry.org/organization-geospatial/)
@@ -36,7 +36,7 @@ Some Python packages/libraries that users may consider investigating include:
   lazy Out-of-Core dataframes (similar to _pandas_), to visualize and explore
   big tabular data sets
 
-## Iceflow notebooks
+## `nsidc-iceflow` notebooks
 
 - [NSIDC Iceflow example](./iceflow-example) provides an example of how to
   search for, download, and interact with `ILATM1B v1` data for a small area of
@@ -46,16 +46,16 @@ Some Python packages/libraries that users may consider investigating include:
   [Applying Coordinate Transformations to Facilitate Data Comparison](./corrections)
   notebook.
 
-- [Using iceflow with icepyx to Generate an Elevation Timeseries](./iceflow-with-icepyx)
+- [Using nsidc-iceflow with icepyx to Generate an Elevation Timeseries](./iceflow-with-icepyx)
   shows how to search for, download, and interact with a large amount of data
-  across many datasets supported by `iceflow`. It also illustrates how to
+  across many datasets supported by `nsidc-iceflow`. It also illustrates how to
   utilize [icepyx](https://icepyx.readthedocs.io/en/latest/) to find and access
   ICESat-2 data. Finally, the notebook provides a simple time-series analysis
-  for elevation change over an area of interest across `iceflow` supported
+  for elevation change over an area of interest across `nsidc-iceflow` supported
   datasets and ICESat-2.
 
-### Downloading Iceflow notebooks
+### Downloading `nsidc-iceflow` notebooks
 
-Users may wish to try executing the Iceflow notebooks themselves. Iceflow
-notebooks can be downloaded
-[from GitHub](https://github.com/nsidc/iceflow/tree/main/docs/notebooks/).
+Users may wish to try executing the `nsidc-iceflow` notebooks themselves.
+Iceflow notebooks can be downloaded
+[from GitHub](https://github.com/nsidc/nsidc-iceflow/tree/main/docs/notebooks/).

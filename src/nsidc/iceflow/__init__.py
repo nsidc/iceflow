@@ -3,7 +3,7 @@ Copyright (c) 2025 NSIDC. All rights reserved.
 
 iceflow: Harmonized access to (pre)OIB/IceSAT/IceSAT2 data
 
-Users interact with `iceflow` by:
+Users interact with `nsidc-iceflow` by:
 
 * Searching for data that match an area of interest/time (`find_iceflow_data`)
 * Downloading data (`download_iceflow_results`)

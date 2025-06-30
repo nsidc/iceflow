@@ -2,13 +2,13 @@
   <img alt="NSIDC logo" src="https://nsidc.org/themes/custom/nsidc/logo.svg" width="150" />
 </p>
 
-# Iceflow Python Library
+# `nsidc-iceflow` Python Library
 
-`iceflow` is a Python library that provides the ability to search, download, and
-access laser altimetry data from (pre-)Operation IceBridge and ICESat/GLAS
-datasets. The library also supports International Terrestrial Reference Frame
-(ITRF) transformations to facilitate comparisons across datasets. `iceflow`
-supports the following datasets:
+`nsidc-iceflow` is a Python library that provides the ability to search,
+download, and access laser altimetry data from (pre-)Operation IceBridge and
+ICESat/GLAS datasets. The library also supports International Terrestrial
+Reference Frame (ITRF) transformations to facilitate comparisons across
+datasets. `nsidc-iceflow` supports the following datasets:
 
 | Dataset                                                  | Temporal Coverage             |
 | -------------------------------------------------------- | ----------------------------- |
@@ -26,12 +26,12 @@ submissions and pull requests in order to foster community contribution. We will
 strive to respond to contributions in a timely manner, but make no guarantees.
 
 If you discover any problems or bugs, please submit an
-[Issue](https://github.com/nsidc/iceflow/issues/new).
+[Issue](https://github.com/nsidc/nsidc-iceflow/issues/new).
 
 If you would like to contribute to this repository, you may fork the repository
 and submit a pull request. See our
 [contributing documentation](https://iceflow.readthedocs.io/en/latest/contributing.html)
-for more information about how to contribute to `iceflow`.
+for more information about how to contribute to `nsidc-iceflow`.
 
 See the [LICENSE](./LICENSE) for details on permissions and warranties. Please
 contact nsidc@nsidc.org for more information.
@@ -49,11 +49,11 @@ contact nsidc@nsidc.org for more information.
 pip install nsidc-iceflow
 ```
 
-### Using `iceflow`
+### Using `nsidc-iceflow`
 
 See
-[Getting started with iceflow](https://iceflow.readthedocs.io/en/latest/getting-started.html)
-for information and examples about how to use `iceflow`.
+[Getting started with `nsidc-iceflow`](https://iceflow.readthedocs.io/en/latest/getting-started.html)
+for information and examples about how to use `nsidc-iceflow`.
 
 ## Credit
 
