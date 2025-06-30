@@ -95,6 +95,42 @@ def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
     raise RuntimeError(err_msg)
 
 
+def _get_pmm_transform_step(
+    data: IceflowDataFrame,
+    target_itrf: str,
+    target_epoch: str | None,
+    plate: str | None,
+):
+    """Perform coordinate propagation to the target epoch using a proj-provided plate
+    motion model (PMM).
+
+    This step uses the target_itrf's init file to lookup the associated plate's
+    PMM parameters. For example, ITRF2014 parameters are defined here:
+    https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
+    The step is inverted because proj defined `t_epoch` as the "central epoch" -
+    not the "target epoch". The transformation uses a delta defined by
+    `t_observed - t_epoch` that are applied to the PMM's rate of change to
+    propagate the point into the past/future. See
+    https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
+    for more information.  For example, if a point's observation date
+    (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch is 2011.0
+    (2011-01-01T00:00:00), then the delta is 1993 - 2011: -18. We need to invert
+    the step so that the point is propagated forward in time, from 1993 to 2011.
+    """
+    plate_model_step = ""
+    if target_epoch:
+        if not plate:
+            plate = plate_name(Point(data.longitude.mean(), data.latitude.mean()))
+        plate_model_step = (
+            f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch}"
+        )
+        if not _check_valid_proj_step(plate_model_step):
+            err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
+            raise RuntimeError(err_msg)
+
+    return plate_model_step
+
+
 @pa.check_types()
 def transform_itrf(
     data: IceflowDataFrame,
@@ -152,34 +188,13 @@ def transform_itrf(
             transformed_chunks.append(chunk)
             continue
 
-        plate_model_step = ""
-        if target_epoch:
-            if not plate:
-                plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
-            plate_model_step = (
-                # Perform coordinate propagation to the target epoch using the
-                # provided plate motion model (PMM).
-                # This step uses the target_itrf's init file to lookup the
-                # associated plate's PMM parameters. For example, ITRF2014
-                # parameters are defined here:
-                # https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
-                # The step is inverted because proj defined `t_epoch` as the
-                # "central epoch" - not the "target epoch. The transformation
-                # uses a delta defined by `t_observed - t_epoch` that are
-                # applied to the PMM's rate of change to propagate the point
-                # into the past/future. See
-                # https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
-                # for more information.
-                # For example, if a point's observation date
-                # (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch
-                # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
-                # 2011: -18. We need to invert the step so that the point is
-                # propagated forward in time, from 1993 to 2011.
-                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch}"
-            )
-            if not _check_valid_proj_step(plate_model_step):
-                err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
-                raise RuntimeError(err_msg)
+        chunk = cast(IceflowDataFrame, chunk)
+        plate_model_step = _get_pmm_transform_step(
+            chunk,
+            target_itrf,
+            target_epoch,
+            plate,
+        )
 
         itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
 
