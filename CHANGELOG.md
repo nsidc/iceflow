@@ -1,3 +1,12 @@
+# v1.2.0
+
+- Add support to `transform_itrf` for PMM models using Origin Rate Bias (ORB)
+  parameters. By default, `transform_itrf` will use ORB parameters for the
+  selected PMM, if available (e.g., ITRF2020 and ITRF2008 init files have ORB
+  parameters defined; ITRF2014 has no ORB parameter sets), for the horizontal
+  component of each point (`longitude` and `latitude`). The vertical component
+  (`elevation`) will be transformed without ORB parameters applied.
+
 # v1.1.0
 
 - Support selecting alternative lat/lon/elev triplet as primary lat/lon/elev

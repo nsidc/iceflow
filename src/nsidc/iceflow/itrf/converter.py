@@ -95,6 +95,122 @@ def _itrf_transformation_step(source_itrf: str, target_itrf: str) -> str:
     raise RuntimeError(err_msg)
 
 
+def _get_pmm_transform_step(
+    data: IceflowDataFrame,
+    target_itrf: str,
+    target_epoch: str | None,
+    plate: str | None,
+    pmm_use_orb: bool,
+):
+    """Perform coordinate propagation to the target epoch using a proj-provided plate
+    motion model (PMM).
+
+    This step uses the target_itrf's init file to lookup the associated plate's
+    PMM parameters. For example, ITRF2014 parameters are defined here:
+    https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
+    The step is inverted because proj defined `t_epoch` as the "central epoch" -
+    not the "target epoch". The transformation uses a delta defined by
+    `t_observed - t_epoch` that are applied to the PMM's rate of change to
+    propagate the point into the past/future. See
+    https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
+    for more information.  For example, if a point's observation date
+    (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch is 2011.0
+    (2011-01-01T00:00:00), then the delta is 1993 - 2011: -18. We need to invert
+    the step so that the point is propagated forward in time, from 1993 to 2011.
+
+    If `pmm_use_orb` is `True`, then this function will use Origin Rate Bias (ORB)
+    parameters for the selected PMM, if available (e.g., ITRF2020 and ITRF2008
+    init files have ORB parameters defined; ITRF2014 has no ORB parameter sets).
+    """
+    plate_model_step = ""
+    if not target_epoch:
+        return plate_model_step
+
+    if not plate:
+        plate = plate_name(Point(data.longitude.mean(), data.latitude.mean()))
+
+    if pmm_use_orb:
+        plate_model_name = f"{plate}_T"
+        plate_model_step = (
+            f"+step +inv +init={target_itrf}:{plate_model_name} +t_epoch={target_epoch}"
+        )
+
+        # If the step is valid, then return the step as-is. Otherwise, fallback
+        # on the non-ORB step.
+        if _check_valid_proj_step(plate_model_step):
+            return plate_model_step
+
+    plate_model_name = f"{plate}"
+    plate_model_step = (
+        f"+step +inv +init={target_itrf}:{plate_model_name} +t_epoch={target_epoch}"
+    )
+
+    if not _check_valid_proj_step(plate_model_step):
+        err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate_model_name}"
+        raise RuntimeError(err_msg)
+
+    return plate_model_step
+
+
+def _run_itrf_pipeline(
+    data: IceflowDataFrame,
+    itrf_transformation_step: str,
+    plate_model_step: str,
+    target_itrf: str,
+):
+    pipeline = (
+        # This initializes the pipeline and declares the use of the WGS84
+        # ellipsoid for all of the following steps. See
+        # https://proj.org/en/9.5/operations/pipeline.html.
+        f"+proj=pipeline +ellps=WGS84 "
+        # Performs unit conversion from lon/lat degrees to radians.
+        # TODO: This step appears to be unnecessary. Removing it does not appear to
+        # affect the output. The following steps require that the
+        # coordinates be geodedic, which could be radians or degrees.
+        f"+step +proj=unitconvert +xy_in=deg +xy_out=rad "
+        # This step explicitly sets the projection as lat/lon. It won't
+        # change the coordinates, but they will be identified as geodetic,
+        # which is necessary for the next steps.
+        f"+step +proj=latlon "
+        # Convert from lat/lon/elev geodetic coordinates to cartesian
+        # coordinates, which are required for the following steps.
+        # See: https://proj.org/en/9.5/operations/conversions/cart.html
+        f"+step +proj=cart "
+        # ITRF transformation. See above for definition.
+        f"{itrf_transformation_step} "
+        # See above for definition.
+        f"{plate_model_step} "
+        # Convert back from cartesian to lat/lon coordinates
+        f"+step +inv +proj=cart "
+        # Convert lon/lat from radians back to degrees.
+        # TODO: remove this if the initial conversion to radians above is not needed
+        f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
+    )
+
+    transformer = pyproj.Transformer.from_pipeline(pipeline)
+
+    decimalyears = (
+        data.reset_index().utc_datetime.apply(_datetime_to_decimal_year).to_numpy()
+    )
+    # TODO: Should we create a new decimalyears when doing an epoch
+    # propagation since PROJ doesn't do this?
+
+    lons, lats, elevs, _ = transformer.transform(
+        data.longitude,
+        data.latitude,
+        data.elevation,
+        decimalyears,
+    )
+
+    transformed_data = data.copy()
+    transformed_data["latitude"] = lats
+    transformed_data["longitude"] = lons
+    transformed_data["elevation"] = elevs
+    transformed_data["ITRF"] = target_itrf
+
+    return transformed_data
+
+
 @pa.check_types()
 def transform_itrf(
     data: IceflowDataFrame,
@@ -104,6 +220,10 @@ def transform_itrf(
     # is given but the plate name is not, each source ITRF is grouped together
     # and the mean of that chunk is used to determine the plate name.
     plate: str | None = None,
+    # Optional toggle for using ORB parameters, when available.
+    # Defaults to `True` because this is recommended per the PMM authors. See
+    # https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2023GL106373.
+    pmm_use_orb: bool = True,
 ) -> IceflowDataFrame:
     """Transform the data's latitude/longitude/elevation variables from the
     source ITRF to the target ITRF.
@@ -117,6 +237,13 @@ def transform_itrf(
     years. Note that not all ITRFs have PMMs defined for them. The PMM used is
     defined for the target_epoch, so it is likely to be most accurate for points
     observed near the ITRF's defined epoch.
+
+    If `pmm_use_orb` is `True`, then this function will use Origin Rate Bias (ORB)
+    parameters for the selected PMM, if available (e.g., ITRF2020 and ITRF2008
+    init files have ORB parameters defined; ITRF2014 has no ORB parameter sets),
+    for the horizontal component of each point (`longitude` and `latitude`). The
+    vertical component (`elevation`) will be transformed without ORB parameters
+    applied.
 
     All ITRF and PMM transformations are dependent on the user's `proj`
     installation's ITRF init files (see
@@ -135,6 +262,7 @@ def transform_itrf(
     # TLAT/TLON/TZ are only available in ILVIS2v2 data:
     sel_ilvis2v2 = data.dataset == "ILVIS2v2"
     data.loc[sel_ilvis2v2, ["latitude", "longitude", "elevation"]] = data.loc[sel_ilvis2v2, ["TLAT", "TLON", "ZT"]]
+
     ```
     """
     if not check_itrf(target_itrf):
@@ -152,86 +280,50 @@ def transform_itrf(
             transformed_chunks.append(chunk)
             continue
 
-        plate_model_step = ""
-        if target_epoch:
-            if not plate:
-                plate = plate_name(Point(chunk.longitude.mean(), chunk.latitude.mean()))
-            plate_model_step = (
-                # Perform coordinate propagation to the target epoch using the
-                # provided plate motion model (PMM).
-                # This step uses the target_itrf's init file to lookup the
-                # associated plate's PMM parameters. For example, ITRF2014
-                # parameters are defined here:
-                # https://github.com/OSGeo/PROJ/blob/8b65d5b14e2a8fbb8198335019488a2b2968df5c/data/ITRF2014.
-                # The step is inverted because proj defined `t_epoch` as the
-                # "central epoch" - not the "target epoch. The transformation
-                # uses a delta defined by `t_observed - t_epoch` that are
-                # applied to the PMM's rate of change to propagate the point
-                # into the past/future. See
-                # https://proj.org/en/9.5/operations/transformations/helmert.html#mathematical-description
-                # for more information.
-                # For example, if a point's observation date
-                # (`t_observed`) is 1993.0 (1993-01-01T00:00:00) and the t_epoch
-                # is 2011.0 (2011-01-01T00:00:00), then the delta is 1993 -
-                # 2011: -18. We need to invert the step so that the point is
-                # propagated forward in time, from 1993 to 2011.
-                f"+step +inv +init={target_itrf}:{plate} +t_epoch={target_epoch}"
-            )
-            if not _check_valid_proj_step(plate_model_step):
-                err_msg = f"Failed to find pre-defined plate-model parameters for {target_itrf}:{plate}"
-                raise RuntimeError(err_msg)
-
         itrf_transformation_step = _itrf_transformation_step(source_itrf, target_itrf)
 
-        pipeline = (
-            # This initializes the pipeline and declares the use of the WGS84
-            # ellipsoid for all of the following steps. See
-            # https://proj.org/en/9.5/operations/pipeline.html.
-            f"+proj=pipeline +ellps=WGS84 "
-            # Performs unit conversion from lon/lat degrees to radians.
-            # TODO: This step appears to be unnecessary. Removing it does not appear to
-            # affect the output. The following steps require that the
-            # coordinates be geodedic, which could be radians or degrees.
-            f"+step +proj=unitconvert +xy_in=deg +xy_out=rad "
-            # This step explicitly sets the projection as lat/lon. It won't
-            # change the coordinates, but they will be identified as geodetic,
-            # which is necessary for the next steps.
-            f"+step +proj=latlon "
-            # Convert from lat/lon/elev geodetic coordinates to cartesian
-            # coordinates, which are required for the following steps.
-            # See: https://proj.org/en/9.5/operations/conversions/cart.html
-            f"+step +proj=cart "
-            # ITRF transformation. See above for definition.
-            f"{itrf_transformation_step} "
-            # See above for definition.
-            f"{plate_model_step} "
-            # Convert back from cartesian to lat/lon coordinates
-            f"+step +inv +proj=cart "
-            # Convert lon/lat from radians back to degrees.
-            # TODO: remove this if the initial conversion to radians above is not needed
-            f"+step +proj=unitconvert +xy_in=rad +xy_out=deg"
+        chunk = cast(IceflowDataFrame, chunk)
+
+        plate_model_step = _get_pmm_transform_step(
+            chunk,
+            target_itrf,
+            target_epoch,
+            plate,
+            pmm_use_orb=False,
         )
 
-        transformer = pyproj.Transformer.from_pipeline(pipeline)
-
-        decimalyears = (
-            chunk.reset_index().utc_datetime.apply(_datetime_to_decimal_year).to_numpy()
-        )
-        # TODO: Should we create a new decimalyears when doing an epoch
-        # propagation since PROJ doesn't do this?
-
-        lons, lats, elevs, _ = transformer.transform(
-            chunk.longitude,
-            chunk.latitude,
-            chunk.elevation,
-            decimalyears,
+        transformed_chunk = _run_itrf_pipeline(
+            chunk,
+            itrf_transformation_step,
+            plate_model_step,
+            target_itrf,
         )
 
-        transformed_chunk = chunk.copy()
-        transformed_chunk["latitude"] = lats
-        transformed_chunk["longitude"] = lons
-        transformed_chunk["elevation"] = elevs
-        transformed_chunk["ITRF"] = target_itrf
+        if pmm_use_orb:
+            plate_model_step_with_orb = _get_pmm_transform_step(
+                chunk,
+                target_itrf,
+                target_epoch,
+                plate,
+                pmm_use_orb=True,
+            )
+
+            # The ORB params are available if the resulting step is different.
+            if plate_model_step_with_orb != plate_model_step:
+                orb_transformed_chunk = _run_itrf_pipeline(
+                    chunk,
+                    itrf_transformation_step,
+                    plate_model_step_with_orb,
+                    target_itrf,
+                )
+                # Transform only the lat/lon elements, per
+                # Z. Altamimi et. al. 2023 (https://doi.org/10.1029/2023GL106373):
+                # > it is recommended to ignore the artifactual vertical component of the
+                # > predicted velocities resulting from the addition of the ORB, and to only
+                # > consider the horizontal components of the predicted velocities.
+                transformed_chunk["latitude"] = orb_transformed_chunk.latitude
+                transformed_chunk["longitude"] = orb_transformed_chunk.longitude
+
         transformed_chunks.append(transformed_chunk)
 
     transformed_df = pd.concat(transformed_chunks)
