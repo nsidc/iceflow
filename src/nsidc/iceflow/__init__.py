@@ -33,7 +33,7 @@ from nsidc.iceflow.data.supported_datasets import (
 )
 from nsidc.iceflow.itrf.converter import transform_itrf
 
-__version__ = "v1.1.0"
+__version__ = "v1.2.0"
 
 
 __all__ = [
